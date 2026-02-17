@@ -1,0 +1,771 @@
+personal:
+  first_name: Jie
+  last_name: Gao
+  email: jgao77@jh.edu
+  phone: +1 (410)710-0555
+  website: https://gaojie058.github.io
+  orcid: 0000-0001-5992-6471
+  nationality: Chinese
+address:
+  street: 3501 Saint Paul Street, APT521
+  city: Baltimore
+  state: Maryland
+  zip: '21218'
+  country: United States
+current_position:
+  title: Malone Postdoctoral Fellow
+  institution: Johns Hopkins University
+  department: Department of Computer Science
+  centers:
+  - Malone Center for Engineering in Healthcare
+  - Center for Language and Speech Processing
+availability:
+  intended_start_date: 2026-08-12
+  notice_period: 6 months
+  availability_note: Intended start date is 6 months from application submission date
+research_interests:
+  primary:
+  - Human-AI Collaboration
+  - Human-Centered AI
+  secondary:
+  - Responsible and Trustworthy AI
+  - AI-Assisted Qualitative Data Analysis
+  tertiary:
+  - Human Aspects of Software Engineering
+  - Computational Social Science
+education:
+- degree: Ph.D.
+  field: Information Systems Technology and Design
+  institution: Singapore University of Technology and Design
+  country: Singapore
+  start_year: 2019
+  start_month: September
+  end_year: 2024
+  end_month: January
+  thesis: Tool Support for Human-AI Collaboration in Qualitative Data Analysis
+  advisor: Simon Perrault
+- degree: M.Eng.
+  field: Software Engineering (Information Product Design)
+  institution: Zhejiang University
+  city: Hangzhou
+  country: China
+  start_year: 2017
+  start_month: September
+  end_year: 2019
+  end_month: June
+- degree: B.Eng.
+  field: Digital Media Technology
+  institution: Shanghai University
+  city: Shanghai
+  country: China
+  start_year: 2013
+  start_month: September
+  end_year: 2017
+  end_month: June
+work_experience:
+- title: Malone Postdoctoral Fellow
+  institution: Johns Hopkins University
+  location: Baltimore, MD, USA
+  start_year: 2025
+  start_month: March
+  end_year: null
+  advisors:
+  - Mark Dredze
+  - Ziang Xiao
+  - Chien-Ming Huang
+- title: Postdoctoral Associate
+  institution: Singapore-MIT Alliance for Research and Technology (SMART)
+  location: Singapore
+  start_year: 2024
+  start_month: January
+  end_year: 2025
+  end_month: March
+  advisors:
+  - Thomas W. Malone
+references:
+- first_name: Mark
+  last_name: Dredze
+  name: Mark Dredze
+  title: Professor
+  job_title: Professor
+  institution: Johns Hopkins University
+  department: Department of Computer Science
+  address: Johns Hopkins University, Department of Computer Science
+  suburb: Baltimore
+  city: Baltimore
+  state: Maryland
+  postcode: '21218'
+  country: United States
+  email: mdredze@cs.jhu.edu
+  phone: +1 (410) 516-6786
+  alternate_phone: ''
+- first_name: Thomas
+  last_name: Malone
+  name: Thomas W. Malone
+  title: Professor
+  job_title: Professor
+  institution: Massachusetts Institute of Technology
+  department: ''
+  address: Massachusetts Institute of Technology
+  suburb: Cambridge
+  city: Cambridge
+  state: Massachusetts
+  postcode: 02139
+  country: United States
+  email: malone@mit.edu
+  phone: +1 (617) 253-6843
+  alternate_phone: ''
+- first_name: Simon
+  last_name: Perrault
+  name: Simon Perrault
+  title: Professor
+  job_title: Professor
+  institution: Telecom Paris, Institut Polytechnique de Paris
+  department: ''
+  address: Telecom Paris, Institut Polytechnique de Paris
+  suburb: Palaiseau
+  city: Palaiseau
+  state: Île-de-France
+  postcode: '91120'
+  country: France
+  email: simon.perrault@telecom-paris.fr
+  phone: +33 664871217
+  alternate_phone: ''
+- first_name: Ziang
+  last_name: Xiao
+  name: Ziang Xiao
+  title: Assistant Professor
+  job_title: Assistant Professor
+  institution: Johns Hopkins University
+  department: ''
+  address: Johns Hopkins University
+  suburb: Baltimore
+  city: Baltimore
+  state: Maryland
+  postcode: '21218'
+  country: United States
+  email: ziang.xiao@jhu.edu
+  phone: +1 (217)281-2005
+  alternate_phone: ''
+- first_name: Toby
+  last_name: Li
+  name: Toby Jia-Jun Li
+  title: Assistant Professor
+  job_title: Assistant Professor
+  institution: University of Notre Dame
+  department: ''
+  address: University of Notre Dame
+  suburb: Notre Dame
+  city: Notre Dame
+  state: Indiana
+  postcode: '46556'
+  country: United States
+  email: toby.j.li@nd.edu
+  phone: +1 (574) 631-5375
+  alternate_phone: ''
+- first_name: Chien-Ming
+  last_name: Huang
+  name: Chien-Ming Huang
+  title: Associate Professor
+  job_title: Associate Professor
+  institution: Johns Hopkins University
+  department: ''
+  address: Johns Hopkins University
+  suburb: Baltimore
+  city: Baltimore
+  state: Maryland
+  postcode: '21218'
+  country: United States
+  email: chienming.huang@jhu.edu
+  phone: ''
+  alternate_phone: ''
+honors:
+- year: 2024
+  award: Malone Postdoctoral Fellowship
+  institution: Johns Hopkins University
+- year: 2019
+  award: SUTD PhD Fellowship
+  institution: Singapore University of Technology and Design
+learned_fields:
+  title:
+    value: Prof.
+    label: Title
+  pronouns:
+    value: She/her/hers
+    label: 'Pronouns:'
+  gender_optional:
+    value: Woman
+    label: 'Gender (optional):'
+  country:
+    value: ''
+    label: Country
+  state_district:
+    value: Maryland
+    label: State / District:*
+  nationality:
+    value: Chinese
+    label: Nationality*
+  suburb:
+    value: Baltimore
+    label: Suburb:*
+  first_name:
+    value: Simon
+    label: First name:*
+  last_name:
+    value: Perrault
+    label: Last name:*
+  name_in_use:
+    value: ''
+    label: Name in use - A name in use is a name that a person uses which is different
+      to their legal given name. A person's name in use can be changed at any time
+      without evidence.:*
+  email_address:
+    value: simon.perrault@telecom-paris.fr
+    label: Email address:*
+  home_address:
+    value: 3501 Saint Paul Street, APT521
+    label: Home address:*
+  postcode_zip:
+    value: '21218'
+    label: PostCode/Zip:*
+  phone_number:
+    value: +1 (410)710-0555
+    label: Phone number:*
+  mobile_number:
+    value: +1 (410)710-0555
+    label: 'Mobile number:'
+  work_status_with_monash:
+    value: Never employed as a Casual, Sessional or Visitor at Monash University
+    label: 'Work Status with Monash:'
+  'yes':
+    value: Yes||2813|
+    label: 'Yes'
+  home_address_line_two:
+    value: ''
+    label: 'Home address line two:'
+  second_nationality:
+    value: ''
+    label: 'Second nationality:'
+  third_nationality:
+    value: ''
+    label: 'Third nationality:'
+  are_you_eligible_to_work_in_australia:
+    value: ''
+    label: Are you eligible to work in Australia?*
+  yes_i_can_provide_these_documents:
+    value: Yes\, I can provide these documents||35248|
+    label: Yes, I can provide these documents
+  have_you_received_a_voluntary_departure_:
+    value: ''
+    label: Have you received a voluntary departure package from Monash University
+      in the last 5 years?*
+  have_you_received_a_severance_payment_fr:
+    value: ''
+    label: Have you received a severance payment from Monash University in the past
+      6 months?*
+  do_you_identify_as_australian_aboriginal:
+    value: ''
+    label: Do you identify as Australian Aboriginal and/or Torres Strait Islander?
+  do_you_have_a_disability_that_would_requ:
+    value: ''
+    label: Do you have a disability that would require a work adjustment?
+  please_enter_the_title_of_your_phd:
+    value: Tool Support for Human-AI Collaboration in Qualitative Data Analysis
+    label: Please enter the title of your PhD
+  please_enter_the_title_of_your_masters_b:
+    value: ''
+    label: Please enter the title of your Masters by Research Thesis
+  add_more_phd_titles:
+    value: Add more PhD titles||417|
+    label: Add more PhD titles
+  add_more_masters_by_research_titles:
+    value: Add more Masters by Research titles||418|
+    label: Add more Masters by Research titles
+  type_of_education:
+    value: Tertiary
+    label: Type of education:*
+  additional_majors:
+    value: ''
+    label: 'Additional majors:'
+  year_finished_actual_or_anticipated:
+    value: '2017'
+    label: 'Year finished (actual or anticipated):'
+  degree_type:
+    value: Bachelor Degree
+    label: 'Degree type:'
+  discipline:
+    value: Computer Science
+    label: 'Discipline:'
+  education_status:
+    value: Completed
+    label: 'Education status:'
+  major:
+    value: Computer Science
+    label: 'Major:'
+  second_major:
+    value: ''
+    label: 'Second major:'
+  institution:
+    value: 上海大学 Shanghai University
+    label: 'Institution:'
+  employer_status:
+    value: Select if relevant
+    label: Employer status:*
+  'no':
+    value: '300000004452112'
+    label: 'No'
+  google_scholar_profile_link_if_applicabl:
+    value: ''
+    label: Google Scholar Profile Link (if applicable)
+  please_indicate_your_teaching_highlights:
+    value: ''
+    label: Please indicate your Teaching highlights (eg. any awards received)
+  please_indicate_your_research_highlights:
+    value: ''
+    label: Please indicate your Research highlights (eg. key grants and publications)
+  agree:
+    value: Agree||25806|
+    label: Agree
+  number_of_candidates_supervised_to_compl:
+    value: ''
+    label: Number of candidates supervised to completion
+  add_more:
+    value: Add more||353|
+    label: Add more
+  type_of_student:
+    value: ''
+    label: Type of student
+  commencement:
+    value: ''
+    label: 'Commencement:'
+  upload_file:
+    value: ''
+    label: Upload file
+  i_certify_that_all_information_that_i_su:
+    value: I certify that all information that I submit via this site (including this
+      form and any attachments) is valid and accurate.  I acknowledge and understand
+      that Monash University may vary or reverse any decision regarding my application
+      or possible subsequent employment on the basis of incorrect or misleading information.||328|
+    label: I certify that all information that I submit via this site (including this
+      form and any attachments) is valid and accurate. I acknowledge and understand
+      that Monash University may vary or reverse any decision regarding my application
+      or possible subsequent employment on the basis of incorrect or misleading information.
+  how_did_you_hear_about_this_opportunity:
+    value: ''
+    label: How did you hear about this opportunity?:*
+  please_indicate_how_you_know_about_this_:
+    value: Academic job posting websites and professional networks
+    label: 'Please indicate how you know about this position:'
+  block_300000818768514_div_div_nth_of_typ:
+    value: Mark Dredze
+    label: block 300000818768514 > div > div:nth of type(2) > form builder > div:nth
+      of type(21) > div > textarea:nth of type(2)
+  present_last_basic_monthly_salary_hk:
+    value: '47000'
+    label: 'Present / Last Basic Monthly Salary (HK$):'
+  expected_monthly_salary_hk:
+    value: Negotiable
+    label: 'Expected Monthly Salary (HK$):'
+  notice_period_required_for_resignation:
+    value: Flexible, typically 1-2 months
+    label: 'Notice Period Required for Resignation:'
+  present_last_employer_title:
+    value: Prof.
+    label: Present / Last Employer (Title)
+  present_last_employer_name:
+    value: Johns Hopkins University
+    label: Present / Last Employer (Name)
+  present_last_employer_position:
+    value: Malone Postdoctoral Fellow
+    label: Present / Last Employer (Position)
+  present_last_employer_email_address:
+    value: mdredze@cs.jhu.edu
+    label: Present / Last Employer (Email Address)
+  present_last_employer_telephone:
+    value: +1 (410) 516-6786
+    label: Present / Last Employer (Telephone)
+  supplementary_information_to_support_you:
+    value: ''
+    label: Supplementary Information (to support your application)
+  name:
+    value: Mark Dredze
+    label: Name
+  i_agree_to_receive_updates_about_new_job:
+    value: 'on'
+    label: I agree to receive updates about new job opportunities.
+  i_agree_to_receive_marketing_communicati:
+    value: 'on'
+    label: I agree to receive  marketing communications
+  if_yes_please_specify:
+    value: Need work Visa
+    label: If yes, please specify
+  preferred_name:
+    value: ''
+    label: 'Preferred name:'
+  city_suburb_town:
+    value: Baltimore
+    label: City/Suburb/Town:*
+  state_territory:
+    value: ''
+    label: State / Territory:**
+  employment_status:
+    value: Never employed or contracted by ANU
+    label: Employment status:*
+  do_you_have_rights_to_live_and_work_in_t:
+    value: ''
+    label: Do you have rights to live and work in this country?*
+  year:
+    value: ''
+    label: Year
+  if_your_application_is_successful_when_c:
+    value: ''
+    label: If your application is successful when can you start?*
+  how_do_you_describe_your_gender_this_ref:
+    value: ''
+    label: How do you describe your gender? This refers to your current gender, which
+      may be different to sex recorded at birth or what is indicated on legal documents.*
+  do_you_identify_as_lesbian_gay_bisexual_:
+    value: ''
+    label: Do you identify as lesbian, gay, bisexual, transgender, queer, questioning,
+      intersex, and/or asexual? (LGBTQIA+)*
+  do_you_identify_as_an_aboriginal_or_torr:
+    value: ''
+    label: Do you identify as an Aboriginal or Torres Strait Islander?*
+  do_you_identify_as_a_person_with_disabil:
+    value: ''
+    label: Do you identify as a person with disability?*
+  do_you_identify_as_neurodivergent:
+    value: ''
+    label: Do you identify as neurodivergent?
+  job_title_or_position:
+    value: ''
+    label: Job Title or Position
+  contact_address:
+    value: ''
+    label: Contact Address
+  suburb_town:
+    value: ''
+    label: Suburb/Town
+  city_state:
+    value: ''
+    label: City/State
+  postcode:
+    value: ''
+    label: Postcode
+  email:
+    value: ''
+    label: Email
+  contact_phone:
+    value: ''
+    label: Contact Phone
+  alternate_phone:
+    value: ''
+    label: Alternate Phone
+  referee_type:
+    value: ''
+    label: Referee Type
+  employer_name:
+    value: Johns Hopkins University
+    label: Employer Name
+  job_title:
+    value: Malone Postdoctoral Fellow
+    label: Job Title
+  month:
+    value: ''
+    label: Month
+  current_job:
+    value: 'on'
+    label: Current Job
+  upload_cover_letter:
+    value: ''
+    label: Upload Cover Letter
+  link_1:
+    value: https://gaojie058.github.io
+    label: Link 1
+  link_2:
+    value: https://scholar.google.com/citations?user=U7KDGDsAAAAJ&hl=zh-CN
+    label: Link 2
+  full_name:
+    value: Jie Gao
+    label: Full Name
+  insider_update:
+    value: '1'
+    label: Insider Update
+  keep_me_signed_in:
+    value: '1'
+    label: Keep me signed in
+  personal_info_div_nth_of_type_1_div_div_:
+    value: Dr.
+    label: personal info > div:nth of type(1) > div > div:nth of type(2) > div > input
+  personal_info_div_nth_of_type_2_div_nth_:
+    value: Gao
+    label: personal info > div:nth of type(2) > div:nth of type(2) > div > div > div:nth
+      of type(2) > input
+  personal_info_div_nth_of_type_3_div_div_:
+    value: jgao77@jh.edu
+    label: personal info > div:nth of type(3) > div > div > div > div:nth of type(2)
+      > input
+  personal_info_div_nth_of_type_4_div_nth_:
+    value: '1996-12-25'
+    label: personal info > div:nth of type(4) > div:nth of type(2) > div > div > div:nth
+      of type(2) > input
+  personal_info_div_nth_of_type_5_div_nth_:
+    value: https://gaojie058.github.io
+    label: personal info > div:nth of type(5) > div:nth of type(2) > div > div > div:nth
+      of type(2) > input
+  personal_info_div_nth_of_type_6_div_div_:
+    value: '2026-08-12'
+    label: personal info > div:nth of type(6) > div > div:nth of type(2) > input
+  full_professor:
+    value: Full Professor
+    label: Full Professor
+  associate_professor:
+    value: Associate Professor
+    label: Associate Professor
+  assistant_professor:
+    value: Assistant Professor
+    label: Assistant Professor
+  research_track:
+    value: Research Track
+    label: Research Track
+  teaching_track:
+    value: Teaching Track
+    label: Teaching Track
+  education_track:
+    value: Education Track
+    label: Education Track
+  visiting_faculty:
+    value: Visiting Faculty
+    label: Visiting Faculty
+  application_info_div_nth_of_type_3_div_d:
+    value: ''
+    label: application info > div:nth of type(3) > div > div > div:nth of type(2)
+      > input
+  application_info_div_nth_of_type_4_div_d:
+    value: ''
+    label: application info > div:nth of type(4) > div > div > div > div:nth of type(2)
+      > div:nth of type(1) > input
+  thrust_of_advanced_materials:
+    value: Advanced Materials
+    label: Thrust of Advanced Materials
+  thrust_of_earth_ocean_and_atmospheric_sc:
+    value: Earth, Ocean and Atmospheric Science
+    label: Thrust of Earth, Ocean and Atmospheric Sciences
+  thrust_of_microelectronics:
+    value: Microelectronics
+    label: Thrust of Microelectronics
+  thrust_of_sustainable_energy_and_environ:
+    value: Sustainable Energy and Environment
+    label: Thrust of Sustainable Energy and Environment
+  thrust_of_artificial_intelligence:
+    value: Artificial Intelligence
+    label: Thrust of Artificial Intelligence
+  thrust_of_computational_media_and_arts:
+    value: Digital Media and Arts
+    label: Thrust of Computational Media and Arts
+  thrust_of_data_science_and_analytics:
+    value: Data Science and Analytics
+    label: Thrust of Data Science and Analytics
+  thrust_of_internet_of_things:
+    value: Internet of Things
+    label: Thrust of Internet of Things
+  artificial_intelligence_of_things:
+    value: Artificial Intelligence of Things
+    label: Artificial Intelligence of Things
+  thrust_of_bioscience_and_biomedical_engi:
+    value: Biomedicine and Biomedical Engineering
+    label: Thrust of Bioscience and Biomedical Engineering
+  thrust_of_intelligent_transportation:
+    value: Intelligent Transportation
+    label: Thrust of Intelligent Transportation
+  thrust_of_robotics_and_autonomous_system:
+    value: Robotics and Autonomous Systems
+    label: Thrust of Robotics and Autonomous Systems
+  thrust_of_smart_manufacturing:
+    value: Smart Manufacturing
+    label: Thrust of Smart Manufacturing
+  thrust_of_carbon_neutrality_and_climate_:
+    value: Carbon Neutrality and Climate Change
+    label: Thrust of Carbon Neutrality and Climate Change
+  thrust_of_financial_technology:
+    value: Financial Technology
+    label: Thrust of Financial Technology
+  thrust_of_innovation_policy_and_entrepre:
+    value: Innovation, Policy & Entrepreneurship
+    label: Thrust of Innovation, Policy and Entrepreneurship
+  thrust_of_urban_governance_and_design:
+    value: Urban Governance and Design
+    label: Thrust of Urban Governance and Design
+  pillar_of_general_education:
+    value: Pillar of General Education
+    label: Pillar of General Education
+  pillar_of_stem_education:
+    value: Division of STEM Education
+    label: Pillar of STEM Education
+  pillar_of_cognitive_sciences:
+    value: Division of Cognitive Sciences
+    label: Pillar of Cognitive Sciences
+  pillar_of_language_education:
+    value: Center for Language Education (GZ)
+    label: Pillar of Language Education
+  base_of_red_bird_mphil:
+    value: Division of Red Bird MPhil
+    label: Base of Red Bird Mphil
+  centre_for_ethics_education_and_contempo:
+    value: Centre for Ethics Education and Contemporary China Studies
+    label: Centre for Ethics Education and Contemporary China Studies
+  brain_and_intelligence:
+    value: Brain and AI
+    label: Brain and Intelligence
+  center_for_computational_science:
+    value: Center for Computational Science
+    label: Center for Computational Science
+  intelligent_optimization:
+    value: Intelligent Optimization
+    label: Intelligent Optimization
+  others:
+    value: Others
+    label: Others
+  bio_inspired_systems_laboratory:
+    value: Bio-Inspired Systems Laboratory
+    label: Bio-Inspired Systems Laboratory
+  center_for_quantum_science_and_technolog:
+    value: Center for Quantum Science and Technology
+    label: Center for Quantum Science and Technology
+  academic_qualification_div_nth_of_type_1:
+    value: 2017-09
+    label: academic qualification > div:nth of type(1) > div:nth of type(3) > div
+      > div > div > div:nth of type(2) > input:nth of type(1)
+  academic_qualification_div_nth_of_type_2:
+    value: 2019-08
+    label: academic qualification > div:nth of type(2) > div:nth of type(3) > div:nth
+      of type(2) > div > div > div:nth of type(2) > input:nth of type(1)
+  present_affiliation_div_nth_of_type_1_di:
+    value: Department of Computer Science
+    label: present affiliation > div:nth of type(1) > div:nth of type(2) > div > div
+      > div:nth of type(2) > input
+  present_affiliation_div_nth_of_type_2_di:
+    value: ''
+    label: present affiliation > div:nth of type(2) > div:nth of type(2) > div > div
+      > div:nth of type(2) > input:nth of type(1)
+  referees_email_div_nth_of_type_2_div_nth:
+    value: mdredze@cs.jhu.edu
+    label: referees email > div:nth of type(2) > div:nth of type(1) > div:nth of type(2)
+      > div > div > div:nth of type(2) > input
+  referees_email_div_nth_of_type_3_div_nth:
+    value: malone@mit.edu
+    label: referees email > div:nth of type(3) > div:nth of type(1) > div:nth of type(2)
+      > div > div > div:nth of type(2) > input
+  referees_email_div_nth_of_type_4_div_nth:
+    value: simon.perrault@telecom-paris.fr
+    label: referees email > div:nth of type(4) > div:nth of type(1) > div:nth of type(2)
+      > div > div > div:nth of type(2) > input
+  h_k_i_d_card_no_if_applicable:
+    value: ''
+    label: H.K.I.D. Card no. (if applicable)
+  chinese_name_if_applicable:
+    value: 高洁
+    label: Chinese name (if applicable)
+  research_interest_field_if_applicable:
+    value: Human-AI Collaboration, Human-Centered AI, Responsible and Trustworthy
+      AI
+    label: Research interest/field (if applicable)
+  field_level_of_the_post_you_wish_to_appl:
+    value: Assistant Professor
+    label: Field/level of the post you wish to apply for (for job posts which indicate
+      multiple levels, e.g. Associate Professor/Assistant Professor)
+  if_you_have_any_close_friends_and_or_rel:
+    value: ''
+    label: If you have any close friends and/or relatives working in this University,
+      please give their names in full and indicate their relationship with you. "Close
+      relatives" include (a) spouse, (b) parents/parents-in-law, (c) brothers/sisters
+      and brothers/sisters-in-law, and (d) children and their spouse.
+  availability_earliest_date_to_assume_dut:
+    value: August 2026 (6 months notice period)
+    label: Availability (earliest date to assume duty or notice period required)
+  date_of_birth:
+    value: Dec
+    label: Date of birth
+  type_of_degree_with_classification_if_an:
+    value: Ph.D. in Information Systems Technology and Design
+    label: Type of Degree (with classification, if any)
+  name_of_institution:
+    value: Singapore University of Technology and Design
+    label: Name of Institution
+  degree_awarded_date_anticipated_date_mm_:
+    value: 01/2024
+    label: Degree awarded date / anticipated date (MM/YYYY)
+  country_region_of_the_institution:
+    value: Singapore
+    label: Country / Region of the Institution
+  please_enter_your_professional_membershi:
+    value: 'Member, Association for Computing Machinery (ACM)
+
+      Member, IEEE Computer Society
+
+
+      Key Professional Service:
+
+      - Associate Chair, ACM CHI 2025 & 2026 (Main Track, the premier venue in Human-Computer
+      Interaction)
+
+      - Associate Chair, ACM CHI 2022 & 2023 (Late-Breaking Work Track)
+
+      - Reviewer, ACM UIST 2025
+
+      - Reviewer, ACM CSCW 2022, 2023
+
+      - Reviewer, ACM CHI 2023, 2024
+
+      - Reviewer, ACM Transactions on Interactive Intelligent Systems (TiiS) 2024,
+      2025
+
+      - Reviewer, International Journal of Human-Computer Interaction (IJHCI) 2025,
+      2026
+
+      - Reviewer, Computers in Human Behavior Reports 2025
+
+      - Reviewer, International Conference on Artificial Intelligence in Education
+      (AIED) 2023'
+    label: 'Please enter your professional memberships (if any), with the following
+      information: (1) Name of professional body, (2) Name of award, (3) How it is
+      obtained (e.g. by examination), and (4) Date of award (month/year).'
+  name_of_employment_institution:
+    value: Johns Hopkins University
+    label: Name of Employment Institution
+  position_held:
+    value: Malone Postdoctoral Fellow, Department of Computer Science
+    label: Position held
+  present_salary_please_indicate_monthly_a:
+    value: USD 5,500/month (approximately HKD 43,000/month)
+    label: Present salary (please indicate monthly/annual; if currently not in employment,
+      please quote last salary)
+  next_incremental_date_if_applicable:
+    value: ''
+    label: Next incremental date (if applicable)
+  country_region_of_the_employment_institu:
+    value: United States
+    label: Country / Region of the Employment Institution
+  engagement_mode:
+    value: Full-time
+    label: Engagement mode
+  from:
+    value: Mar
+    label: From
+  to:
+    value: ''
+    label: To
+  organisation:
+    value: Telecom Paris, Institut Polytechnique de Paris
+    label: 'Organisation:'
+  referee_position:
+    value: Professor
+    label: Referee position:*
+  office_phone:
+    value: +33 664871217
+    label: 'Office phone:'
+  i_declare_that_the_information_i_have_gi:
+    value: I declare that the information I have given in this application is correct
+      and complete to the best of my knowledge and belief.||7338|
+    label: I declare that the information I have given in this application is correct
+      and complete to the best of my knowledge and belief.
