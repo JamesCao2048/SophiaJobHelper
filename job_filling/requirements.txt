@@ -1,0 +1,5 @@
+pymupdf
+pytest
+playwright
+anthropic
+pyyaml
