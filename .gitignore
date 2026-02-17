@@ -4,6 +4,16 @@
 
 # PDF 文件（申请材料、陈述书等产出）
 *.pdf
+# 豁免：两个子项目的 materials 目录（含 PDF）纳入版本控制
+!job_hunting/materials/**
+!job_filling/materials/**
+
+# LaTeX 编译中间产物（materials 内）
+job_hunting/materials/**/*.aux
+job_hunting/materials/**/*.fdb_latexmk
+job_hunting/materials/**/*.fls
+job_hunting/materials/**/*.log
+job_hunting/materials/**/*.out
 
 # Excel 数据文件
 *.xlsx
@@ -11,9 +21,6 @@
 
 # CSV 数据导出
 *.csv
-
-# 申请材料目录（含个人文件、PDF 等）
-materials/
 
 # 学校申请草稿（每所学校的定制化输出）
 job_hunting/drafts/
