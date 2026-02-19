@@ -121,6 +121,12 @@ output/{school_id}/                        ← 学校级目录（同校多院系
    - 将已有院系的 `related_applications` 信息写入当前院系的 `faculty_data.json`
    - 在 step1_summary.md 中列出：从哪个已有院系复用了哪些论文
 
+   **跨系 faculty 数据复用约定：**
+   - 已有院系的 `cross_department_collaborators` 往往正是当前院系的主体 faculty
+   - 预填充步骤：从已有院系的 `cross_department_collaborators` 中，找出 `department` 字段匹配当前院系的成员，将其基础信息（name/title/homepage/research_interests）作为当前院系 `faculty` 数组的**起点**，省去重复搜索基础信息
+   - 但预填充只是起点，仍需：① 重新判断 `overlap_with_sophia`（角色从"配角/合作者"变成"评委/主角"，分析重心不同）；② 重新搜索 `overlapping_papers`（角度不同，上次找的论文未必是最相关的）
+   - 已下载的论文 PDF 可直接复用（复制到当前 `papers/`），无需重新下载
+
 2. 爬取院系页面（五层 fallback 策略）：
    - **Layer 1**: 运行 `python overseas_pipeline/src/faculty_scraper.py`（Jina Reader API）
      ```
@@ -435,6 +441,30 @@ C. 忽略冲突，仍按地区卡执行
 - **这是澳洲申请的核心文件，不提交直接出局**
 - 同时生成 `selection_criteria_response.notes.md`
 
+#### Step 3a 收尾：Humanizer 去 AI 化处理（强制，每份材料必须执行）
+
+**REQUIRED SKILL: 在写入 .tex 文件之前，必须对所有生成的英文正文使用 `humanizer` skill 处理。**
+
+处理范围：**所有正文叙述段落**，包括：
+- Cover Letter 所有段落
+- Research Statement 新增/修改的段落（已有原文保留的段落无需重处理）
+- Teaching Statement 新增/修改的段落
+- Selection Criteria Response 所有 STAR 回应段落
+
+不处理范围：LaTeX 命令/环境声明、参考文献条目、课程代码、人名/职位名称、数字/统计数据
+
+**Humanizer 检查清单（写入 .tex 前必须全部确认）：**
+- [ ] 无 "pivotal / crucial / underscore / showcase / delve / landscape / testament / fostering" 等 AI 高频词
+- [ ] 无 "serves as / stands as / marks a / represents a" 等 copula 替代结构（改用 "is/are"）
+- [ ] 无 "Not only...but also..." / "It's not just...it's..." 负向并行结构
+- [ ] Em dash（—）每份材料不超过 2 处
+- [ ] 无无来源的 "Experts argue / Industry reports / Observers note" 等模糊引用
+- [ ] 无 "highlights / underscores / reflecting / contributing to" 等假深度 -ing 结尾
+- [ ] 无过度 hedging（"could potentially / might arguably / may possibly"）
+- [ ] 无 "I hope this helps / let me know / here is a..." 等对话口吻残留
+- [ ] 结尾段有具体内容，非泛泛 "I look forward to..."（或结尾保持简洁直接）
+- [ ] 句子长度有变化（非每句都是同等长度的复合句）
+
 #### Step 3b: 复制模板 + 编译 PDF（收尾步骤）
 
 **执行流程：**
@@ -543,3 +573,78 @@ notes.md 是给 Sophia 审核的"修改日志"，必须包含足够的上下文�
 ## 关于 .gitignore
 
 `output/` 目录下的内容（学校分析数据、材料初稿）**不提交**到 git，已通过 `.gitignore` 排除。
+
+---
+
+## 追踪数据库集成（ApplicationTracker）
+
+overseas_pipeline 完成每个 Step 后，需要更新追踪数据库（`tracking/applications.db`）。
+
+### 获取 app_id
+
+在开始研究某个学校前，先查找或创建 tracking 记录：
+
+```python
+import sys, os
+sys.path.insert(0, os.path.join(os.getcwd()))
+from tracking.tracking_db import ApplicationTracker
+tracker = ApplicationTracker()
+
+# 查找已有记录（按 school_id 匹配）
+all_apps = tracker.all_applications()
+match = next((a for a in all_apps if school_id in (a.get("school_id") or "")), None)
+if match:
+    app_id = match["id"]
+else:
+    # 新建记录
+    app_id = tracker.add_job(school=school_name, position=job_title, region=region)
+print(f"app_id: {app_id}")
+```
+
+或通过 CLI 手动创建：
+```bash
+python -m tracking.cli add "University Name" "Position Title" --region australia
+python -m tracking.cli list --status discovered  # 找到 ID
+```
+
+### Step 1 完成后
+
+```python
+tracker.mark_researched(
+    app_id=app_id,
+    pipeline_dir=f"overseas_pipeline/output/{school_id}",
+    school_id=school_id,
+    department=dept,                    # from faculty_data.json
+    hci_density_target=hci_target,      # "none"/"few"/"many"
+    hci_density_wide=hci_wide,
+    hci_strategy=strategy,
+    high_overlap_count=n,
+    data_quality=quality,               # "high"/"medium"/"low"
+)
+```
+
+### Step 2 完成后
+
+```python
+tracker.mark_analyzed(app_id=app_id, fit_score=fit_score)  # 1.0-10.0
+```
+
+### Step 3 完成后
+
+```python
+tracker.mark_materials_ready(app_id=app_id)
+```
+
+### 常用查询
+
+```bash
+# 查看当前所有状态
+python -m tracking.cli dashboard
+
+# 查看某学校的详情和状态历史
+python -m tracking.cli show <app_id>
+
+# 手动更新状态（收到邮件后）
+python -m tracking.cli update <app_id> long_list
+python -m tracking.cli update <app_id> rejected
+```
