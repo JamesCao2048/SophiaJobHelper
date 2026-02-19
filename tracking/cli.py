@@ -118,7 +118,11 @@ def cmd_list(tracker: ApplicationTracker, args):
 def cmd_update(tracker: ApplicationTracker, args):
     app_id = int(args.id)
     new_status = args.new_status
-    tracker.update_status(app_id, new_status, changed_by="manual")
+    try:
+        tracker.update_status(app_id, new_status, changed_by="manual")
+    except ValueError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
     app = tracker.get(app_id)
     print(f"#{app_id} {app['school']} → {colored_status(new_status)}")
 
@@ -126,7 +130,11 @@ def cmd_update(tracker: ApplicationTracker, args):
 def cmd_priority(tracker: ApplicationTracker, args):
     app_id = int(args.id)
     tag = args.tag if args.tag != "none" else None
-    tracker.set_priority(app_id, tag)
+    try:
+        tracker.set_priority(app_id, tag)
+    except ValueError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
     print(f"#{app_id} priority → {tag}")
 
 
