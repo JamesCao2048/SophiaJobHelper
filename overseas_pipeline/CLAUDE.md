@@ -10,13 +10,15 @@ Claude Code 驱动的海外教职申请材料准备流水线。目标：将每�
 
 ## 网页抓取规则（强制）
 
-**所有涉及 URL 抓取的步骤，必须使用 `web-fetch-fallback` skill 的三层 fallback 策略：**
+**所有涉及 URL 抓取的步骤，必须使用 `web-fetch-fallback` skill 的五层 fallback 策略：**
 
-1. **Layer 1**: WebFetch / Jina Reader / curl + browser UA
-2. **Layer 2**: Tavily Extract API（`$TAVILY_API_KEY`）
-3. **Layer 3**: Tavily Search API
+1. **Layer 1**: curl + browser User-Agent
+2. **Layer 1.5**: Jina Reader（`https://r.jina.ai/`，免费无 key，适合 Medium/Cloudflare 场景）
+3. **Layer 2**: Tavily Extract API（`$TAVILY_API_KEY`）
+4. **Layer 2.5**: Wayback Machine（`web.archive.org/web/{year}/原URL`，免费，适合博客/个人网站）
+5. **Layer 3**: Tavily Search API
 
-**不允许在 Layer 1 失败后直接放弃**——必须依次尝试 Layer 2 和 Layer 3。大学网站普遍有 Cloudflare 保护，Layer 1 几乎必然失败，Layer 2/3 才是主力。
+**不允许在 Layer 1 失败后直接放弃**——必须依次尝试后续各层。大学网站普遍有 Cloudflare 保护，Layer 1 几乎必然失败，Layer 1.5/2/2.5/3 才是主力。详见 `web-fetch-fallback` skill。
 
 ## 资源引用关系
 
@@ -97,16 +99,17 @@ output/{school_id}/
 
 **执行步骤：**
 1. 确定学校 ID（snake_case，如 `monash_university`）
-2. 爬取院系页面（三层 fallback 策略）：
+2. 爬取院系页面（五层 fallback 策略）：
    - **Layer 1**: 运行 `python overseas_pipeline/src/faculty_scraper.py`（Jina Reader API）
      ```
      python overseas_pipeline/src/faculty_scraper.py --school "{学校名}" --url "{院系页面URL}"
      ```
-   - **Layer 2**: 如 Jina Reader 失败（403/Cloudflare），使用 `web-fetch-fallback` skill 的三层 fallback：
-     1. `curl` + browser User-Agent
-     2. Tavily Extract API（`$TAVILY_API_KEY`）
-     3. Tavily Search API
-   - **Layer 3**: 以上均失败时，提示用户手动 copy-paste
+   - **Layer 1.5～3**: 如 Jina Reader 失败（403/Cloudflare），依次使用 `web-fetch-fallback` skill：
+     1. curl + browser UA
+     2. Tavily Extract API
+     3. Wayback Machine
+     4. Tavily Search API
+   - **全部失败时**: 提示用户手动 copy-paste
    - 输出原始 markdown 到 `output/{school_id}/raw/`
 3. **Claude Code 分析**（从原始 markdown 中提取结构化数据）：
    - 读取爬取的 markdown 内容
@@ -121,8 +124,30 @@ output/{school_id}/
    - 在 `faculty_data.json` 的 `overlapping_papers` 中记录每篇论文的 `local_pdf` 路径
    - 论文是 Step 2 fit_report 中"具体研究结合点"分析的关键依据，不下载会导致分析空泛
 5. 生成 `output/{school_id}/faculty_data.json`（见格式规范）
-5. 生成 `output/{school_id}/faculty_data.sources.md`（标注每位 faculty 信息的来源 URL）
-6. 检查 `region_knowledge/schools/{school_id}.md` 是否存在，如不存在则创建框架
+6. 生成 `output/{school_id}/faculty_data.sources.md`（标注每位 faculty 信息的来源 URL）
+7. 检查 `region_knowledge/schools/{school_id}.md` 是否存在，如不存在则创建框架
+8. **HCI 密度分类（Code）**：
+   ```
+   python overseas_pipeline/src/hci_density_classifier.py \
+     --input output/{school_id}/faculty_data.json \
+     [--target-dept "{目标系名称}"]
+   ```
+   自动推断双层密度（target_dept + faculty_wide）和策略标签，写入 `faculty_data.json` 的 `hci_density` 字段。**agent 随后补充 `strategy_rationale`**（自然语言解释，检查边界情况）。
+
+9. **课程体系抓取（Code）**：
+   ```
+   python overseas_pipeline/src/course_catalog_scraper.py \
+     --url "{目标系课程页面URL}" \
+     --output output/{school_id}/faculty_data.json \
+     --school "{学校名}"
+   ```
+   五层 fallback 抓取课程列表，写入 `faculty_data.json` 的 `department_courses` 字段。如课程页面 URL 未知，用 Tavily 搜索 `site:{domain} course catalog`。**agent 随后审查**：识别 Sophia 能教的课，按密度策略排序（pioneer→CS 核心课在前；builder→互补课程在前；specialist→高阶课在前）。
+
+10. **agent 审查补充**：
+    - 检查密度分类是否有边界遗漏（如某教授写 "computational social science" 但实际做 HCI）
+    - 补充 `hci_density.strategy_rationale` 自然语言解释
+    - 将密度判断 + 课程匹配概览写入 `step1_summary.md`，供 Sophia 异步审查
+    - Sophia 有异议时给 comment 覆盖；无 comment 则流程继续
 
 **数据质量评估（Step 1 完成后必须执行）：**
 
@@ -222,25 +247,27 @@ C. 中止（等后续改进 scraper 后重试）
 **前提：** Step 1 已完成（`output/{school_id}/faculty_data.json` 存在）
 
 **执行步骤：**
-1. 读取 `output/{school_id}/faculty_data.json`
+1. 读取 `output/{school_id}/faculty_data.json`（含 `hci_density` 和 `department_courses` 字段）
 2. 确定 region → 读取 `region_knowledge/regions/{region}.md`
 3. 检查 `region_knowledge/schools/{school_id}.md` 是否存在，如存在则读取（用于覆盖地区卡差异）
-4. 爬取职位 JD 原文：
+4. 读取 HCI 密度策略文件：`overseas_pipeline/strategies/hci_density_strategy.md`
+   - 根据 `hci_density.strategy` 确定点名优先级和课程匹配顺序
+5. 爬取职位 JD 原文：
    - 用 `python overseas_pipeline/src/faculty_scraper.py --url "{job_url}" --output-type raw`
    - 或请用户提供 JD 文本
-5. 读取 Sophia 全套材料：
+6. 读取 Sophia 全套材料：
    - `job_filling/materials/Research_Statement.md`
    - `job_filling/materials/Teaching_Statement.md`
    - `job_filling/materials/cv_latest.md`
    - `job_filling/materials/Impact_Statement.md`（如存在）
-6. **⚠ 规则冲突检查（关键）**：
+7. **⚠ 规则冲突检查（关键）**：
    - 比较 JD 要求与地区规则卡的规则
    - 如发现冲突，**立即暂停**，向用户显示：
      - 地区卡的规则（含 source 链接）
      - JD 的实际要求（含 URL）
      - 处理选项 A/B/C
-7. 生成 `output/{school_id}/fit_report.md`（见格式规范）
-8. 生成 `output/{school_id}/fit_report.sources.md`
+8. 生成 `output/{school_id}/fit_report.md`（见格式规范）
+9. 生成 `output/{school_id}/fit_report.sources.md`
 
 **fit_report.md 格式：**
 ```markdown
@@ -263,19 +290,39 @@ C. 中止（等后续改进 scraper 后重试）
 ### 区域适配 (X/10)
 ...
 
+### HCI 密度策略分析 (X/10)
+- 目标系 HCI 密度：{level}（{count} 人：{names}）
+- 学院 HCI 密度：{level}（{count} 人：{dept} 系的 {names}）
+- 推荐策略：`{strategy}`（参见 strategies/hci_density_strategy.md）
+- 策略要点：
+  - 对目标系评委：{具体修辞建议，如"需要技术伪装，避免感性 HCI 词汇"}
+  - 点名优先级：{目标系有交集的教授} → {其他系补充教授（如有需要）}
+  - {如为 pioneer_with_allies：必须论证为什么你属于目标系而非 HCI 系}
+
 ### 关键决策人分析（材料写给谁看）
 ...
 
 ### 各材料调整建议
 
 #### Cover Letter
-...
+- **密度策略** [`{strategy}`]：{具体修辞建议，引用策略文件对应章节}
+- **点名建议**：
+  - 目标系（优先）：{教授列表 + 合作点}
+  - 跨系补充（如需要）：{教授列表 + 合作点}
+- {如为 pioneer_with_allies：⚠ 论证重点——为什么申请目标系而非 HCI 系}
+- 其他定制点：...
 
 #### Research Statement
-...
+- **密度策略** [`{strategy}`]：{硬化/愿景化程度建议}
+- 具体修改点：...
 
 #### Teaching Statement
-...
+- **密度策略** [`{strategy}`]：{课程呈现顺序建议}
+- **目标系课程匹配**（来自 department_courses）：
+  - 可教的现有课：{课程编号 + 名称}（如未能通过 course catalog 抓取，此处为空，需手动补充）
+  - 可开设新课：{课程编号 + 名称}
+  - 联合开课建议：{与哪个系合作，开什么课}
+- 其他修改点：...
 
 #### Selection Criteria Response（如为澳洲职位）
 ...（列出每条 criterion 的回应框架）
@@ -313,9 +360,21 @@ C. 忽略冲突，仍按地区卡执行
 1. 读取 `output/{school_id}/fit_report.md` 中的"各材料调整建议"
 2. 读取 Sophia 现有材料（`job_filling/materials/*.md`）
 3. 读取区域规则卡（`region_knowledge/regions/{region}.md`）
-4. 读取 overleaf 原始 LaTeX 源文件（`overleaf-projects/Faculty Position/`）
-5. 为每份材料生成初稿 + notes（Step 3a）
-6. 复制 overleaf 项目到学校输出目录 + 替换内容 + 编译 PDF（Step 3b）
+4. 读取 HCI 密度策略文件：`overseas_pipeline/strategies/hci_density_strategy.md`
+   - 从 `faculty_data.json` 获取 `hci_density.strategy` 和 `department_courses`
+5. 读取 overleaf 原始 LaTeX 源文件（`overleaf-projects/Faculty Position/`）
+6. 为每份材料生成初稿 + notes（Step 3a）
+7. 复制 overleaf 项目到学校输出目录 + 替换内容 + 编译 PDF（Step 3b）
+8. **同校多系一致性检查**（如 `related_applications` 字段存在）：
+   - 读取同校其他投递的 fit_report.md
+   - 在每份 notes.md 的"给 Sophia 的审核重点"中追加：
+     ```markdown
+     ## 同校多系一致性检查
+     - 本校另一份申请：{department}（{strategy} 策略，状态：{status}）
+     - 核心叙事一致性：✅/⚠ {两份材料核心定位是否统一}
+     - 侧重点差异：本系版（{简述}）vs 另一系版（{简述}）
+     - ⚠ 注意：{具体提醒，如两份 Cover Letter 均未提及另一份申请}
+     ```
 
 #### Step 3a: 生成内容
 
