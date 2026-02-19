@@ -15,22 +15,27 @@ Claude Code 驱动的海外教职申请材料准备流水线。目标：将每�
 1. **Layer 1**: curl + browser User-Agent
 2. **Layer 1.5**: Jina Reader（`https://r.jina.ai/`，免费无 key，适合 Medium/Cloudflare 场景）
 3. **Layer 2**: Tavily Extract API（`$TAVILY_API_KEY`）
-4. **Layer 2.5**: Wayback Machine（`web.archive.org/web/{year}/原URL`，免费，适合博客/个人网站）
+4. **Layer 2.5**: Wayback Machine（`web.archive.org/web/{year}/原URL`，适合博客/个人网站）
 5. **Layer 3**: Tavily Search API
 
-**不允许在 Layer 1 失败后直接放弃**——必须依次尝试后续各层。大学网站普遍有 Cloudflare 保护，Layer 1 几乎必然失败，Layer 1.5/2/2.5/3 才是主力。详见 `web-fetch-fallback` skill。
+**不允许在 Layer 1 失败后直接放弃**——必须依次尝试后续各层。详见 `web-fetch-fallback` skill。
 
 ## 资源引用关系
 
 ```
 overseas_pipeline/           ← 本模块
-├── src/faculty_scraper.py   ← Step 1 爬取工具（Python 获取数据）
+├── src/faculty_scraper.py   ← Step 1 爬取工具
 ├── templates/cover_letter/  ← LaTeX 模板（OUCletter.cls + main_template.tex）
+├── workflows/               ← 各步骤详细流程（按需读取）
+│   ├── step1_research.md
+│   ├── step2_analysis.md
+│   ├── step3_materials.md
+│   └── cv_strategy.md
 └── output/{school}/         ← 产出物（.gitignore，不提交）
 
-region_knowledge/            ← 区域知识库（独立子模块）
-├── regions/{region}.md      ← 地区规则卡（被 Step 2/3 读取）
-└── schools/{school}.md      ← 学校知识卡（Step 1 处理后回写）
+region_knowledge/            ← 区域知识库
+├── regions/{region}.md      ← 地区规则卡（Step 2/3 读取）
+└── schools/{school}.md      ← 学校知识卡
 
 job_filling/materials/       ← Sophia 现有申请材料
 ├── cv_latest.md
@@ -39,65 +44,48 @@ job_filling/materials/       ← Sophia 现有申请材料
 ├── Impact_Statement.md
 └── publication*.md
 
-overleaf-projects/           ← 申请材料 LaTeX 源文件（被 Step 3 读取）
+overleaf-projects/Faculty Position/  ← LaTeX 源文件（Step 3 读取）
+├── Cover Letter/                    ← 各校专属版
+├── Research Statement/              ← 完整版（含图）
+├── Teaching Statement/              ← 含 Zhiyao/Erika/Ruyuan 故事
+├── DEI-structured-1p/               ← Diversity Statement 1 页（管道默认）
+├── DEI-structured-2p/               ← Diversity Statement 2 页
+├── DEI-prose-2p/                    ← 散文叙事版（备用参考）
+├── CV_latest/                       ← CV 模块化源（Step 3 按需定制）
+└── templates/cover_letter/          ← Cover Letter 模板
 ```
 
 ## 产出物结构
 
 ```
-output/{school_id}/                        ← 学校级目录（同校多院系共存）
-├── {dept_id}/                             ← 院系级目录（所有产出物在此）
-│   ├── faculty_data.json          ← Step 1 产出：faculty 结构化数据
-│   ├── faculty_data.sources.md    ← Step 1 产出：数据来源标注
-│   ├── data_quality.json          ← Step 1 产出：数据质量评估
-│   ├── fit_report.md              ← Step 2 产出：匹配分析报告
-│   ├── fit_report.sources.md      ← Step 2 产出：参考资料清单
-│   ├── step1_summary.md           ← Step 1 完成摘要
-│   ├── step2_summary.md           ← Step 2 完成摘要
-│   ├── step3_summary.md           ← Step 3 完成摘要
-│   ├── raw/                       ← 原始抓取内容
+output/{school_id}/
+├── {dept_id}/                         ← 院系级目录（必须存在，单系学校也需要此层）
+│   ├── faculty_data.json              ← Step 1
+│   ├── faculty_data.sources.md        ← Step 1
+│   ├── data_quality.json              ← Step 1
+│   ├── fit_report.md                  ← Step 2
+│   ├── fit_report.sources.md          ← Step 2
+│   ├── step1_summary.md
+│   ├── step2_summary.md
+│   ├── step3_summary.md
+│   ├── raw/                           ← 原始抓取内容
 │   │   ├── faculty_page.md
-│   │   └── course_catalog_raw.md  ← 课程页原始内容（agent 分析用）
-│   ├── papers/                    ← Step 1 下载的相关论文（PDF）
-│   └── materials/                 ← Step 3 产出
+│   │   ├── jd_*.md
+│   │   └── course_catalog_raw.md
+│   ├── papers/                        ← 下载的相关论文 PDF
+│   └── materials/                     ← Step 3 产出
 │       ├── Cover Letter/
-│       │   ├── main.tex / main.pdf
-│       │   ├── OUCletter.cls
-│       │   ├── signature*.pdf/png
-│       │   └── cover_letter.notes.md
-│       ├── Research Statement/
-│       │   ├── main.tex / main.pdf
-│       │   ├── figures/
-│       │   ├── reference.tex
-│       │   └── research_statement.notes.md
+│       ├── Research Statement/        （或 Research Interests/）
 │       ├── Teaching Statement/
-│       │   ├── Teaching_Statement.tex / .pdf
-│       │   └── teaching_statement.notes.md
-│       └── Selection Criteria Response/（澳洲特有）
-│           ├── selection_criteria_response.tex / .pdf
-│           └── selection_criteria_response.notes.md
-└── {dept_id_2}/                           ← 同校另一个院系（结构相同）
-    └── ...
+│       ├── Diversity Statement/        （JD 要求时）
+│       ├── CV/                         （变体≠base 时）
+│       └── Selection Criteria Response/（仅澳洲）
+└── {dept_id_2}/                       ← 同校另一院系（结构相同）
 ```
 
-**`dept_id` 命名规则：** 目标院系名称的英文缩写，snake_case，如：
-- "Department of Data Science and AI" → `dsai`
-- "Human-Centred Computing" → `hcc`
-- "Department of Computer Science" → `cs`
-- "School of Information Systems" → `information_systems`
-
-### 材料输出格式规范
-
-**最终产物（.tex）：**
-- 必须是完整、干净、可直接编译的 LaTeX 文件
-- 不包含任何标注（`[NEW]`、`[MODIFIED]`、编辑说明等）
-- 用 `xelatex` 编译后可直接生成 PDF
-- Sophia 审核时看 PDF，修改时编辑 .tex
-
-**修改说明（.notes.md）：**
-- Markdown 格式
-- 包含：总体策略、参考资料清单、逐段 diff（原文 vs 修改、修改原因引用具体来源）
-- 这是给 Sophia 审核用的"修改日志"，不是提交材料
+**材料格式规范：**
+- `.tex`：完整、干净、可直接编译，不含任何 `[NEW]`/`[MODIFIED]` 标注
+- `.notes.md`：修改日志（总体策略 + 参考资料清单 + 逐段 diff + 审核重点）
 
 ---
 
@@ -105,455 +93,31 @@ output/{school_id}/                        ← 学校级目录（同校多院系
 
 ### "研究 {学校名}"（Step 1: Research）
 
-**前提：** 需要学校名 + 院系 URL（或职位 URL）
+→ **执行前先读取 `overseas_pipeline/workflows/step1_research.md`**
 
-**执行步骤：**
-1. 确定学校 ID 和院系 ID：
-   - `school_id`：snake_case，如 `monash_university`
-   - `dept_id`：目标院系英文缩写，snake_case，如 `dsai`、`hcc`、`cs`
-   - 输出目录：`output/{school_id}/{dept_id}/`
+**前提：** 学校名 + 院系 URL（或职位 URL）
 
-1b. **扫描同校已有院系产物**（如 `output/{school_id}/` 已存在）：
-   - 列出已有的 `{dept_id}/` 子目录
-   - 扫描各子目录的 `papers/` 和 `faculty_data.json`
-   - 识别与当前院系 faculty 重叠的教授（joint appointment 或同校 HCI 教授）
-   - 将有价值的论文 PDF **复制**到当前院系的 `papers/` 目录（不是 symlink）
-   - 将已有院系的 `related_applications` 信息写入当前院系的 `faculty_data.json`
-   - 在 step1_summary.md 中列出：从哪个已有院系复用了哪些论文
-
-   **跨系 faculty 数据复用约定：**
-   - 已有院系的 `cross_department_collaborators` 往往正是当前院系的主体 faculty
-   - 预填充步骤：从已有院系的 `cross_department_collaborators` 中，找出 `department` 字段匹配当前院系的成员，将其基础信息（name/title/homepage/research_interests）作为当前院系 `faculty` 数组的**起点**，省去重复搜索基础信息
-   - 但预填充只是起点，仍需：① 重新判断 `overlap_with_sophia`（角色从"配角/合作者"变成"评委/主角"，分析重心不同）；② 重新搜索 `overlapping_papers`（角度不同，上次找的论文未必是最相关的）
-   - 已下载的论文 PDF 可直接复用（复制到当前 `papers/`），无需重新下载
-
-2. 爬取院系页面（五层 fallback 策略）：
-   - **Layer 1**: 运行 `python overseas_pipeline/src/faculty_scraper.py`（Jina Reader API）
-     ```
-     python overseas_pipeline/src/faculty_scraper.py --school "{学校名}" --url "{院系页面URL}"
-     ```
-   - **Layer 1.5～3**: 如 Jina Reader 失败（403/Cloudflare），依次使用 `web-fetch-fallback` skill：
-     1. curl + browser UA
-     2. Tavily Extract API
-     3. Wayback Machine
-     4. Tavily Search API
-   - **全部失败时**: 提示用户手动 copy-paste
-   - 输出原始 markdown 到 `output/{school_id}/raw/`
-3. **Claude Code 分析**（从原始 markdown 中提取结构化数据）：
-   - 读取爬取的 markdown 内容
-   - 读取 `job_filling/materials/Research_Statement.md` 了解 Sophia 的研究方向
-   - 识别 faculty 列表，对每人判断 `overlap_with_sophia`（high/medium/low/none）
-   - 识别标准：Human-AI collaboration / HCI / CSCW / AI / NLP / qualitative methods 相关
-   - 对 overlap=high 的 faculty（≤5人）记录详细的 `overlapping_papers` 信息
-4. **下载高匹配 faculty 的相关论文**（必须执行，不可跳过）：
-   - 对每位 overlap=high 的 faculty，通过 WebSearch 找到与 Sophia 研究方向最相关的 1-3 篇论文
-   - 下载 PDF 到 `output/{school_id}/papers/`，命名格式：`{作者姓}_{年份}_{简短标题}.pdf`
-   - 优先从 arXiv、ACL Anthology、Springer 等开放源下载
-   - 在 `faculty_data.json` 的 `overlapping_papers` 中记录每篇论文的 `local_pdf` 路径
-   - 论文是 Step 2 fit_report 中"具体研究结合点"分析的关键依据，不下载会导致分析空泛
-5. 生成 `output/{school_id}/faculty_data.json`（见格式规范）
-6. 生成 `output/{school_id}/faculty_data.sources.md`（标注每位 faculty 信息的来源 URL）
-7. 检查 `region_knowledge/schools/{school_id}.md` 是否存在，如不存在则创建框架
-8. **HCI 密度分类（Code）**：
-   ```
-   python overseas_pipeline/src/hci_density_classifier.py \
-     --input output/{school_id}/faculty_data.json \
-     [--target-dept "{目标系名称}"]
-   ```
-   自动推断双层密度（target_dept + faculty_wide）和策略标签，写入 `faculty_data.json` 的 `hci_density` 字段。**agent 随后补充 `strategy_rationale`**（自然语言解释，检查边界情况）。
-
-9. **课程体系抓取（Code）**：
-   ```
-   python overseas_pipeline/src/course_catalog_scraper.py \
-     --url "{目标系课程页面URL}" \
-     --output output/{school_id}/faculty_data.json \
-     --school "{学校名}"
-   ```
-   五层 fallback 抓取课程列表：
-   - 原始内容**始终保存**到 `output/{school_id}/{dept_id}/raw/course_catalog_raw.md`
-   - 正则启发式提取结果写入 `faculty_data.json` 的 `department_courses` 字段
-   - 如课程页面 URL 未知，用 Tavily 搜索 `site:{domain} course catalog`
-
-   **agent 随后审查**：
-   - 若 `department_courses` 为空（正则提取失败），读取 `raw/course_catalog_raw.md` 直接识别课程
-   - 识别 Sophia 能教的课，按密度策略排序（pioneer→CS 核心课在前；builder→互补课程在前；specialist→高阶课在前）
-   - 将识别结果写回 `faculty_data.json` 的 `department_courses` 字段（覆盖空列表）
-
-10. **agent 审查补充**：
-    - 检查密度分类是否有边界遗漏（如某教授写 "computational social science" 但实际做 HCI）
-    - 补充 `hci_density.strategy_rationale` 自然语言解释
-    - 将密度判断 + 课程匹配概览写入 `step1_summary.md`，供 Sophia 异步审查
-    - Sophia 有异议时给 comment 覆盖；无 comment 则流程继续
-
-**数据质量评估（Step 1 完成后必须执行）：**
-
-生成 `output/{school_id}/data_quality.json`：
-```json
-{
-  "overall_quality": "high | medium | low",
-  "scrape_success": true/false,
-  "data_source": "jina_reader | direct_html | web_search_summary | manual_paste",
-  "faculty_count": 6,
-  "high_overlap_count": 2,
-  "papers_downloaded": 0,
-  "issues": [
-    "Cloudflare blocked: faculty page scraped via WebSearch summaries only",
-    "No papers downloaded for high-overlap faculty"
-  ]
-}
-```
-
-**质量分级标准：**
-| 质量 | 条件 | 行为 |
-|------|------|------|
-| **high** | Jina Reader/直接爬取成功 + faculty 页面完整 + high overlap faculty 论文已下载 | 静默继续 Step 2 |
-| **medium** | 爬取成功但部分信息缺失（如缺论文下载），或来自 WebSearch 摘要但确认了 faculty 主页 | **⚠ Warning**：显示质量报告，询问用户是否继续 |
-| **low** | 爬取完全失败 / faculty 数据来自搜索摘要且未验证 / high overlap faculty = 0 | **❌ 暂停**：必须等用户手动补充数据或确认跳过 |
-
-**Warning 格式：**
-```
-⚠ Step 1 数据质量警告：{school_name}
-
-数据来源：{data_source}（非直接爬取）
-问题：
-  - {issue_1}
-  - {issue_2}
-
-影响：
-  - Faculty overlap 判断基于搜索摘要，可能不准确
-  - 未下载高匹配 faculty 论文，fit_report 中的"具体研究结合点"将缺乏依据
-
-选项：
-A. 继续 Step 2（接受当前数据质量，分析结果标注为 [低置信度]）
-B. 手动补充数据（在浏览器中访问 faculty 页面，copy-paste 到此处）
-C. 中止（等后续改进 scraper 后重试）
-
-请回复 A、B 或 C。
-```
-
-**"一键分析"模式下的行为：**
-- 默认：数据质量 ≤ medium 时暂停（同上）
-- 如果用户指定了 `--ignore-warnings`（如 "一键分析 {学校} 跳过警告"）：显示 warning 但不暂停，继续执行，所有产出物标注 `[低置信度]`
-
-**如果爬取完全失败（反爬/结构复杂）：**
-- 提示用户手动 copy-paste faculty 列表：
-  ```
-  ⚠ 自动爬取失败，请在浏览器中打开 {URL}，复制 faculty 列表内容后粘贴到此处。
-  ```
-
-**faculty_data.json 格式：**
-```json
-{
-  "school": "Monash University",
-  "school_id": "monash_university",
-  "department": "Department of Data Science and AI",
-  "department_url": "https://...",
-  "job_url": "https://...",
-  "region": "australia",
-  "research_focus": ["AI", "HCI", "data science"],
-  "faculty": [
-    {
-      "name": "Prof. Jane Smith",
-      "title": "Professor",
-      "research_interests": ["human-AI interaction", "CSCW"],
-      "homepage": "https://...",
-      "google_scholar": "https://scholar.google.com/citations?user=xxxxx",
-      "overlap_with_sophia": "high",
-      "overlap_reason": "Both work on human-AI collaboration for data analysis",
-      "overlapping_papers": [
-        {
-          "title": "...",
-          "venue": "CHI 2024",
-          "year": 2024,
-          "url": "https://doi.org/...",
-          "relevance": "Direct overlap with CollabCoder line"
-        }
-      ]
-    }
-  ],
-  "scrape_date": "YYYY-MM-DD",
-  "scrape_method": "jina_reader"
-}
-```
-
----
+核心步骤：确定 ID → 爬取院系页面（五层 fallback）→ 分析 faculty 重叠 → 下载高匹配论文 → HCI 密度分类 → 课程体系抓取 → 数据质量评估
 
 ### "分析 {学校名}"（Step 2: Fit Analysis）
 
-**前提：** Step 1 已完成（`output/{school_id}/faculty_data.json` 存在）
+→ **执行前先读取 `overseas_pipeline/workflows/step2_analysis.md`**
 
-**执行步骤：**
-1. 读取 `output/{school_id}/faculty_data.json`（含 `hci_density` 和 `department_courses` 字段）
-2. 确定 region → 读取 `region_knowledge/regions/{region}.md`
-3. 检查 `region_knowledge/schools/{school_id}.md` 是否存在，如存在则读取（用于覆盖地区卡差异）
-4. 读取 HCI 密度策略文件：`overseas_pipeline/strategies/hci_density_strategy.md`
-   - 根据 `hci_density.strategy` 确定点名优先级和课程匹配顺序
-5. 爬取职位 JD 原文：
-   - 用 `python overseas_pipeline/src/faculty_scraper.py --url "{job_url}" --output-type raw`
-   - 或请用户提供 JD 文本
-6. 读取 Sophia 全套材料：
-   - `job_filling/materials/Research_Statement.md`
-   - `job_filling/materials/Teaching_Statement.md`
-   - `job_filling/materials/cv_latest.md`
-   - `job_filling/materials/Impact_Statement.md`（如存在）
-7. **⚠ 规则冲突检查（关键）**：
-   - 比较 JD 要求与地区规则卡的规则
-   - 如发现冲突，**立即暂停**，向用户显示：
-     - 地区卡的规则（含 source 链接）
-     - JD 的实际要求（含 URL）
-     - 处理选项 A/B/C
-8. 生成 `output/{school_id}/fit_report.md`（见格式规范）
-9. 生成 `output/{school_id}/fit_report.sources.md`
+**前提：** Step 1 已完成
 
-**fit_report.md 格式：**
-```markdown
-# {学校} -- 匹配分析报告
-
-## 基本信息
-- 院系：
-- 地区 / 规则卡：
-- 职级：
-- Deadline：
-- 职位链接：
-
-## Fit Score: X/10
-
-## 匹配维度分析
-
-### 研究方向匹配 (X/10)
-...
-
-### 区域适配 (X/10)
-...
-
-### HCI 密度策略分析 (X/10)
-- 目标系 HCI 密度：{level}（{count} 人：{names}）
-- 学院 HCI 密度：{level}（{count} 人：{dept} 系的 {names}）
-- 推荐策略：`{strategy}`（参见 strategies/hci_density_strategy.md）
-- 策略要点：
-  - 对目标系评委：{具体修辞建议，如"需要技术伪装，避免感性 HCI 词汇"}
-  - 点名优先级：{目标系有交集的教授} → {其他系补充教授（如有需要）}
-  - {如为 pioneer_with_allies：必须论证为什么你属于目标系而非 HCI 系}
-
-### 关键决策人分析（材料写给谁看）
-...
-
-### 各材料调整建议
-
-#### Cover Letter
-- **密度策略** [`{strategy}`]：{具体修辞建议，引用策略文件对应章节}
-- **点名建议**：
-  - 目标系（优先）：{教授列表 + 合作点}
-  - 跨系补充（如需要）：{教授列表 + 合作点}
-- {如为 pioneer_with_allies：⚠ 论证重点——为什么申请目标系而非 HCI 系}
-- 其他定制点：...
-
-#### Research Statement
-- **密度策略** [`{strategy}`]：{硬化/愿景化程度建议}
-- 具体修改点：...
-
-#### Teaching Statement
-- **密度策略** [`{strategy}`]：{课程呈现顺序建议}
-- **目标系课程匹配**（来自 department_courses）：
-  - 可教的现有课：{课程编号 + 名称}（如未能通过 course catalog 抓取，此处为空，需手动补充）
-  - 可开设新课：{课程编号 + 名称}
-  - 联合开课建议：{与哪个系合作，开什么课}
-- 其他修改点：...
-
-#### Selection Criteria Response（如为澳洲职位）
-...（列出每条 criterion 的回应框架）
-
-### 风险提示
-...
-
-### 投递建议
-- 是否建议投递：
-- 优先级：my favorite / worth trying / low priority
-```
-
-**规则冲突处理流程：**
-```
-⚠ 发现规则冲突，暂停流水线。
-
-【地区卡规则】{具体规则内容}（来源：{source URL}）
-【JD 实际要求】{JD 中的具体要求}（来源：{job URL}）
-
-请选择处理方式：
-A. 以该校 JD 为准（本次），记录到学校卡
-B. 以该校 JD 为准，同时标记地区卡 needs_review
-C. 忽略冲突，仍按地区卡执行
-
-请回复 A、B 或 C。
-```
-
----
+核心步骤：读取 faculty_data + 地区规则卡 → 爬取 JD → 规则冲突检查（冲突时必须暂停）→ 生成 fit_report.md
 
 ### "生成材料 {学校名}"（Step 3: Materials Generation）
 
-**前提：** Step 2 已完成（`output/{school_id}/fit_report.md` 存在）
+→ **执行前先读取 `overseas_pipeline/workflows/step3_materials.md`**
 
-**执行步骤：**
-1. 读取 `output/{school_id}/fit_report.md` 中的"各材料调整建议"
-2. 读取 Sophia 现有材料（`job_filling/materials/*.md`）
-3. 读取区域规则卡（`region_knowledge/regions/{region}.md`）
-4. 读取 HCI 密度策略文件：`overseas_pipeline/strategies/hci_density_strategy.md`
-   - 从 `faculty_data.json` 获取 `hci_density.strategy` 和 `department_courses`
-5. 读取 overleaf 原始 LaTeX 源文件（`overleaf-projects/Faculty Position/`）
-6. 为每份材料生成初稿 + notes（Step 3a）
-7. 复制 overleaf 项目到学校输出目录 + 替换内容 + 编译 PDF（Step 3b）
-8. **同校多系一致性检查**（如 `related_applications` 字段存在）：
-   - 读取同校其他投递的 fit_report.md
-   - 在每份 notes.md 的"给 Sophia 的审核重点"中追加：
-     ```markdown
-     ## 同校多系一致性检查
-     - 本校另一份申请：{department}（{strategy} 策略，状态：{status}）
-     - 核心叙事一致性：✅/⚠ {两份材料核心定位是否统一}
-     - 侧重点差异：本系版（{简述}）vs 另一系版（{简述}）
-     - ⚠ 注意：{具体提醒，如两份 Cover Letter 均未提及另一份申请}
-     ```
+**前提：** Step 2 已完成
 
-#### Step 3a: 生成内容
-
-**Cover Letter：**
-- 读取 overleaf 中已有的该校 cover letter（如 `overleaf-projects/Cover Letter/Cover Letter- {学校名}/main.tex`），或读取模板 `overseas_pipeline/templates/cover_letter/main_template.tex`
-- 基于 fit_report 建议定制内容
-- 长度：1-2 页（澳洲规范），不要写成美式 5 页长文
-- ⚠ **OUCletter.cls 注意：** cls 的 `\cvheader` 已自动渲染完整信息栏（JHU logo + 姓名 + 联系方式 + 地址）。**不要**添加任何 tikz overlay 或 eso-pic 来叠加地址，否则会导致重叠。只需定义 `\signature{\name}` 供 closing 使用。
-- 同时生成 `cover_letter.notes.md`
-
-**Research Statement：**
-- 读取 `overleaf-projects/Faculty Position/Research Statement/Research Statement/main.tex`
-- 基于原始 LaTeX 直接修改，保留完整格式和图片引用
-- 修改点：加入 ARC grant 计划（必须具体提及 DECRA）、根据院系研究重点调整强调、加入院系合作段落
-- 同时生成 `research_statement.notes.md`
-
-**Teaching Statement：**
-- 读取 `overleaf-projects/Faculty Position/Teaching Statement/Teaching Statement/Teaching_Statement.tex`
-- 基于原始 LaTeX 直接修改
-- 修改点：补充该校课程名称（从 JD/网站查取）、加入具体量化数据、加入澳洲 40/40/20 声明（如适用）
-- 同时生成 `teaching_statement.notes.md`
-
-**Selection Criteria Response（仅澳洲职位）：**
-- 从 JD 中提取所有 Essential 和 Desirable criteria
-- 全新生成 LaTeX 文件（使用与其他材料一致的样式）
-- 格式：逐条用 STAR 法则回应（Situation → Task → Action → Result）
-- 长度：6-10 页（澳洲规范）
-- **这是澳洲申请的核心文件，不提交直接出局**
-- 同时生成 `selection_criteria_response.notes.md`
-
-#### Step 3a 收尾：Humanizer 去 AI 化处理（强制，每份材料必须执行）
-
-**REQUIRED SKILL: 在写入 .tex 文件之前，必须对所有生成的英文正文使用 `humanizer` skill 处理。**
-
-处理范围：**所有正文叙述段落**，包括：
-- Cover Letter 所有段落
-- Research Statement 新增/修改的段落（已有原文保留的段落无需重处理）
-- Teaching Statement 新增/修改的段落
-- Selection Criteria Response 所有 STAR 回应段落
-
-不处理范围：LaTeX 命令/环境声明、参考文献条目、课程代码、人名/职位名称、数字/统计数据
-
-**Humanizer 检查清单（写入 .tex 前必须全部确认）：**
-- [ ] 无 "pivotal / crucial / underscore / showcase / delve / landscape / testament / fostering" 等 AI 高频词
-- [ ] 无 "serves as / stands as / marks a / represents a" 等 copula 替代结构（改用 "is/are"）
-- [ ] 无 "Not only...but also..." / "It's not just...it's..." 负向并行结构
-- [ ] Em dash（—）每份材料不超过 2 处
-- [ ] 无无来源的 "Experts argue / Industry reports / Observers note" 等模糊引用
-- [ ] 无 "highlights / underscores / reflecting / contributing to" 等假深度 -ing 结尾
-- [ ] 无过度 hedging（"could potentially / might arguably / may possibly"）
-- [ ] 无 "I hope this helps / let me know / here is a..." 等对话口吻残留
-- [ ] 结尾段有具体内容，非泛泛 "I look forward to..."（或结尾保持简洁直接）
-- [ ] 句子长度有变化（非每句都是同等长度的复合句）
-
-#### Step 3b: 复制模板 + 编译 PDF（收尾步骤）
-
-**执行流程：**
-1. 从 `overleaf-projects/Faculty Position/` 复制完整 LaTeX 项目目录到 `output/{school_id}/materials/`：
-   - `overleaf-projects/Cover Letter/Cover Letter- {学校名}/` → `output/{school_id}/materials/Cover Letter/`
-     - 如 overleaf 中没有该校 cover letter，复制模板 `overseas_pipeline/templates/cover_letter/` 的内容
-   - `Research Statement/Research Statement/` → `output/{school_id}/materials/Research Statement/`
-   - `Teaching Statement/Teaching Statement/` → `output/{school_id}/materials/Teaching Statement/`
-   - Selection Criteria Response 无需复制（新建目录即可）
-
-2. 用 Step 3a 生成的 .tex 内容**替换**复制后目录中的对应 .tex 文件
-
-3. **检查样式一致性**：
-   - 对比 Step 3a 生成的 .tex 与原始模板的 preamble（包、颜色、页边距、字体等）
-   - 如发现差异需要修改样式（如调整页边距适配更长内容），在 notes.md 中说明修改原因
-
-4. **编译 PDF**：
-   ```bash
-   cd "output/{school_id}/materials/{文件夹}" && xelatex {主tex文件} && xelatex {主tex文件}
-   ```
-   - 执行两遍 xelatex 确保页码和引用正确
-   - 如编译失败，检查错误并修复，记录到 notes.md
-
-5. 验证 PDF 生成成功，检查页数是否合理
-
-**每份 .notes.md 格式（强制要求，不可简化）：**
-
-notes.md 是给 Sophia 审核的"修改日志"，必须包含足够的上下文让她无需打开 .tex 文件就能理解所有修改。**必须包含以下所有章节：**
-
-```markdown
-# {材料名} 修改说明 -- {学校}
-
-## 生成日期
-
-## 总体策略
-<!-- 2-3 句话说明整体定制方向和关键定位决策 -->
-<!-- 例：将 Sophia 的 human-AI collaboration 研究定位为 "human-centered evaluation for agentic AI" -->
-
-## 参考资料清单
-| # | 类型 | 资料 | 链接/路径 |
-|---|------|------|-----------|
-| R1 | 区域规则卡 | 澳洲规则卡 Section X（具体行号）| region_knowledge/regions/australia.md L58-138 |
-| R2 | Fit Report | {学校} 匹配分析 | output/{school}/fit_report.md |
-| R3 | Sophia 材料 | Research Statement | job_filling/materials/Research_Statement.md |
-...
-<!-- 参考资料必须标注具体章节/行号，不可泛泛引用 -->
-
-## 逐段修改说明
-
-### 1. {段落标识} [NEW/MODIFIED/UNCHANGED]
-**原文：** > 引用原始文本（如为新增则标注"无对应原文"）
-**修改为：** > 引用修改后的关键句子
-**原因：**
-- 引用 [R1: 具体章节/行号] ...
-- 说明这个修改的设计意图
-
-### N. 未修改部分
-<!-- 必须列出所有未修改的主要段落，说明保留原因 -->
-<!-- 例：教学哲学段（interactive + continuous refinement）完全保留，这是 Sophia 的核心教学理念 -->
-
-## 样式说明与 Debug 记录
-<!-- 记录编译器选择（pdflatex/xelatex）、字体、颜色方案等 -->
-<!-- 如有编译问题的修复，必须记录 -->
-
-## 给 Sophia 的审核重点
-<!-- 3-5 条需要 Sophia 核实或决策的具体项目 -->
-<!-- 每条必须是可操作的（如"核实 X 数字是否准确"），不是泛泛的"请审核" -->
-```
-
-**notes.md 质量检查标准（Step 3 完成前必须自检）：**
-- [ ] 每个修改段落都有原文 vs 修改 的对比
-- [ ] 每个修改原因都引用了具体的参考资料编号和章节
-- [ ] 未修改的部分也有说明（为什么保留）
-- [ ] 有编译/样式说明
-- [ ] "给 Sophia 的审核重点"包含具体可操作的审核项
-
----
+核心步骤：按 fit_report 建议生成 Cover Letter / Research Statement / Teaching Statement / Diversity Statement（按需）/ CV（按需）/ Selection Criteria Response（澳洲）→ Humanizer 处理（强制）→ 编译 PDF
 
 ### "一键分析 {学校名}"
 
-依次执行 Step 1 → Step 2 → Step 3，中间不暂停（规则冲突时除外）。
-
-**用法：** 适用于已确认要投的学校，需同时提供：
-- 院系 URL（或职位 URL）
-
-**执行：**
-1. 如果 `faculty_data.json` 不存在 → 先执行"研究 {学校名}"
-2. 如果 `fit_report.md` 不存在 → 执行"分析 {学校名}"
-3. 执行"生成材料 {学校名}"
+依次执行 Step 1 → Step 2 → Step 3，读取对应 workflow 文件。规则冲突或数据质量不足时暂停。
 
 ---
 
@@ -564,11 +128,7 @@ notes.md 是给 Sophia 审核的"修改日志"，必须包含足够的上下文�
 3. **冲突时必须暂停**：规则冲突不能静默处理，必须等用户判断
 4. **澳洲 KSC 是重点**：Selection Criteria Response 是澳洲申请的核心，不能遗漏
 5. **引用要具体**：notes 文件中引用规则卡时需注明章节，不能泛泛引用
-6. **每步必须生成 step summary 文件**：每个 Step 完成后，除了在命令行向用户展示报告，**必须同时保存到文件**：
-   - Step 1 → `output/{school_id}/step1_summary.md`（数据质量报告 + 适配度初判 + 高匹配 faculty 概览 + 论文下载情况）
-   - Step 2 → `output/{school_id}/step2_summary.md`（fit score + 各维度评分 + 规则冲突记录 + 材料调整要点）
-   - Step 3 → `output/{school_id}/step3_summary.md`（各材料生成状态 + PDF 编译结果 + 需要 Sophia 重点审核的内容）
-   - 文件内容应与命令行展示的内容一致，方便跨 session 回溯和 Sophia 异步审阅
+6. **每步必须生成 step summary 文件**（step1/2/3_summary.md），内容与命令行展示一致
 
 ## 关于 .gitignore
 
@@ -582,29 +142,24 @@ overseas_pipeline 完成每个 Step 后，需要更新追踪数据库（`trackin
 
 ### 获取 app_id
 
-在开始研究某个学校前，先查找或创建 tracking 记录：
-
 ```python
 import sys, os
 sys.path.insert(0, os.path.join(os.getcwd()))
 from tracking.tracking_db import ApplicationTracker
 tracker = ApplicationTracker()
 
-# 查找已有记录（按 school_id 匹配）
 all_apps = tracker.all_applications()
 match = next((a for a in all_apps if school_id in (a.get("school_id") or "")), None)
 if match:
     app_id = match["id"]
 else:
-    # 新建记录
     app_id = tracker.add_job(school=school_name, position=job_title, region=region)
-print(f"app_id: {app_id}")
 ```
 
-或通过 CLI 手动创建：
+或通过 CLI：
 ```bash
 python -m tracking.cli add "University Name" "Position Title" --region australia
-python -m tracking.cli list --status discovered  # 找到 ID
+python -m tracking.cli list --status discovered
 ```
 
 ### Step 1 完成后
@@ -614,12 +169,12 @@ tracker.mark_researched(
     app_id=app_id,
     pipeline_dir=f"overseas_pipeline/output/{school_id}",
     school_id=school_id,
-    department=dept,                    # from faculty_data.json
-    hci_density_target=hci_target,      # "none"/"few"/"many"
+    department=dept,
+    hci_density_target=hci_target,
     hci_density_wide=hci_wide,
     hci_strategy=strategy,
     high_overlap_count=n,
-    data_quality=quality,               # "high"/"medium"/"low"
+    data_quality=quality,
 )
 ```
 
@@ -638,13 +193,8 @@ tracker.mark_materials_ready(app_id=app_id)
 ### 常用查询
 
 ```bash
-# 查看当前所有状态
 python -m tracking.cli dashboard
-
-# 查看某学校的详情和状态历史
 python -m tracking.cli show <app_id>
-
-# 手动更新状态（收到邮件后）
 python -m tracking.cli update <app_id> long_list
 python -m tracking.cli update <app_id> rejected
 ```

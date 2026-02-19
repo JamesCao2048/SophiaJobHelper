@@ -37,6 +37,8 @@ HCI_KEYWORDS = [
     "human factors", "ergonomics",
     "design research", "design thinking",
     "human-centered", "human centered", "people-centered",
+    "human-centred", "human centred", "people-centred",  # AU spelling
+    "human-computer dialogue", "human computer dialogue",
     "end-user", "end user computing",
     "conversational agent", "conversational interface",
     "intelligent user interface",
@@ -86,6 +88,11 @@ def classify(faculty_data: dict, target_dept_name: str | None, keywords: list) -
         if target_dept.lower() in dept.lower() or dept.lower() in target_dept.lower():
             target_hci.append(f["name"])
         else:
+            wide_hci.append(f["name"])
+
+    # cross_department_collaborators 总是归入 faculty_wide（明确是跨系的）
+    for f in faculty_data.get("cross_department_collaborators", []):
+        if is_hci_researcher(f, keywords):
             wide_hci.append(f["name"])
 
     target_level = count_to_level(len(target_hci))
