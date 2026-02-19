@@ -50,6 +50,8 @@ STRATEGY_MATRIX = {
     ("few",  "none"):  "builder",
     ("few",  "few"):   "builder",
     ("few",  "many"):  "builder_in_rich_ecosystem",
+    ("many", "none"):  "specialist",
+    ("many", "few"):   "specialist",
     ("many", "many"):  "specialist",
 }
 
