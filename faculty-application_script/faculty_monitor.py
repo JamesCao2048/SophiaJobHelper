@@ -817,6 +817,30 @@ def main():
     # 5. 打印推荐
     print_recommendations(recommended)
 
+    # 6. 写入追踪数据库
+    try:
+        import sys as _sys
+        import os as _os
+        _sys.path.insert(0, _os.path.join(_os.path.dirname(__file__), ".."))
+        from tracking.tracking_db import ApplicationTracker
+        _tracker = ApplicationTracker()
+        _added = 0
+        _last_id = None
+        for _job in recommended:
+            _last_id = _tracker.add_job(
+                school=_job.get("title", "")[:80],
+                position=_job.get("title", ""),
+                region=_job.get("region"),
+                job_url=_job.get("url"),
+                source="faculty_monitor",
+                monitor_score=_job.get("score"),
+            )
+            _added += 1
+        if _added:
+            log(f"📊 已将 {_added} 个推荐职位写入追踪数据库")
+    except Exception as _e:
+        log(f"⚠️  追踪数据库写入失败（不影响主功能）: {_e}")
+
     if show_all:
         print(f"\n📄 所有抓取到的职位 ({len(all_jobs)}):")
         for j in sorted(all_jobs, key=lambda x: x.get("score", 0), reverse=True):
