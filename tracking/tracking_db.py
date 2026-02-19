@@ -8,6 +8,12 @@ from pathlib import Path
 from typing import Optional, List
 
 
+ALLOWED_UPDATE_COLUMNS = {
+    "pipeline_dir", "school_id", "department", "hci_density_target",
+    "hci_density_wide", "hci_strategy", "high_overlap_count",
+    "data_quality", "fit_score", "form_url", "notes", "source",
+}
+
 VALID_STATUSES = {
     "discovered", "filtered_out", "researched", "analyzed",
     "decision_nogo", "materials_ready", "form_filling", "submitted",
@@ -81,7 +87,7 @@ CREATE TABLE IF NOT EXISTS status_log (
 
 
 class ApplicationTracker:
-    def __init__(self, db_path: str = None):
+    def __init__(self, db_path: Optional[str] = None):
         if db_path is None:
             db_path = str(_DEFAULT_DB)
         self.db_path = db_path
@@ -194,6 +200,8 @@ class ApplicationTracker:
                 set_parts.append(f"{ts_col}=?")
                 params.append(now)
             for k, v in extra_fields.items():
+                if k not in ALLOWED_UPDATE_COLUMNS:
+                    raise ValueError(f"Illegal column name: {k}")
                 set_parts.append(f"{k}=?")
                 params.append(v)
             params.append(app_id)
@@ -236,6 +244,9 @@ class ApplicationTracker:
 
     def stale_applications(self, status: str, older_than_days: int = 14) -> List[dict]:
         ts_col = STATUS_TIMESTAMPS.get(status, "updated_at")
+        SAFE_TS_COLUMNS = set(STATUS_TIMESTAMPS.values()) | {"updated_at"}
+        if ts_col not in SAFE_TS_COLUMNS:
+            ts_col = "updated_at"
         with self._conn() as conn:
             rows = conn.execute(
                 f"""SELECT * FROM applications
