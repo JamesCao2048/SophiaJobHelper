@@ -1,0 +1,5 @@
+# 覆盖父目录 *.pdf 规则：保留源文件 PDF（图片、签名、logo、figures 等）
+!*.pdf
+
+# 仅排除编译产物
+main.pdf

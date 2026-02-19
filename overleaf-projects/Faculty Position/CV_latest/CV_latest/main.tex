@@ -1,0 +1,133 @@
+% --- LaTeX CV Template (Compact Version) ---
+
+\documentclass[a4paper, 9.5em]{extarticle}
+
+\usepackage{fontawesome5}
+
+% --- Package imports ---
+\usepackage{enumitem, longtable, amsmath, array}
+\usepackage{hyperref}
+
+\usepackage{lmodern}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+
+\renewcommand{\headrulewidth}{0pt} % 去掉页眉那条线
+\renewcommand{\footrulewidth}{0pt} % 去掉页脚那条线
+\renewcommand{\headrulewidth}{0pt} % 去掉页眉线
+
+\pagestyle{fancy}
+\fancyhf{} % 清空默认页眉页脚
+\fancyfoot[C]{\thepage/\pageref*{LastPage}} % 居中显示 1/N 形式的页码
+
+% --- Page layout settings ---
+\usepackage[a4paper, includefoot, left=0.1in, right=0.15in, bottom=0.5in, top=0.5in, footskip=5pt]{geometry}
+\renewcommand{\baselinestretch}{1.2}
+
+% --- Page formatting ---
+\usepackage[dvipsnames]{xcolor}
+
+% --- Coffee title + Caramel accent color scheme ---
+\definecolor{pagebg}{HTML}{FAF2ED}
+\definecolor{headingcolor}{HTML}{B87350}
+\definecolor{linkcolor}{HTML}{B87350}
+\definecolor{tagbg}{HTML}{F0DDD2}
+\definecolor{tagframe}{HTML}{D4B8A6}
+
+% \pagecolor{pagebg}
+
+\hypersetup{colorlinks=true, linkcolor=linkcolor, urlcolor=linkcolor}
+\usepackage[most]{tcolorbox}
+
+\newtcbox{\explain}{on line,
+  colback=tagbg,
+  colframe=tagframe,
+  boxrule=0.2pt,
+  arc=2pt,
+  left=3pt,
+  right=3pt,
+  top=1pt,
+  bottom=1pt,
+  boxsep=0pt,
+  nobeforeafter,
+  tcbox raise base,
+  fontupper=\footnotesize\itshape
+}
+
+% \usepackage[most]{tcolorbox}
+\definecolor{impacttext}{HTML}{5A7D9A}
+\newcommand{\impacttag}[1]{{\footnotesize\color{impacttext}#1}}
+
+
+\usepackage[normalem]{ulem}
+% \pagenumbering{gobble}
+% \newcommand{\headingfont}{\large\color{BrickRed}}
+
+\newcommand{\headingfont}{\large\color{headingcolor}}
+
+\newcommand{\sectiontitle}[1]{%
+  {\headingfont\textbf{#1}}%
+  \newline\vspace{-2pt}%
+  {\color{headingcolor!60}\rule{\linewidth}{0.8pt}}%
+}
+
+\newcommand{\me}[1]{\textbf{\textcolor{headingcolor}{#1}}}
+
+% --- CV section settings ---
+\newcolumntype{R}{>{\raggedleft}p{0.3in}}
+
+\newenvironment{SectionTable}[1]{
+	\renewcommand*{\arraystretch}{1.5}
+	\setlength{\tabcolsep}{10pt}
+	\begin{longtable}{Rp{5.9in}} & #1 \\[0.2em]}
+{\end{longtable}\vspace{-0.5cm}}
+
+\newenvironment{SectionTableSingleSpace}[1]{
+	\renewcommand*{\arraystretch}{1.1}
+	\setlength{\tabcolsep}{4pt}
+	\begin{longtable}{Rp{5.5in}} & #1 \\[0.4em]}
+{\end{longtable}\vspace{-0.15cm}}
+
+
+
+
+
+
+
+
+% --- Document starts here ---
+
+\begin{document}
+
+\input{content/0_name}
+\input{content/1_interests}
+\input{content/2_employment}
+\input{content/3_education}
+% \newpage
+\input{content/4_ongoing}
+% \newpage
+\input{content/5_pubs}
+\input{content/10_honors}
+\input{content/6_talks}
+\input{content/7_service}
+\input{content/8_mentorship}
+% \input{content/8_public_mentorship}
+
+\input{content/9_teaching}
+
+\input{content/11_reference}
+
+
+
+\end{document}
+
+
+
+
+
+
+\begin{SectionTable}{\headingfont Other interests}
+& Running, photography, writing, classical music
+\end{SectionTable}

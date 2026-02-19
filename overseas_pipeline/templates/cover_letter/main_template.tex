@@ -1,0 +1,187 @@
+% ============================================================
+% Overseas Pipeline -- Cover Letter Template
+%
+% 使用方法（由 Claude Code 在 Step 3 生成时替换占位符）：
+%
+% 占位符说明：
+%   {{POSITION_TITLE}}     - 职位名称，如 "Lecturer (Level B)"
+%   {{POSITION_REF}}       - 职位 Reference 号（如有），如 "Ref: 688354"
+%   {{DEPARTMENT_NAME}}    - 院系名称，如 "Department of Data Science and AI"
+%   {{UNIVERSITY_NAME}}    - 学校名称，如 "Monash University"
+%   {{SEARCHING_FOCUS}}    - 该职位的研究重点描述
+%   {{FACULTY_OVERLAP}}    - 与 faculty 的具体 overlap 段落（1-2 句）
+%   {{CLOSING_PARA}}       - 结尾段落（感谢 + 期望讨论）
+%   {{JOB_URL}}            - 职位链接
+%   {{GRANT_MENTION}}      - 资助计划提及（如澳洲的 ARC DECRA）
+%
+% 编译：xelatex main.tex
+% ============================================================
+
+\documentclass[11pt]{OUCletter}
+\usepackage{fontspec}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=blue,
+  urlcolor=blue,
+  filecolor=magenta,
+  pdfborder={0 0 0},
+  breaklinks=true,
+  bookmarksopen=true,
+  bookmarksnumbered=true
+}
+
+\definecolor{scured}{RGB}{1, 45, 114}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{eso-pic}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\rhead{Page \thepage \hspace{1pt} of \pageref{LastPage}}
+
+% ============================================================
+% 自定义变量 -- Claude Code 在生成时替换这些值
+% ============================================================
+\newcommand{\searchingfocus}{\textbf{{{SEARCHING_FOCUS}}}}
+\newcommand{\departmentname}{{{DEPARTMENT_NAME}}}
+\newcommand{\universityname}{{{UNIVERSITY_NAME}}}
+
+% ============================================================
+% 申请人信息（Sophia 固定信息，通常不需要修改）
+% ============================================================
+\def\name{\textbf{Jie Gao} \\[10pt]
+    Malone Postdoctoral Fellow \\
+    Department of Computer Science \\
+    Malone Center for Engineering in Healthcare \\
+    Center for Language and Speech Processing \\
+    Johns Hopkins University \\
+    jgao77@jh.edu \\
+    \href{https://gaojie058.github.io/}{https://gaojie058.github.io/} \\
+}
+
+\def\Where{\hspace{-1.2mm}\textbf{\color{scured}%
+        {Department of Computer Science}, \\
+        {Johns Hopkins University}
+}}
+
+\def\Address{Malone Hall, 3400 N Charles St}
+\def\CityZip{Baltimore, MD 21218, USA}
+\def\Email{\textbf{\color{scured}E-mail}: jgao77@jh.edu}
+\def\TEL{\textbf{\color{scured}Phone}: +1 (410)710-0555}
+\def\URL{\textbf{\color{scured}Website}: {https://gaojie058.github.io/}}
+
+% ============================================================
+% Signature（使用图片签名或文字签名）
+% ============================================================
+% 如果 signature.pdf 存在，使用图片签名：
+% \signature{\vspace{2mm}\includegraphics[scale=0.3]{signature.pdf}\\\vspace{2mm}\name}
+% 否则使用文字签名：
+\signature{\name}
+
+% ============================================================
+% TikZ 坐标系（用于右上角地址块）
+% ============================================================
+\makeatletter
+\def\parsecomma#1,#2\endparsecomma{\def\page@x{#1}\def\page@y{#2}}
+\tikzdeclarecoordinatesystem{page}{
+    \parsecomma#1\endparsecomma
+    \pgfpointanchor{current page}{north east}
+    \pgf@xc=\pgf@x%
+    \pgf@yc=\pgf@y%
+    \pgfpointanchor{current page}{south west}
+    \pgf@xb=\pgf@x%
+    \pgf@yb=\pgf@y%
+    \pgfmathparse{(\pgf@xc-\pgf@xb)/2.*\page@x+(\pgf@xc+\pgf@xb)/2.}
+    \expandafter\pgf@x\expandafter=\pgfmathresult pt
+    \pgfmathparse{(\pgf@yc-\pgf@yb)/2.*\page@y+(\pgf@yc+\pgf@yb)/2.}
+    \expandafter\pgf@y\expandafter=\pgfmathresult pt
+}
+\makeatother
+
+\address{}
+
+\def\newaddress{
+    \Where\\
+    \Address\\
+    \CityZip\\
+    \TEL\\
+    \Email\\
+    \URL
+}
+
+\date{\vspace{10mm} \today}
+
+% ============================================================
+% 正文
+% ============================================================
+\begin{document}
+
+    \begin{letter}{
+            \textit{Selection Panel Chair}, \\
+            \departmentname{}, \\
+            \universityname
+        }
+
+        \begin{tikzpicture}[remember picture,overlay,,every node/.style={anchor=center}]
+        \node[text width=7cm] at (page cs:0.5,0.73){\small \newaddress};
+        \end{tikzpicture}
+
+        \opening{Dear Selection Committee,}
+
+        % --------------------------------------------------------
+        % 第一段：开头定调（简洁，直接点明职位和身份）
+        % --------------------------------------------------------
+        I write to apply for the \href{{{JOB_URL}}}{\textbf{{{POSITION_TITLE}}}} position
+        ({{POSITION_REF}}) in \departmentname{} at \textbf{\universityname}.
+        I am currently a \href{https://malonecenter.jhu.edu/people-2/members/#postdoctoral-members}{Malone Postdoctoral Fellow}
+        at Johns Hopkins University, specializing in \textbf{human-AI collaboration},
+        \textbf{responsible and trustworthy AI}, and \textbf{human-centered computing}.
+        My research directly aligns with \departmentname's focus in \searchingfocus.
+
+        % --------------------------------------------------------
+        % 第二段：研究核心贡献（高影响，具体成果）
+        % --------------------------------------------------------
+        \textbf{(1) My research addresses fundamental challenges at the intersection of HCI and AI.}
+        A central question driving my work is: \textit{How can we design AI systems that strengthen
+        human capabilities in analyzing complex unstructured data?} To address this, I have developed
+        human-AI partnership systems: \href{https://dl.acm.org/doi/abs/10.1145/3617362}{CoAIcoder}
+        (TOCHI 2023) and \href{https://dl.acm.org/doi/abs/10.1145/3613904.3642002}{CollabCoder}
+        (CHI 2024), which support efficient, transparent, and trustworthy human-AI analytical workflows.
+        Two of these systems---\href{https://gaojie058.github.io/CollabCoder/}{CollabCoder} and
+        \href{https://mindcoder.ai/}{MindCoder}---have been publicly deployed as open-source tools,
+        demonstrating real-world impact beyond publication. My CHI and TOCHI publications are
+        well-cited and have attracted researchers across software engineering, healthcare, and education.
+
+        % --------------------------------------------------------
+        % 第三段：与该校 faculty 的具体 overlap（个性化，Step 3 填充）
+        % --------------------------------------------------------
+        \textbf{(2) Research fit with \universityname{}.}
+        {{FACULTY_OVERLAP}}
+
+        % --------------------------------------------------------
+        % 第四段：资助潜力（澳洲需要提 ARC）
+        % --------------------------------------------------------
+        \textbf{(3) Research funding potential.}
+        As an early-career researcher with a strong publication record at top-tier venues
+        (CHI, TOCHI, UIST), I am well-positioned to pursue competitive funding.
+        {{GRANT_MENTION}}
+        I also have strong potential to pursue ARC Linkage Projects through collaborations
+        with industry partners, building on my prior experience at the Singapore--MIT Alliance
+        (SMART), where I collaborated directly with Changi Airport and Synergy Marine Group.
+
+        % --------------------------------------------------------
+        % 结尾
+        % --------------------------------------------------------
+        {{CLOSING_PARA}}
+
+        \closing{Sincerely yours,}
+    \end{letter}
+
+\end{document}

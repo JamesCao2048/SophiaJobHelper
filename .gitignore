@@ -24,6 +24,11 @@ job_hunting/materials/**/*.out
 
 # 学校申请草稿（每所学校的定制化输出）
 job_hunting/drafts/
+china_job_hunting/drafts/
+
+# Overseas Pipeline 产出物（学校分析数据、材料初稿）
+overseas_pipeline/output/*/
+!overseas_pipeline/output/.gitkeep
 
 # 扫描/调研结果数据
 job_hunting/scan/*.xlsx
@@ -34,6 +39,20 @@ backup_*/
 
 # 临时/运行中输出
 /tmp/
+faculty-application_script/monitor_log.txt
+
+# ============================================================
+# Overleaf 本地同步（用 Google Drive 管理，git 仅保留参考模板 .tex 源码）
+# ============================================================
+
+# 敏感 cookie 文件
+overleaf-projects/cookie.json
+
+# Cover Letter 目录：忽略全部，仅保留 King's College London 作参考
+overleaf-projects/Cover Letter/*
+!overleaf-projects/Cover Letter/Cover Letter - King's College London/
+
+# Faculty Position 目录：全部纳入版本控制（编译产物由其内部 .gitignore 管理）
 
 # ============================================================
 # 敏感信息
@@ -44,6 +63,13 @@ backup_*/
 .env
 .env.*
 !.env.example
+
+# Google Service Account 密钥
+credentials/
+**/credentials/*.json
+
+# 同步数据缓存
+synced_data/
 
 # ============================================================
 # macOS

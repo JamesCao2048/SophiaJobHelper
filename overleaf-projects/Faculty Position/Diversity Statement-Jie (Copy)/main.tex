@@ -1,0 +1,31 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SPDX-License-Identifier: BSD-3-Clause
+% Copyright (c) 2020, Salman Ahmad Faris
+% https://github.com/salfaris/EasyPS
+% Copyright (c) 2024, Daize Dong
+% https://github.com/DaizeDong/Easier-PS-and-SoP
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{easier_sop}
+
+\usepackage{hyperref}
+
+% --- ESSAY DISPLAY SETTINGS ---
+\SetStudentName{Jie Gao}           % Your name
+% \SetProgramName{ProgramName}           % Program you're applying for
+\SetUniversityName{Service and Diversity Statement}     % University name
+\SetUniversityAbbr{\GetUniversityName} % University abbreviation (default as the university name if not set)
+
+
+% CONTENT
+\begin{document}
+\thispagestyle{firstpageheader} % Use the expanded header on the first page
+\input{content}
+\newpage
+\nocite{*} % show all the references
+% Make bibliography smaller
+% {\footnotesize
+% \bibliography{ref}
+% }
+
+\end{document}
