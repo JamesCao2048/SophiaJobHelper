@@ -423,6 +423,17 @@ async def cmd_apply(args: argparse.Namespace) -> int:
         print(f"\n{GREEN}Apply complete.{RESET}")
     finally:
         await browser_inst.close()
+    # Update tracker if --app-id provided
+    if hasattr(args, 'app_id') and args.app_id:
+        try:
+            import sys as _sys, os as _os
+            _sys.path.insert(0, _os.path.join(_os.path.dirname(__file__), ".."))
+            from tracking.tracking_db import ApplicationTracker
+            _tracker = ApplicationTracker()
+            _tracker.mark_submitted(args.app_id)
+            print(f"{GREEN}✓ Tracker updated: #{args.app_id} → submitted{RESET}")
+        except Exception as _e:
+            print(f"{YELLOW}⚠  Tracker update failed (non-fatal): {_e}{RESET}")
     return 0
 
 
@@ -544,6 +555,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("extract", help="Extract form fields as JSON (for Claude Code)")
     apply_parser = sub.add_parser("apply", help="Apply fill instructions from JSON file")
     apply_parser.add_argument("instructions", help="Path to JSON instructions file")
+    apply_parser.add_argument("--app-id", type=int, default=None,
+                              help="Tracking DB application ID to mark as submitted on success")
     sub.add_parser("wait-and-learn", help="Wait for navigation then auto-learn")
     sub.add_parser("fill", help="Fill the current page (local rules only)")
     sub.add_parser("watch", help="Continuously fill pages as you navigate")
