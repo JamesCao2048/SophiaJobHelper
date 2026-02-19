@@ -45,36 +45,46 @@ overleaf-projects/           ← 申请材料 LaTeX 源文件（被 Step 3 读�
 ## 产出物结构
 
 ```
-output/{school_id}/
-├── faculty_data.json          ← Step 1 产出：faculty 结构化数据
-├── faculty_data.sources.md    ← Step 1 产出：数据来源标注
-├── data_quality.json          ← Step 1 产出：数据质量评估（决定是否 warn 用户）
-├── fit_report.md              ← Step 2 产出：匹配分析报告
-├── fit_report.sources.md      ← Step 2 产出：参考资料清单
-├── papers/                    ← Step 1 下载的相关论文（PDF）
-└── materials/                 ← Step 3 产出
-    ├── Cover Letter/              ← 从 overleaf-projects 复制的完整 LaTeX 项目
-    │   ├── main.tex                   ← 定制后的 cover letter
-    │   ├── main.pdf                   ← 编译后的 PDF
-    │   ├── OUCletter.cls              ← 样式文件
-    │   ├── signature*.pdf/png         ← 签名文件
-    │   └── ...                        ← 其他依赖文件
-    ├── Research Statement/        ← 从 overleaf-projects 复制的完整 LaTeX 项目
-    │   ├── main.tex                   ← 定制后的 research statement
-    │   ├── main.pdf                   ← 编译后的 PDF
-    │   ├── figures/                   ← 图片文件夹
-    │   └── reference.tex              ← 参考文献
-    ├── Teaching Statement/        ← 从 overleaf-projects 复制的完整 LaTeX 项目
-    │   ├── Teaching_Statement.tex     ← 定制后的 teaching statement
-    │   └── Teaching_Statement.pdf     ← 编译后的 PDF
-    ├── Selection Criteria Response/  ← 新建的 LaTeX 项目（澳洲特有）
-    │   ├── selection_criteria_response.tex
-    │   └── selection_criteria_response.pdf
-    ├── cover_letter.notes.md      ← 修改说明（diff + 原因 + 参考来源）
-    ├── research_statement.notes.md
-    ├── teaching_statement.notes.md
-    └── selection_criteria_response.notes.md  ← （澳洲特有）
+output/{school_id}/                        ← 学校级目录（同校多院系共存）
+├── {dept_id}/                             ← 院系级目录（所有产出物在此）
+│   ├── faculty_data.json          ← Step 1 产出：faculty 结构化数据
+│   ├── faculty_data.sources.md    ← Step 1 产出：数据来源标注
+│   ├── data_quality.json          ← Step 1 产出：数据质量评估
+│   ├── fit_report.md              ← Step 2 产出：匹配分析报告
+│   ├── fit_report.sources.md      ← Step 2 产出：参考资料清单
+│   ├── step1_summary.md           ← Step 1 完成摘要
+│   ├── step2_summary.md           ← Step 2 完成摘要
+│   ├── step3_summary.md           ← Step 3 完成摘要
+│   ├── raw/                       ← 原始抓取内容
+│   │   ├── faculty_page.md
+│   │   └── course_catalog_raw.md  ← 课程页原始内容（agent 分析用）
+│   ├── papers/                    ← Step 1 下载的相关论文（PDF）
+│   └── materials/                 ← Step 3 产出
+│       ├── Cover Letter/
+│       │   ├── main.tex / main.pdf
+│       │   ├── OUCletter.cls
+│       │   ├── signature*.pdf/png
+│       │   └── cover_letter.notes.md
+│       ├── Research Statement/
+│       │   ├── main.tex / main.pdf
+│       │   ├── figures/
+│       │   ├── reference.tex
+│       │   └── research_statement.notes.md
+│       ├── Teaching Statement/
+│       │   ├── Teaching_Statement.tex / .pdf
+│       │   └── teaching_statement.notes.md
+│       └── Selection Criteria Response/（澳洲特有）
+│           ├── selection_criteria_response.tex / .pdf
+│           └── selection_criteria_response.notes.md
+└── {dept_id_2}/                           ← 同校另一个院系（结构相同）
+    └── ...
 ```
+
+**`dept_id` 命名规则：** 目标院系名称的英文缩写，snake_case，如：
+- "Department of Data Science and AI" → `dsai`
+- "Human-Centred Computing" → `hcc`
+- "Department of Computer Science" → `cs`
+- "School of Information Systems" → `information_systems`
 
 ### 材料输出格式规范
 
@@ -98,7 +108,19 @@ output/{school_id}/
 **前提：** 需要学校名 + 院系 URL（或职位 URL）
 
 **执行步骤：**
-1. 确定学校 ID（snake_case，如 `monash_university`）
+1. 确定学校 ID 和院系 ID：
+   - `school_id`：snake_case，如 `monash_university`
+   - `dept_id`：目标院系英文缩写，snake_case，如 `dsai`、`hcc`、`cs`
+   - 输出目录：`output/{school_id}/{dept_id}/`
+
+1b. **扫描同校已有院系产物**（如 `output/{school_id}/` 已存在）：
+   - 列出已有的 `{dept_id}/` 子目录
+   - 扫描各子目录的 `papers/` 和 `faculty_data.json`
+   - 识别与当前院系 faculty 重叠的教授（joint appointment 或同校 HCI 教授）
+   - 将有价值的论文 PDF **复制**到当前院系的 `papers/` 目录（不是 symlink）
+   - 将已有院系的 `related_applications` 信息写入当前院系的 `faculty_data.json`
+   - 在 step1_summary.md 中列出：从哪个已有院系复用了哪些论文
+
 2. 爬取院系页面（五层 fallback 策略）：
    - **Layer 1**: 运行 `python overseas_pipeline/src/faculty_scraper.py`（Jina Reader API）
      ```
@@ -141,7 +163,15 @@ output/{school_id}/
      --output output/{school_id}/faculty_data.json \
      --school "{学校名}"
    ```
-   五层 fallback 抓取课程列表，写入 `faculty_data.json` 的 `department_courses` 字段。如课程页面 URL 未知，用 Tavily 搜索 `site:{domain} course catalog`。**agent 随后审查**：识别 Sophia 能教的课，按密度策略排序（pioneer→CS 核心课在前；builder→互补课程在前；specialist→高阶课在前）。
+   五层 fallback 抓取课程列表：
+   - 原始内容**始终保存**到 `output/{school_id}/{dept_id}/raw/course_catalog_raw.md`
+   - 正则启发式提取结果写入 `faculty_data.json` 的 `department_courses` 字段
+   - 如课程页面 URL 未知，用 Tavily 搜索 `site:{domain} course catalog`
+
+   **agent 随后审查**：
+   - 若 `department_courses` 为空（正则提取失败），读取 `raw/course_catalog_raw.md` 直接识别课程
+   - 识别 Sophia 能教的课，按密度策略排序（pioneer→CS 核心课在前；builder→互补课程在前；specialist→高阶课在前）
+   - 将识别结果写回 `faculty_data.json` 的 `department_courses` 字段（覆盖空列表）
 
 10. **agent 审查补充**：
     - 检查密度分类是否有边界遗漏（如某教授写 "computational social science" 但实际做 HCI）

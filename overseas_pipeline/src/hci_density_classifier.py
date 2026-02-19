@@ -8,9 +8,9 @@ hci_density_classifier.py -- Step 1 辅助：HCI 密度自动分类
 写回 faculty_data.json 的 hci_density 字段。
 
 用法:
-  python hci_density_classifier.py --input output/monash_university/faculty_data.json
-  python hci_density_classifier.py --input output/monash_university/faculty_data.json --target-dept "DSAI"
-  python hci_density_classifier.py --input output/monash_university/faculty_data.json --dry-run
+  python hci_density_classifier.py --input output/monash_university/dsai/faculty_data.json
+  python hci_density_classifier.py --input output/monash_university/dsai/faculty_data.json --target-dept "DSAI"
+  python hci_density_classifier.py --input output/monash_university/dsai/faculty_data.json --dry-run
 """
 
 import argparse

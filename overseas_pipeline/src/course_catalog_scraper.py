@@ -293,6 +293,16 @@ def main() -> None:
         return
 
     output_path = Path(args.output)
+
+    # 保存原始内容到 raw/ 目录，供 agent 在正则提取为空时直接分析
+    raw_dir = output_path.parent / "raw"
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    raw_path = raw_dir / "course_catalog_raw.md"
+    with open(raw_path, "w", encoding="utf-8") as f:
+        f.write(f"<!-- source: {args.url} | layer: {layer} | date: {datetime.now().strftime('%Y-%m-%d')} -->\n\n")
+        f.write(content)
+    log(f"Raw content saved to {raw_path} ({len(content)} chars)")
+
     if output_path.exists():
         with open(output_path, encoding="utf-8") as f:
             faculty_data = json.load(f)
@@ -305,6 +315,9 @@ def main() -> None:
         json.dump(faculty_data, f, indent=2, ensure_ascii=False)
 
     print(f"\n✓ Written to {output_path}")
+    if len(courses) == 0:
+        print(f"⚠ 课程提取为空（{layer} 内容已保存到 {raw_path}）")
+        print("  Agent 应在 Step 1 step 10 审查中直接读取 raw 文件识别课程")
 
 
 if __name__ == "__main__":
