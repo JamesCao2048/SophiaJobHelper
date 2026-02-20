@@ -66,17 +66,22 @@
 ### 3.4 特色材料
 
 #### Bicultural Statement / Te Tiriti Commitment Statement
-- **状态**: 取决于 JD 是否明确要求（见下方优先级判断）
-- **优先级判断规则**（⚠️ 流水线必须遵守）：
-  - **高优先级**：JD 明确提及 Te Tiriti / Māori / Pasifika / Bicultural / Treaty → 必须准备专门段落，三条款逐一回应
-  - **中优先级**：JD 未提及上述关键词 → 在 Cover Letter 中用 1-2 句简要展示文化敏感度即可，不需大篇幅；如篇幅紧张可省略
-  - 流水线 Step 2 分析时，**必须检查 JD 原文**是否包含关键词，并在 fit_report 中标注实际优先级，提示用户
-- 参考来源：([亚洲教职分析](../general/research_job_rules/亚洲及中东教职招聘分析.md) L166)
-- **⚠️ 错误写法**: 把它写成美国式的 Diversity Statement（多元化声明），只谈"包容少数族裔"= 直接低分出局
-- **正确写法**: 必须具体引用条约的三个条款 ([亚洲教职分析](../general/research_job_rules/亚洲及中东教职招聘分析.md) L173):
-  - **Kāwanatanga (Governance/Partnership)**：你如何在教学和科研管理中与毛利人建立伙伴关系？
-  - **Tino Rangatiratanga (Chieftainship/Self-determination)**：你的 CS/HCI 研究如何赋能毛利数据主权（Māori Data Sovereignty）？
-  - **Ōritetanga (Equity)**：你的算法或系统如何确保不加剧对毛利群体的不平等？
+- **状态**: 取决于 JD 信号强度和学校信号强度的矩阵交叉结果（6 个策略标签：skip / subtle / moderate / strong / full_treaty）
+- **Pipeline 行为**:
+  - Step 1（Step 10.5）：自动检测 JD 信号和学校信号，预判策略标签，写入 `faculty_data.json → te_tiriti`
+  - Step 2：矩阵交叉确认策略标签，生成 fit_report 中的 Te Tiriti 专节（含两层证据原文 + Sophia 经历锚点）
+  - Step 3：按策略标签生成对应段落，Humanizer 强制检查诚实度
+- **详细策略（六个策略标签的修辞指南、学校种子表、引用索引）**:
+  见 `overseas_pipeline/strategies/nz_te_tiriti_strategy.md`
+- **核心禁忌（快速参考）**:
+  - ❌ 写成美式 Diversity Statement（只谈"包容少数族裔"）→ 直接低分出局
+  - ❌ 把毛利人归为"少数族裔"之一（毛利人是条约缔约方，具有独特宪法地位）
+  - ❌ 伪装已有毛利社区合作经验（无经历的申请者只能表达真诚意愿和学习计划）
+- **正确框架（快速参考）**: 三条款（仅 `strong` / `full_treaty` 级别需逐一展开）:
+  - **Kāwanatanga (Partnership)**：参与式设计方法论、跨学科协作经历
+  - **Tino Rangatiratanga (Self-determination)**：人类控制权研究、数据主权意识
+  - **Ōritetanga (Equity)**：AI 公平性立场、多元背景学生支持经验
+- 参考来源：[亚洲教职分析](../general/research_job_rules/亚洲及中东教职招聘分析.md) L166-181
 
 ---
 
