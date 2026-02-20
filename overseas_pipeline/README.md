@@ -116,36 +116,6 @@ overseas_pipeline/overleaf-projects/Faculty Position/
 
 ---
 
-## 发布到 Release 分支
-
-`release` 分支是干净的对外发布版本，只包含 overseas_pipeline 相关的子模块，不含开发工具（`tracking/`、`google-sheets-sync/` 等）。
-
-**告诉 Claude Code 任意一种说法即可触发发布：**
-```
-release
-发布
-同步到 release 分支
-```
-
-Claude 会自动运行同步脚本。你也可以手动运行：
-
-```bash
-# 先预览会同步哪些变更（推荐）
-bash ../scripts/do_release.sh --dry-run
-
-# 正式同步
-bash ../scripts/do_release.sh
-
-# 同步并推送到远端
-bash ../scripts/do_release.sh --push
-```
-
-**Release 分支包含：** `general/`、`overseas_pipeline/`、`job_filling/`、`region_knowledge/`、`CLAUDE.md`、`README.md`
-
-> 如需将新子模块纳入 release，编辑 `../scripts/do_release.sh` 中的 `SYNC_PATHS` 数组即可。
-
----
-
 ## 启动 Claude Code
 
 **必须从 `overseas_pipeline/` 目录内启动 Claude Code**（确保相对路径正确，无需每次确认权限）：
