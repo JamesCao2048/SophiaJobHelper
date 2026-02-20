@@ -74,13 +74,21 @@ if ! git rev-parse --verify "$RELEASE_BRANCH" > /dev/null 2>&1; then
 fi
 
 # ============================================================
-# 暂存未提交的修改
+# 自动提交 main 上的未提交修改
 # ============================================================
-STASHED=0
 if ! git diff --quiet || ! git diff --staged --quiet; then
-    echo "📝 检测到未提交的修改，临时暂存..."
-    git stash push -m "pre-release $(date +%Y%m%d-%H%M%S)"
-    STASHED=1
+    echo "📝 检测到未提交的修改，自动提交到 main..."
+    git add -A
+    AUTO_COMMIT_MSG="chore: auto-commit before release ($(date +%Y-%m-%d))"
+    if [ "$DRY_RUN" -eq 1 ]; then
+        echo "  [DRY RUN] 将自动提交：$AUTO_COMMIT_MSG"
+        echo "  变更文件："
+        git diff --staged --name-only | sed 's/^/    /'
+    else
+        git commit -m "$AUTO_COMMIT_MSG"
+        echo "  ✓ 已提交：$AUTO_COMMIT_MSG"
+    fi
+    echo ""
 fi
 
 # ============================================================

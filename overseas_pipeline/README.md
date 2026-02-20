@@ -45,7 +45,7 @@
 [Step 3] 生成材料
   └→ AI 生成 Cover Letter / Research Statement / Teaching Statement 等
          ↓
-你审阅 .notes.md 文件，在 Overleaf 修改 .tex 文件，提交申请
+你审阅 .notes.md 文件，本地修改 .tex 文件并编译 PDF，提交申请
 ```
 
 每步都可以单独运行，也可以一次性运行"一键分析"。
@@ -113,6 +113,36 @@ overseas_pipeline/overleaf-projects/Faculty Position/
 ├── CV_latest/                   ← CV 源文件
 └── templates/cover_letter/      ← Cover Letter 模板（新学校用）
 ```
+
+---
+
+## 发布到 Release 分支
+
+`release` 分支是干净的对外发布版本，只包含 overseas_pipeline 相关的子模块，不含开发工具（`tracking/`、`google-sheets-sync/` 等）。
+
+**告诉 Claude Code 任意一种说法即可触发发布：**
+```
+release
+发布
+同步到 release 分支
+```
+
+Claude 会自动运行同步脚本。你也可以手动运行：
+
+```bash
+# 先预览会同步哪些变更（推荐）
+bash ../scripts/do_release.sh --dry-run
+
+# 正式同步
+bash ../scripts/do_release.sh
+
+# 同步并推送到远端
+bash ../scripts/do_release.sh --push
+```
+
+**Release 分支包含：** `general/`、`overseas_pipeline/`、`job_filling/`、`region_knowledge/`、`CLAUDE.md`、`README.md`
+
+> 如需将新子模块纳入 release，编辑 `../scripts/do_release.sh` 中的 `SYNC_PATHS` 数组即可。
 
 ---
 
@@ -310,7 +340,7 @@ output/{school_id}/{dept_id}/
 
 2. 打开对应的 PDF 文件，阅读完整材料
 
-3. 如需修改，打开 Overleaf 中对应的 `.tex` 文件进行编辑
+3. 如需修改，用本地文本编辑器（VS Code、Cursor 等）打开对应的 `.tex` 文件编辑，编辑后重新编译 PDF
 
 ### `.notes.md` 文件阅读指南
 
@@ -350,11 +380,24 @@ Cover Letter 第2段提到的合作方向不太准确，
 
 AI 会直接修改 `.tex` 文件并重新编译 PDF。
 
-### 方式二：在 Overleaf 中直接编辑
+### 方式二：本地直接编辑 .tex 文件
 
-如果你熟悉 LaTeX，可以直接在 Overleaf 中打开对应的 `.tex` 文件编辑。
+如果你熟悉 LaTeX，可以用本地编辑器（VS Code、Cursor、TeXShop 等）直接打开 `.tex` 文件编辑，然后在终端运行编译命令生成 PDF。
 
-> **注意**：`output/` 目录中的文件不在 Overleaf 云端同步，修改后需要手动更新。
+**LaTeX 编译指令：**
+
+```bash
+# 进入对应材料目录（以 Cover Letter 为例）
+cd output/university_of_auckland/cs/materials/Cover\ Letter/
+
+# latexmk 自动处理（推荐，自动处理参考文献和多轮编译）
+latexmk -pdf main.tex
+
+# 编译完成后清理中间文件（可选）
+latexmk -c
+```
+
+> **安装 LaTeX**：macOS 推荐 `brew install --cask mactex-no-gui`（命令行版，含 `pdflatex` / `latexmk`，约 4 GB）；或完整版 [MacTeX](https://www.tug.org/mactex/)。
 
 ### 意见反馈格式建议
 
