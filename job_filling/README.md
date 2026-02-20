@@ -1,87 +1,195 @@
-# job_filling — AI 驱动的申请表单自动填写系统
+# job_filling — AI 智能表单填写工具
 
-通过 Chrome CDP 连接浏览器，由 Claude Code 直接推理匹配，自动填写学术教职申请表单，并随使用积累学习记忆。
+> **目标**：学术教职申请表单从手动逐字填写，变为 AI 自动填写初稿 + 你快速校对，平均每份表单节省 20-40 分钟
 
-## 核心设计
+---
 
-**Claude Code 本身是匹配引擎**——不调用外部 API，直接读取 `profile.yaml` 和 `materials/*.md`，推理每个字段的最佳填写值，生成指令后由 Python 脚本执行填写。
+## 目录
 
-```
-extract（提取字段）→ Claude Code 推理匹配 → apply（执行填写）→ 用户校对 → learn（学习修改）
-```
+1. [工具是什么](#工具是什么)
+2. [整体工作流程](#整体工作流程)
+3. [第一次使用：安装与配置](#第一次使用安装与配置)
+4. [每次使用：填写步骤](#每次使用填写步骤)
+5. [如何给出调整意见](#如何给出调整意见)
+6. [profile.yaml 说明](#profileyaml-说明)
+7. [文件目录结构](#文件目录结构)
+8. [常见问题](#常见问题)
 
-## 依赖安装
+---
 
-```bash
-pip install -r requirements.txt
-# 主要依赖：playwright, pyyaml, pymupdf
-playwright install chromium
-```
+## 工具是什么
 
-## 快速开始
+这是一个让 Claude Code（AI 助手）自动填写学术教职申请网页表单的工具。
 
-### Step 0：启动 Chrome 调试端口
+**核心原理**：Claude Code 读取你的个人资料（`profile.yaml`）和申请材料（`materials/`），通过 Chrome 远程调试接口连接你的浏览器，逐字段推理并填写网页表单。你只需检查并修正填写结果，无需手动逐字输入。
 
-```bash
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-  --remote-debugging-port=9222 &
-```
+**主要特点**：
+- **越用越准**：每次你修正 AI 填错的内容，系统自动记忆，下次申请同类字段时直接用修正后的值
+- **支持复杂控件**：不仅支持普通文本框，也支持自定义 JS 下拉（如 PageUp 系统的 `pu-select`）、搜索弹窗等
+- **安全不乱填**：对于没有信息依据的字段，AI 会明确告知你，而不是猜测乱填
 
-然后在 Chrome 中打开目标申请页面并登录，导航到表单页面。
+---
 
-### Step 1：准备个人材料
-
-- `profile.yaml`：个人信息（姓名、地址、教育经历、工作经历等）
-- `materials/`：将 PDF 材料转为 Markdown（供 Claude Code 读取）
-
-```bash
-python pdf_to_md.py materials/CV.pdf          # 转换 PDF → MD
-```
-
-### Step 2：填写表单（通过 Claude Code）
-
-打开 Claude Code，告诉它：**"帮我填写表单"**
-
-Claude Code 会依次执行：
-```bash
-python form_filler.py extract        # 提取当前页面所有字段
-# Claude Code 读取字段 + profile + materials，推理匹配，写入 /tmp/instructions.json
-python form_filler.py apply /tmp/instructions.json   # 执行填写
-```
-
-填写后 Claude Code 输出汇总报告：
-```
-✓  高信心（来自记忆或 profile 精确匹配）
-⚠  低信心（推理得出，建议检查）
-✗  未填写（确实无相关信息）
-```
-
-### Step 3：校对与翻页
-
-在 Chrome 中检查并手动修正字段，然后点击"下一页"。
-
-告诉 Claude Code：**"下一页了"**，它会自动学习你的修改并填写新页面。
-
-### Step 4：持续填写模式
+## 整体工作流程
 
 ```
+启动调试 https://申请页面URL    ← 一句话完成依赖安装+浏览器启动+导航
+         ↓
+在调试浏览器里登录，导航到表单第一页
+         ↓
 告诉 Claude Code："启动持续填写"
+         ↓
+AI 自动填写当前页 → 输出填写报告（✓/⚠/✗）
+         ↓
+你在调试浏览器中检查、修正 ⚠ 字段，补填 ✗ 字段
+         ↓
+直接点击"下一页"（无需告知 AI）
+         ↓
+AI 自动检测翻页 → 学习你的修改 → 填写新页面 → 输出报告
+         ↓
+重复，直到表单完成 → 告诉 AI "停"
 ```
 
-系统自动循环：填写 → 等待翻页 → 学习修改 → 填写下一页，无需手动干预。
+**你主动操作的只有两件事**：检查报告 + 在调试浏览器里手动修正/翻页。其余全部由 AI 自动处理。
 
-## CLI 命令参考
+
+## 每次使用：填写步骤
+
+**必须在 `job_filling/` 目录内启动 Claude Code：**
 
 ```bash
-python form_filler.py extract                    # 提取当前页面字段 → JSON 输出
-python form_filler.py apply /tmp/instructions.json  # 按指令填写
-python form_filler.py learn                      # 读回当前页面值，保存到 profile.yaml
-python form_filler.py wait-and-learn             # 等待翻页后自动学习（持续监控）
-python form_filler.py fill                       # 本地规则匹配 + 填写（不依赖 Claude Code）
-python form_filler.py watch                      # 持续监控模式（fill 命令版）
+cd job_filling
+claude --dangerously-skip-permissions
 ```
 
-## profile.yaml 结构
+> **注意**：`--dangerously-skip-permissions` 让 AI 直接操作文件和运行脚本，无需逐一确认。这是正常使用所需的参数，在本地环境中安全。
+
+启动后，Claude Code 会检查调试浏览器状态并告诉你下一步。
+
+---
+
+### Step 0：启动调试浏览器并打开申请页面
+
+**说：**
+```
+启动调试 https://申请网站/表单页面URL
+```
+
+AI 会依次完成：
+1. 检查并安装依赖（首次使用自动安装）
+2. 启动**调试浏览器**（独立于你日常使用的 Chrome 的专用窗口）
+3. 在调试浏览器中打开你提供的 URL
+
+> **关于调试浏览器**：这是一个专用 Chrome 窗口（存储在 `/tmp/chrome-job-filling`），与你平时用的 Chrome 完全独立。首次使用时需要在这个窗口里重新登录申请网站，之后密码会自动保存，下次无需重复登录。**所有后续操作（检查填写结果、手动修正、点击下一页）都在这个调试浏览器中进行**，不要在你的日常 Chrome 中操作。
+
+如果页面需要登录，在调试浏览器中完成登录并导航到表单页面，然后回来告诉 AI。
+
+---
+
+### Step 1：启动持续填写
+
+**说（任选其一）：**
+```
+启动持续填写
+开始填写
+持续填写
+```
+
+AI 会立即填写当前页面并输出汇总报告：
+
+```
+📋 本轮填写汇总（共 12 个字段）
+
+已填写（10 个）：
+  ✓ 姓名 → Sophia Zhang
+  ✓ 邮箱 → sophia@university.edu
+  ⚠ 研究方向 → Human-Computer Interaction    ← 建议检查：从材料拼凑，不确定是否符合该系偏好
+
+未填写（2 个）：
+  ✗ 第二国籍 — profile 中无此信息
+  ✗ 紧急联系人 — profile 中无此信息
+
+🔍 建议重点检查：
+  - 研究方向：选项较多，AI 选了最接近的，请确认是否准确
+
+等待翻页中...（请在调试浏览器检查后点击"下一页"）
+```
+
+**信心标记含义：**
+| 标记 | 含义 |
+|------|------|
+| ✓ | 高信心：来自记忆或 profile 精确匹配 |
+| ⚠ | 低信心：通过推理得出，建议检查 |
+| ✗ | 未填：确实无相关信息，需手动填写 |
+
+---
+
+### Step 2：在调试浏览器里校对并翻页
+
+重点检查报告中 ⚠ 字段，手动补填 ✗ 字段。
+
+**直接点击"下一页"**——无需告知 AI。AI 会自动检测到翻页，学习你的修改，并填写新页面。
+
+---
+
+### Step 3：重复，直到完成
+
+AI 自动循环：检测翻页 → 学习修改 → 填写新页 → 输出报告 → 等待翻页…
+
+完成所有页面后，告诉 AI：
+```
+停
+结束
+完成了
+```
+
+---
+
+### 调试模式（排查问题时使用）
+
+如果某页填写结果不对，或者只想处理当前页，可以用单页模式：
+
+**填写当前页（不启动持续监控）：**
+```
+帮我填写表单
+填写当前页
+```
+
+**手动告知翻页（触发学习 + 填写下一页）：**
+```
+下一页了
+继续
+```
+
+单页模式下，每次翻页都需要手动告知 AI，适合逐页排查问题。
+
+---
+
+## 如何给出调整意见
+
+### 方式一：直接口述
+
+在 Claude Code 聊天窗口里描述你想要的修改：
+
+```
+第3个字段选的不对，这里应该选"Permanent Resident"不是"Citizen"
+```
+
+```
+research interests 那段太短了，能不能更具体一点？
+```
+
+### 方式二：直接在 Chrome 里改 （推荐）
+
+在表单页面直接手动修改字段，AI 翻页时会自动学习你的修改，下次同类字段会用新值。
+
+---
+
+## profile.yaml 说明
+
+`profile.yaml` 是这个工具的核心数据文件，包含两部分：
+
+### 基本信息（你手动维护）
 
 ```yaml
 personal:           # 姓名、邮箱、电话、网站、ORCID
@@ -92,50 +200,97 @@ work_experience:    # 工作经历列表
 references:         # 推荐人信息
 research_interests: # 研究方向（primary/secondary/tertiary）
 honors:             # 荣誉奖项
-
-learned_fields:     # 积累学习记录（自动更新）
-  field_key:
-    value: "填写的值"   # "" 表示刻意留空，下次跳过
-    label: "字段标签"   # 原始标签，用于跨网站一致性检测
 ```
 
-`learned_fields` 优先级最高，随每次申请自动积累。
+### 学习记忆（AI 自动维护）
 
-## 支持的字段类型
+```yaml
+learned_fields:
+  title:
+    value: "Dr"               # 自动填写的值
+    label: "Title:*"          # 该字段原始标签
+  second_nationality:
+    value: ""                 # 空字符串 = 刻意留空，下次跳过
+    label: "Second nationality:"
+```
 
-| 字段类型 | action 值 | 说明 |
-|---------|-----------|------|
-| 文本输入框 / 文本域 | `fill` | 直接输入文本 |
-| 原生下拉 `<select>` | `select` | 必须使用 options 中的 value 值 |
-| 单选 / 复选框 | `check` | 必须使用 options 中的 value 值 |
-| 自定义 JS 下拉（PageUp pu-select） | `custom-select` | 需提供 `listbox_id` |
-| 搜索弹窗（机构/专业查找） | `search-select` | 需提供 `hidden_id`，搜索词宜简短 |
+`learned_fields` 是 AI 通过学习积累的记忆，**优先级最高**，匹配时会优先使用。字段越多，填写越准确。
 
-## 注意事项
+> **安全说明**：`profile.yaml` 含个人敏感信息，已加入 `.gitignore`，不会提交到 git。`materials/` 目录同样如此。
 
-**条件展开字段**：选择某些字段（如教育类型）后会动态出现子字段。每次 apply 后需重新 extract，循环直到没有新字段出现。
+---
 
-**个人数据保护**：
-- `profile.yaml` 含个人信息，已加入 `.gitignore`，**禁止提交**
-- `materials/` 同样已忽略
+## 文件目录结构
 
-**Chrome 连接**：
-- 端口 9222 必须在运行前空闲
-- CDP 断开不会关闭用户的 Chrome，可随时重连
+```
+job_filling/
+├── README.md                    ← 本文件
+├── CLAUDE.md                    ← AI 指令（不需要手动修改）
+├── form_filler.py               ← CLI 主入口
+├── field_extractor.py           ← 从 DOM 提取表单字段
+├── browser.py                  ← Playwright CDP 连接封装
+├── profile_store.py             ← profile.yaml 读写工具
+├── llm_matcher_local.py         ← 本地规则匹配（fallback）
+├── pdf_to_md.py                 ← PDF → Markdown 转换工具
+├── profile.yaml                 ← ★ 个人资料 + 学习记忆（本地保留，不提交）
+└── materials/                   ← ★ 申请材料（本地保留，不提交）
+    ├── CV.md
+    ├── Research_Statement.md
+    └── Teaching_Statement.md
+```
 
-**select/radio/checkbox 填写**：value 必须来自 extract 输出的 options 列表，不能自行填写文字。
+---
 
-**search-select 字段**：搜索词用简短英文缩写（如 "MIT" 而非全称），无结果时自动 fallback 为手动输入模式。
+## 常见问题
 
-## 文件说明
+**Q: 第一次怎么开始？**
 
-| 文件 | 用途 |
+A: 启动 Claude Code 后，直接告诉 AI：`启动调试 https://申请网站URL`。AI 会自动：① 安装依赖；② 打开调试浏览器；③ 导航到你提供的 URL。不需要手动安装任何东西。
+
+---
+
+**Q: 调试浏览器和我平时用的 Chrome 是什么关系？**
+
+A: 完全独立的两个 Chrome 窗口。调试浏览器使用单独的配置文件（存储在 `/tmp/chrome-job-filling`），有独立的 Cookie、密码保存、书签等。你在调试浏览器里登录的账号不会影响日常 Chrome，反之亦然。
+
+首次使用需要在调试浏览器里登录申请网站，之后密码会保存，只需登录一次（除非你清除了 `/tmp/chrome-job-filling`）。
+
+**重要：填写表单期间，所有操作（检查填写、手动修正、点击下一页）都在调试浏览器中进行，不要用日常 Chrome。**
+
+---
+
+**Q: AI 填错了怎么办？**
+
+A: 直接在 Chrome 里手动改成正确值，然后点"下一页"。AI 会自动学习你的修改，下次不会再填错同类字段。如果是系统性错误（比如某类字段 AI 总是选错选项），可以告诉 AI："这类字段以后选 XX"，AI 会更新 `learned_fields`。
+
+---
+
+**Q: 有些字段是下拉选项，AI 能识别吗？**
+
+A: 能。系统支持四种字段类型：
+
+| 类型 | 说明 |
 |------|------|
-| `form_filler.py` | CLI 主入口 |
-| `field_extractor.py` | 从 DOM 提取表单字段 |
-| `profile_store.py` | profile.yaml 读写工具 |
-| `browser.py` | Playwright CDP 连接封装 |
-| `llm_matcher_local.py` | 本地规则匹配（`fill` 命令 fallback） |
-| `pdf_to_md.py` | PDF → Markdown 转换工具 |
-| `profile.yaml` | 个人资料 + 学习记忆（本地保留，不提交） |
-| `materials/*.md` | 材料文档（Claude Code 推理上下文） |
+| 文本框 / 文本域 | 直接输入文本 |
+| 原生下拉 `<select>` | 从选项列表中选择 |
+| 单选 / 复选框 | 从选项值中选择 |
+| 自定义 JS 下拉（如 PageUp pu-select） | 点击展开后选择 |
+| 搜索弹窗（机构/专业查找） | 输入关键词后从搜索结果选择 |
+
+---
+
+**Q: 表单有"下一步"按钮触发新字段展开，AI 会处理吗？**
+
+A: 会。某些表单在选择某个选项后（如"教育类型"）会动态展开子字段。AI 每次填写后会重新检查页面，发现新字段后继续匹配填写，循环直到没有新字段为止。
+
+---
+
+**Q: `profile.yaml` 填多详细比较好？**
+
+A: 越详细越好。基本信息（姓名、地址、教育、工作经历、推荐人）填完整后，首次使用 AI 就能覆盖大部分字段。随着使用次数增加，`learned_fields` 会自动补全剩余细节。
+
+---
+
+**Q: 这个工具和 `overseas_pipeline` 是什么关系？**
+
+A: 互补关系。`overseas_pipeline` 负责**准备**申请材料（Cover Letter、Research Statement 等），`job_filling` 负责**提交**申请（填写网页表单）。通常的完整流程是：先用 `overseas_pipeline` 生成定制化材料，再用 `job_filling` 填写学校的在线申请系统。

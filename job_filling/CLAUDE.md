@@ -8,53 +8,97 @@
 
 **当检测到新会话开始时（system-reminder 中包含 SessionStart hook 输出），必须在第一次回复中主动执行以下操作：**
 
-1. **向用户显示欢迎信息**，包括：
-   - 系统名称和功能概述（智能表单自动填写、积累学习、安全保障）
-   - 当前状态（Chrome 调试端口状态、当前打开的页面）
-   - 主要使用方式（"帮我填写表单"、"启动持续填写"）
+1. **检查 Chrome 调试端口状态**：`curl -s http://localhost:9222/json/version 2>/dev/null`
+2. **根据状态展示不同提示**：
 
-2. **检查系统状态**：
-   - Chrome 调试端口是否已启动（`curl -s http://localhost:9222/json/version`）
-   - 当前打开的标签页（`curl -s http://localhost:9222/json`）
-
-3. **提示下一步操作（根据 Chrome 状态）**：
-
-   **如果 Chrome 未启动：**
+   **如果 Chrome 调试端口未启动：**
    ```
-   📋 Chrome 调试端口未启动，需要先启动。
+   👋 表单自动填写工具已就绪
 
-   我来帮你启动 Chrome 调试端口（命令会在后台运行）。
-   启动后你可以在 Chrome 中：
-   1. 打开要填写的申请页面
-   2. 登录并导航到表单页面
-   3. 回来告诉我"帮我填写表单"
-   ```
-   然后执行启动命令：`/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 &`
-
-   **如果 Chrome 已启动但没有打开的标签页：**
-   ```
-   ✅ Chrome 调试端口已启动（端口 9222）
-   📋 当前没有打开的标签页
-
-   请在 Chrome 中：
-   1. 打开要填写的申请页面
-   2. 登录并导航到表单页面
-   3. 回来告诉我"帮我填写表单"
+   调试浏览器尚未启动。告诉我：
+     "启动调试 https://申请表单网址"
+   我会自动安装依赖、打开调试浏览器并导航到表单页面。
    ```
 
-   **如果 Chrome 已启动且有打开的标签页：**
+   **如果 Chrome 已启动：**
+   执行 `curl -s http://localhost:9222/json 2>/dev/null | python3 -c "import sys,json; tabs=json.load(sys.stdin); [print(t.get('title','(无标题)'),'|',t.get('url','')) for t in tabs if t.get('type')=='page']"` 获取当前页面，然后展示：
    ```
-   ✅ Chrome 已就绪（端口 9222）
-   📄 当前页面：[页面标题] ([URL])
+   👋 表单自动填写工具已就绪
 
-   准备好后告诉我：
-   - "帮我填写表单" — 自动填写当前页面
-   - "启动持续填写" — 填完后自动监控翻页并继续填写
+   ✅ 调试浏览器运行中
+   📄 当前页面：[页面标题] | [URL]
+
+   告诉我：
+   - "启动持续填写" — 填写当前页并自动监控翻页（推荐）
+   - "启动调试 https://新网址" — 跳转到另一个申请页面
    ```
 
 **触发条件**：当 system-reminder 中包含 `SessionStart:startup hook success` 字样时。
 
 **不要等用户主动询问，主动展示这些信息。**
+
+---
+
+## "启动调试"命令
+
+**触发词**：`启动调试`、`打开调试浏览器`、`初始化`、`setup`，后面可选跟一个 URL。
+
+**执行流程（严格按顺序，每步完成后告知用户）：**
+
+### 第一步：检查并安装依赖
+
+```bash
+python -c "import playwright, yaml, fitz" 2>/dev/null && echo "deps_ok" || echo "deps_missing"
+```
+
+- 输出 `deps_ok`：告知"依赖已安装，继续启动浏览器"，跳到第二步
+- 输出 `deps_missing`：告知"正在安装依赖（约1分钟）..."，然后执行：
+  ```bash
+  pip install -r requirements.txt && playwright install chromium
+  ```
+  安装完成后继续第二步。
+
+### 第二步：启动调试浏览器
+
+检查端口是否已占用：
+```bash
+curl -s http://localhost:9222/json/version 2>/dev/null && echo "chrome_running" || echo "chrome_not_running"
+```
+
+- 输出 `chrome_running`：告知"✅ 调试浏览器已在运行"，跳到第三步
+- 输出 `chrome_not_running`：执行启动命令：
+  ```bash
+  /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+    --remote-debugging-port=9222 \
+    --user-data-dir=/tmp/chrome-job-filling &
+  sleep 2
+  ```
+  告知用户：`✅ 调试浏览器已启动。注意：这是独立于你日常 Chrome 的专用窗口（存储在 /tmp/chrome-job-filling），首次使用需要在该窗口内重新登录申请网站，之后密码会自动保存。`
+
+### 第三步：导航到表单 URL
+
+- **用户在触发词中已附带 URL**（如 `启动调试 https://...`）：直接执行
+  ```bash
+  python form_filler.py navigate "https://..."
+  ```
+
+- **用户未提供 URL**：展示提示，等用户回复后再导航
+  ```
+  调试浏览器已就绪。请粘贴申请表单的完整 URL：
+  ```
+  收到 URL 后执行：`python form_filler.py navigate "URL"`
+
+### 第四步：告知后续操作
+
+导航成功后展示：
+```
+✅ 已在调试浏览器中打开：[页面标题]
+   [URL]
+
+下一步：
+1. 如果看到登录页面 → 在调试浏览器窗口中完成登录，再导航到表单第一页，然后告诉我"启动持续填写"
+2. 如果已在表单页面 → 告诉我"启动持续填写"
+```
 
 ## 核心架构
 
@@ -97,29 +141,34 @@
 >
 > **不在聊天中问用户输入字段值 — 填不了的让用户在浏览器手动填。**
 
-### 第 0 步：启动 Chrome 调试端口
+### 主流程：持续填写（默认推荐模式）
 
-**做什么：** 我会检查 Chrome 调试端口是否已启动。如未启动，我会帮你启动。
+**用户说：** "启动持续填写" / "开始填写" / "持续填写" / "启动watch"
 
-**为什么：** 系统需要通过 CDP（Chrome DevTools Protocol）连接你的浏览器，才能读取和操作页面表单。
+**第一次启动时，我会：**
+1. extract → 推理匹配 → apply 填写当前页面
+2. **重新 extract 检查条件展开的新字段** → 如有新字段则继续匹配 → apply（循环直到无新字段）
+3. 输出填写汇总报告
+4. 告诉用户："请在调试浏览器中检查，改好后直接点击下一页，我会自动继续"
+5. 通过 **Task agent** 启动 `python form_filler.py wait-and-learn`，等待翻页
 
-**下一步：** 在 Chrome 中打开要填写的申请页面，登录后导航到表单页面，然后告诉我"**帮我填写表单**"。
+**翻页后自动执行：**
+6. wait-and-learn 检测到翻页 → 自动学习当前页面值（保存 learned_fields）→ 输出新页面 URL
+7. 我提取新页面字段 → 推理匹配 → apply 填写
+8. 回到步骤 3，循环执行
+9. 用户说"停" / "结束" / "完成了"时，停止 agent
 
----
-
-### 第 1 步：自动填写当前页面
-
-**用户说：** "帮我填写表单" / "填写当前页面" / "开始填写"
-
-**我会做什么：**
-1. 执行 `python form_filler.py extract` 提取页面所有字段
-2. 读取 `profile.yaml` 和 `materials/*.md`
-3. 用我的推理能力为每个字段匹配最佳值（参考下方"字段匹配指引"）
-4. 生成填写指令写入 `/tmp/instructions.json`
-5. 执行 `python form_filler.py apply /tmp/instructions.json` 填写
-6. **重新提取并检查是否有新展开的字段**（见下方"条件展开字段处理"）
-
-**填写原则：尽量填写所有字段。** 除非 profile.yaml 和 materials 中确实没有任何相关信息，否则应该通过推理给出合理值。宁可填了让用户在浏览器修改，也不要留空让用户手动输入。
+**重要：使用 Task agent 执行 wait-and-learn**
+- **必须通过 Task tool 启动 Bash agent**，不能直接用 Bash tool
+  ```python
+  Task(
+    subagent_type="Bash",
+    description="等待翻页并学习",
+    prompt="在 job_filling/ 目录下执行 python form_filler.py wait-and-learn，等待用户点击下一页后自动学习字段值"
+  )
+  ```
+- 这样用户可以在子任务中看到实时输出（等待提示、学习过程、新页面 URL）
+- agent 完成后，我自动填写新页面，然后启动新的 wait-and-learn agent
 
 **每轮填写后必须输出汇总报告：**
 
@@ -128,70 +177,40 @@
 
 已填写（Y 个）：
   ✓ 字段名 → 值
-  ✓ 字段名 → 值
-  ⚠ 字段名 → 值    ← 建议检查：[原因，如"最接近的选项，不完全匹配"]
+  ⚠ 字段名 → 值    ← 建议检查：[原因]
 
 未填写（Z 个）：
-  ✗ 字段名 — 原因（如"无相关信息"/"readonly 搜索字段需手动"）
+  ✗ 字段名 — 原因
 
 🔍 建议重点检查：
   - 字段名：[为什么信心较低]
+
+等待翻页中...（请检查后直接点击"下一页"，无需告知我）
 ```
+
+**填写原则：尽量填写所有字段。** 宁可填了让用户修改，也不要留空让用户手动输入。
 
 **信心标记规则：**
 - `✓` — 高信心：来自 learned_fields 精确匹配或 profile 中有明确对应值
 - `⚠` — 低信心：通过推理得出但不确定、选项中没有精确匹配只有近似值、或从 materials 中拼凑
 - `✗` — 未填：确实无信息
 
-**下一步：** 去 Chrome 中重点检查 ⚠ 标记的字段，手动补充 ✗ 字段。改完后直接点击"下一页"。
-
 ---
 
-### 第 2 步：翻页（自动学习 + 继续填写）
+### 调试模式（排查问题时使用）
 
-**用户说：** "下一页了" / "继续" / "我点了下一页"
+**用户说：** "帮我填写表单" / "填写当前页面"（不带"持续"/"watch"关键词）
+
+**与持续模式的区别**：只填写当前页，不启动翻页监控。适合逐页排查问题。
 
 **我会做什么：**
-1. 执行 `python form_filler.py learn` 读回当前页面值（捕获你的手动修改）
-2. 回到第 1 步，对新页面执行同样的流程
+1. extract → 推理匹配 → apply 填写当前页面（含条件展开字段循环检查）
+2. 输出汇总报告
+3. 告诉用户："检查后点击下一页，然后告诉我'下一页了'"
 
-**为什么自动学习很重要：**
-- 你修正的值 → 下次会用修正后的值
-- 你新填的字段 → 下次自动填写
-- 你主动留空的字段 → 下次不再填
-
----
-
-### 持续填写模式
-
-**用户说：** "启动持续填写" / "持续填写" / "开始watch" / "启动watch"
-
-**工作流程：**
-
-**第一次启动时，我会：**
-1. extract → 推理匹配 → apply 填写当前页面
-2. **重新 extract 检查条件展开的新字段** → 如有新字段则继续匹配 → apply（循环直到无新字段）
-3. 输出填写汇总报告
-4. 告诉用户："请检查并点击下一页"
-5. 通过 **Task agent** 启动 `python form_filler.py wait-and-learn`，等待翻页
-
-**翻页后自动执行：**
-6. wait-and-learn 检测到翻页 → 自动学习当前页面值（保存 learned_fields）→ 输出新页面 URL
-7. 我提取新页面字段 → 推理匹配 → apply 填写
-8. 回到步骤 3，循环执行
-9. 用户说"停"时，停止 agent
-
-**重要：使用 Task agent 执行 wait-and-learn**
-- **必须通过 Task tool 启动 Bash agent**，不能直接用 Bash tool
-  ```python
-  Task(
-    subagent_type="Bash",
-    description="等待翻页并学习",
-    prompt="执行 python form_filler.py wait-and-learn，等待用户点击下一页，然后学习当前页面的字段值"
-  )
-  ```
-- 这样用户可以进入子任务查看实时输出（等待翻页提示、学习过程、新页面 URL）
-- agent 完成后（翻页+学习完成），我会自动填写新页面，然后启动新的 wait-and-learn agent
+**用户说"下一页了"/"继续"/"我点了下一页"：**
+1. 执行 `python form_filler.py learn` 读回当前页面值（捕获手动修改）
+2. 对新页面重复单页填写流程
 
 ---
 
@@ -199,13 +218,13 @@
 
 每次启动会话时执行：
 
-1. **检查 Chrome 调试端口**：`curl -s http://localhost:9222/json/version`
-2. **如未启动**，启动 Chrome：
-   ```
-   /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 &
-   ```
-3. **检查当前标签页**：`curl -s http://localhost:9222/json`，告诉用户当前打开的页面
-4. **提醒用户**："Chrome 已就绪。请打开要填写的申请页面并登录，准备好后告诉我。"
+1. **检查 Chrome 调试端口**：`curl -s http://localhost:9222/json/version 2>/dev/null`
+2. **如已启动**：`curl -s http://localhost:9222/json 2>/dev/null` 显示当前页面列表
+3. **根据状态**：
+   - 已启动 → 显示当前页面，提示"启动持续填写" 或 "启动调试 [URL]"
+   - 未启动 → 提示用户说"启动调试 [URL]"来完成初始化
+
+**不要**在 session start 时自动启动 Chrome 或自动安装依赖。等用户说"启动调试"再执行。
 
 ---
 
@@ -323,21 +342,30 @@ PageUp 等网站使用自定义 JS 下拉组件（`div.pu-select`），非原生
 
 ## 命令执行说明
 
-| 用户说... | 我执行的命令 | 说明 |
-|----------|------------|------|
-| "帮我填写表单" | ① `python form_filler.py extract` → ② 我推理匹配 → ③ `python form_filler.py apply /tmp/instructions.json` | 提取 → 推理 → 填写 |
-| "下一页了" / "继续" | ① `python form_filler.py learn` → ② 重复填写流程 | 学习修改 → 填新页面 |
-| "启动持续填写" / "填写当前页面并watch" | 循环：extract → 推理 → apply → `python form_filler.py watch`（**前台运行，实时输出**） | 持续监控模式 |
-| "学习我的修改" | `python form_filler.py learn` | 手动触发学习 |
+| 用户说... | 模式 | 我执行的命令 |
+|----------|------|------------|
+| "启动持续填写" / "开始填写" / "持续填写" | **主流程（推荐）** | extract → 推理 → apply → Task agent 运行 `wait-and-learn` → 翻页后重复循环 |
+| "帮我填写表单" / "填写当前页" | 调试模式 | extract → 推理 → apply（仅当前页，不监控翻页） |
+| "下一页了" / "继续" | 调试模式翻页 | `python form_filler.py learn` → 重复单页填写流程 |
+| "学习我的修改" | 手动 | `python form_filler.py learn` |
+| "启动调试 https://..." | 初始化 | 检查依赖 → 启动 Chrome → navigate → 提示"启动持续填写" |
 
-**Watch 模式执行要求：**
-- **禁止**使用 `run_in_background=true` 参数
-- **必须**让用户看到 watch 命令的实时输出
-- **必须**在输出中明确告知用户当前状态（等待翻页、学习中、提取中、填写中）
-- 如果用户需要查看进度，应该能从输出中直接看到，而不是读取后台日志文件
+**持续填写模式执行要求：**
+- **必须通过 Task tool 启动 Bash agent** 运行 wait-and-learn，不能直接用 Bash tool（确保用户能看到实时输出）
+- **禁止**使用 `run_in_background=true`
+- agent 完成（翻页+学习完成）后，主流程自动填写新页面并启动新的 wait-and-learn agent
 
 ## 修改代码时注意
 
 - 新增规则匹配字段：编辑 `llm_matcher_local.py` 的 `_RULES` 列表
 - 新增自定义下拉类型：扩展 `field_extractor.py` 中 JS 的 "Custom pu-select dropdowns" 部分
 - `profile.yaml` 含个人信息，不要提交到 git
+
+
+<claude-mem-context>
+# Recent Activity
+
+<!-- This section is auto-generated by claude-mem. Edit content outside the tags. -->
+
+*No recent activity*
+</claude-mem-context>
