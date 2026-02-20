@@ -141,3 +141,18 @@ tracking/export_tracking.xlsx
 *.swo
 *.sublime-project
 *.sublime-workspace
+
+# ============================================================
+# claude-mem 插件自动生成的 CLAUDE.md（子目录内）
+# 注意：overseas_pipeline/CLAUDE.md、region_knowledge/CLAUDE.md 等顶层文件不受影响（已追踪）
+# ============================================================
+
+overseas_pipeline/*/CLAUDE.md
+overseas_pipeline/*/*/CLAUDE.md
+region_knowledge/*/CLAUDE.md
+region_knowledge/*/*/CLAUDE.md
+
+# LaTeX 构建产物（overseas_pipeline 内）
+overseas_pipeline/**/*.aux
+overseas_pipeline/**/*.log
+overseas_pipeline/**/*.out
