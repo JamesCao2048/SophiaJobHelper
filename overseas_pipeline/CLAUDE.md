@@ -193,6 +193,36 @@ output/{school_id}/
 
 ---
 
+## Release 命令
+
+用户说以下任意内容时，执行 release 操作：
+
+> `release`、`发布`、`同步到 release`、`更新 release 分支`、`出一个 release`
+
+**执行方式（从 overseas_pipeline/ 目录调用，自动定位 git 根目录）：**
+
+```bash
+# 预览变更（推荐先确认）
+bash ../scripts/do_release.sh --dry-run
+
+# 正式同步（确认无误后）
+bash ../scripts/do_release.sh
+
+# 同步并自动 push 到远端
+bash ../scripts/do_release.sh --push
+```
+
+**同步内容**（在 `scripts/do_release.sh` 的 `SYNC_PATHS` 中配置）：
+- `general/`、`overseas_pipeline/`、`job_filling/`、`region_knowledge/`
+- `CLAUDE.md`、`README.md`、`.gitignore`
+
+**不同步**（开发工具，仅保留在 main）：
+- `china_job_hunting/`、`faculty-application_script/`、`google-sheets-sync/`、`tracking/`、`scripts/`
+
+> 如需将新子模块加入 release，编辑 `scripts/do_release.sh` 的 `SYNC_PATHS` 数组，并告知用户已更新配置。
+
+---
+
 ## 质量要求
 
 1. **全链路可溯源**：每个产出物必须有对应的 `.sources.md` 文件

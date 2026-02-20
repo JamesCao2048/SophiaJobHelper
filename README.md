@@ -95,6 +95,25 @@ Claude Code 驱动的海外教职申请材料准备流水线，目标将每所�
 
 ---
 
+## Release 分支
+
+`release` 分支是专注于海外教职申请的**精简发布版本**，只包含相关子模块：
+
+| 包含 | 排除 |
+|------|------|
+| `general/`、`overseas_pipeline/`、`job_filling/`、`region_knowledge/` | `china_job_hunting/`、`faculty-application_script/`、`google-sheets-sync/`、`tracking/` |
+
+**发布方式**（在 Claude Code 中说 `release`，或手动运行）：
+
+```bash
+bash scripts/do_release.sh          # 同步 main → release
+bash scripts/do_release.sh --push   # 同步并推送到远端
+```
+
+后续如需将新子模块纳入 release，编辑 `scripts/do_release.sh` 中的 `SYNC_PATHS` 数组。
+
+---
+
 ## 整体工作流
 
 ```
