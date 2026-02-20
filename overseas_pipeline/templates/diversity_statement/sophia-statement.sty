@@ -1,0 +1,118 @@
+% sophia-statement.sty
+% Shared style package for all Sophia Gao faculty application statement documents.
+% Provides: Caramel color scheme (matching CV_latest), lmodern font, CV-style section headings,
+%           standardized header/footer.
+%
+% Usage:
+%   \usepackage[doctitle={Research Statement}]{sophia-statement}
+%
+% Options:
+%   doctitle  - Document title shown in right header (default: Statement)
+%   authorname - Author name shown in left header (default: Jie Gao)
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{sophia-statement}[2026/02/20 Sophia statement shared style]
+
+% --- Option declarations ---
+\RequirePackage{kvoptions}
+\SetupKeyvalOptions{family=sophiastmt, prefix=sophiastmt@}
+\DeclareStringOption[Jie Gao]{authorname}
+\DeclareStringOption[Statement]{doctitle}
+\ProcessKeyvalOptions{sophiastmt}
+
+% --- Core packages ---
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}
+\RequirePackage{lmodern}              % lmodern font (matches CV_latest)
+\RequirePackage{microtype}
+\RequirePackage[dvipsnames]{xcolor}
+\RequirePackage{hyperref}
+\RequirePackage{fancyhdr}
+\RequirePackage{lastpage}
+\RequirePackage{titlesec}
+\RequirePackage{enumitem}
+\RequirePackage{parskip}
+
+% --- Page layout ---
+\RequirePackage[a4paper, top=0.65in, bottom=0.65in, left=0.75in, right=0.75in]{geometry}
+\setlength{\parskip}{0.35em}
+\setlength{\parindent}{0pt}
+
+% ============================================================
+% COLOR DEFINITIONS — Coffee title + Caramel accent (from CV_latest)
+% ============================================================
+\definecolor{headingcolor}{HTML}{B87350}    % Primary accent: warm caramel brown
+\definecolor{linkcolor}{HTML}{B87350}        % Links
+\definecolor{tagbg}{HTML}{F0DDD2}            % Tag background
+\definecolor{tagframe}{HTML}{D4B8A6}         % Tag frame
+\definecolor{textgray}{HTML}{4A3828}         % Subdued body text
+
+% --- Hyperref ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor,
+    citecolor=linkcolor,
+}
+
+% ============================================================
+% HEADER & FOOTER — matches CV_latest style
+% ============================================================
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancyhead[L]{\small\color{headingcolor}\sophiastmt@authorname}
+\fancyhead[R]{\small\color{headingcolor}\sophiastmt@doctitle}
+\fancyfoot[C]{\small\color{headingcolor!70}\thepage/\pageref*{LastPage}}
+
+% First page: same as regular pages (no special large header for statements)
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \renewcommand{\headrulewidth}{0pt}
+    \fancyhead[L]{\small\color{headingcolor}\sophiastmt@authorname}
+    \fancyhead[R]{\small\color{headingcolor}\sophiastmt@doctitle}
+    \fancyfoot[C]{\small\color{headingcolor!70}\thepage/\pageref*{LastPage}}
+}
+
+% ============================================================
+% SECTION / SUBSECTION FORMATTING — CV_latest style
+% (sectiontitle: bold + 60% opacity underline rule)
+% ============================================================
+\newcommand{\headingfont}{\large\bfseries\color{headingcolor}}
+
+\titleformat{\section}
+    {\headingfont}
+    {}
+    {0em}
+    {}
+    [{\vspace{-4pt}\color{headingcolor!60}\rule{\textwidth}{0.8pt}}]
+
+\titleformat{\subsection}
+    {\normalsize\bfseries\color{headingcolor}}
+    {$\bullet$\hspace{0.5em}}
+    {0em}
+    {}
+
+\titlespacing*{\section}{0pt}{0.9em}{0.3em}
+\titlespacing*{\subsection}{0pt}{0.5em}{0.15em}
+
+% ============================================================
+% CUSTOM COMMANDS
+% ============================================================
+\newcommand{\highlight}[1]{\textbf{\textcolor{headingcolor}{#1}}}
+\newcommand{\me}[1]{\textbf{\textcolor{headingcolor}{#1}}}
+
+% Tag box (optional, for call-out labels)
+\RequirePackage[most]{tcolorbox}
+\newtcbox{\tagbox}{on line,
+  colback=tagbg,
+  colframe=tagframe,
+  boxrule=0.2pt,
+  arc=2pt,
+  left=3pt, right=3pt, top=1pt, bottom=1pt,
+  boxsep=0pt,
+  nobeforeafter,
+  tcbox raise base,
+  fontupper=\footnotesize\itshape
+}

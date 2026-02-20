@@ -1,0 +1,91 @@
+% ============================================================
+% Selection Criteria Response — Base Template (Australia only)
+% Target: 6–10 pages (depends on number of criteria)
+%
+% HOW TO USE (Step 3):
+%   1. Copy this directory to output/{school}/{dept}/materials/Selection Criteria Response/
+%   2. Copy sophia-statement.sty alongside (or adjust path in \usepackage)
+%   3. Extract ALL Essential and Desirable criteria from JD (raw/jd_*.md)
+%   4. Respond to each criterion using STAR format (Situation→Task→Action→Result)
+%   5. Compile: pdflatex main.tex && pdflatex main.tex
+%   6. Verify: Every criterion addressed; no criterion skipped
+%
+% STAR FORMAT per criterion:
+%   \criterion{criterion text}
+%   paragraph: Situation + Task (1-2 sentences context)
+%   paragraph: Action (what you did — specific, first-person)
+%   paragraph: Result (outcome, impact, measurable if possible)
+%
+% WARNING: This is the core document for Australian applications.
+%          Not submitting = automatic disqualification.
+% ============================================================
+
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[
+  doctitle={Selection Criteria Response},
+  authorname={Jie Gao}
+]{sophia-statement}
+
+\usepackage{enumitem}
+
+% Custom criterion command
+\newcommand{\criterion}[2]{%
+    \subsection{#1: \textit{#2}}%
+}
+
+% ============================================================
+% DOCUMENT
+% ============================================================
+\begin{document}
+
+% ----- Title block -----
+\begin{center}
+    {\large\bfseries\color{headingcolor} Selection Criteria Response}\\[4pt]
+    {\normalsize Jie Gao \quad \textbar\quad [Department], [University]}\\[2pt]
+    {\small\color{textgray} \href{mailto:jie.gao@jhu.edu}{jie.gao@jhu.edu}}
+\end{center}
+\vspace{0.5em}
+
+% ============================================================
+% ESSENTIAL CRITERIA
+% ============================================================
+\section{Essential Criteria}
+
+% ----- Criterion E1 (replace with actual criterion text from JD) -----
+\criterion{E1}{[Criterion text from JD — e.g., PhD in Computer Science or related discipline]}
+
+[STAR response]
+
+\textbf{Situation \& Context:} [Brief context sentence.]
+
+\textbf{Action:} [What you specifically did or have.]
+
+\textbf{Result:} [Concrete outcome or evidence.]
+
+% ----- Criterion E2 -----
+\criterion{E2}{[Criterion text from JD]}
+
+[STAR response]
+
+\textbf{Situation \& Context:} [...]
+
+\textbf{Action:} [...]
+
+\textbf{Result:} [...]
+
+% Add more \criterion{E3}{...} blocks as needed
+
+% ============================================================
+% DESIRABLE CRITERIA
+% ============================================================
+\section{Desirable Criteria}
+
+% ----- Criterion D1 -----
+\criterion{D1}{[Criterion text from JD]}
+
+[STAR response]
+
+% Add more \criterion{D2}{...} blocks as needed
+
+\end{document}
