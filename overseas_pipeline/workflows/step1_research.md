@@ -131,6 +131,95 @@ python overseas_pipeline/src/course_catalog_scraper.py \
 - 补充 `hci_density.strategy_rationale` 自然语言解释
 - 将密度判断 + 课程匹配概览写入 `step1_summary.md`
 
+### 10.5 Te Tiriti 信号采集（仅 region=new_zealand 时执行）
+
+读取策略文件：`overseas_pipeline/strategies/nz_te_tiriti_strategy.md`
+
+#### A. JD 信号检测
+
+1. 读取已爬取的 `raw/jd_*.md`（若尚未爬取，执行爬取）
+2. 扫描策略文件 §一 中的关键词清单（核心词 + 辅助词）
+3. 按位置权重规则判定 `jd_signal` level：
+   - Essential Criteria / Key Responsibilities → `explicit`
+   - Desirable / Nice-to-have → `boilerplate`
+   - 仅 EEO 样板 / 页脚 → `no_mention`
+4. 对每个命中词记录：原文文本 + 所在板块/bullet 位置
+5. 写入 `faculty_data.json → te_tiriti.jd_signal`（含 evidence 数组，格式见下）
+
+#### B. 学校信号检测
+
+1. 检查学校卡 `region_knowledge/schools/{school_id}/{dept_id}.md` 是否已有 `Te Tiriti 学校信号` 字段，且 `assessed_date` 在 6 个月内
+   - 如有 → 读取复用，写入 `faculty_data.json → te_tiriti.school_signal`，跳到 C
+   - 如无或已过期 → 继续
+2. 查策略文件 §六 学校种子表，按 school_id 匹配已知条约页面 URL
+3. 爬取种子 URL（五层 fallback）
+4. 如种子不足或失败，搜索补充：
+   - `"{school_name} Te Tiriti strategy"`
+   - `"{school_name} Māori strategic framework"`
+   - `"{school_name} Treaty of Waitangi policy"`
+5. 基于爬取内容评定 `school_signal` level（见策略文件 §一 1.2 评级标准）
+6. 摘录原文证据（至少 2 条），记录来源 URL + 文档名
+7. 识别该校专有框架名称和核心价值观术语
+8. **双写入：**
+   - 写入 `region_knowledge/schools/{school_id}/{dept_id}.md → ## Te Tiriti 学校信号`（格式见下）
+   - 写入 `output/{school_id}/{dept_id}/knowledge/{dept_id}.md`（同步）
+9. 写入 `faculty_data.json → te_tiriti.school_signal`
+
+#### C. 预判策略标签
+
+1. 查策略文件 §二 矩阵，根据 jd_signal × school_signal 得出初步 strategy label
+2. 写入 `faculty_data.json → te_tiriti.strategy`
+3. 留空 `te_tiriti.strategy_rationale`（Step 2 填充）
+4. 在 `step1_summary.md` 中追加一行：`Te Tiriti: JD=[level], School=[level] → [strategy]（初步）`
+
+#### faculty_data.json te_tiriti 块格式
+
+```json
+"te_tiriti": {
+  "jd_signal": {
+    "level": "explicit | boilerplate | no_mention",
+    "evidence": [
+      {
+        "text": "原文摘录（英文原文）",
+        "location": "所在板块/bullet，如 'Key Responsibilities, bullet 7'",
+        "source": "raw/jd_main.md"
+      }
+    ]
+  },
+  "school_signal": {
+    "level": "strong | moderate | light",
+    "evidence": [
+      {
+        "text": "原文摘录（英文原文）",
+        "url": "来源 URL",
+        "document_name": "文档名称"
+      }
+    ],
+    "key_framework_name": "该校专有框架名称（如有）",
+    "key_values": ["该校专有毛利价值观术语列表"]
+  },
+  "strategy": "skip | subtle | moderate | strong | full_treaty",
+  "strategy_rationale": ""
+}
+```
+
+#### 学校卡 Te Tiriti 字段格式
+
+```markdown
+## Te Tiriti 学校信号
+
+- **signal_level**: strong | moderate | light
+- **assessed_date**: YYYY-MM-DD
+- **key_framework**: 框架名称（如 Waipapa Taumata Rau）
+- **key_values**: 术语1, 术语2, ...
+- **evidence**:
+  1. "原文摘录..."
+     - source: [文档名](URL)
+  2. "原文摘录..."
+     - source: [文档名](URL)
+- **notes**: 其他备注（如 PVC(Māori) 审查权限等）
+```
+
 ---
 
 ## 数据质量评估（Step 1 完成后必须执行）
