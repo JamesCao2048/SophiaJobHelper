@@ -490,6 +490,28 @@ async def cmd_learn(args: argparse.Namespace) -> int:
     return 0
 
 
+async def cmd_navigate(args: argparse.Namespace) -> int:
+    """Navigate the debug browser to a URL."""
+    from playwright.async_api import async_playwright
+    pw = await async_playwright().start()
+    try:
+        browser = await pw.chromium.connect_over_cdp(args.cdp_url)
+        context = browser.contexts[0]
+        pages = context.pages
+        page = pages[-1] if pages else await context.new_page()
+        await page.goto(args.url, wait_until="domcontentloaded", timeout=30000)
+        title = await page.title()
+        print(f"{GREEN}已导航到:{RESET} {page.url}")
+        print(f"{CYAN}页面标题:{RESET} {title}")
+        await browser.close()
+    except Exception as e:
+        print(f"{RED}导航失败: {e}{RESET}", file=sys.stderr)
+        return 1
+    finally:
+        await pw.stop()
+    return 0
+
+
 async def cmd_watch(args: argparse.Namespace) -> int:
     browser_inst, page = await br.connect(args.cdp_url)
     try:
@@ -561,6 +583,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("fill", help="Fill the current page (local rules only)")
     sub.add_parser("watch", help="Continuously fill pages as you navigate")
     sub.add_parser("learn", help="Read back current page values and save to profile")
+    nav_parser = sub.add_parser("navigate", help="Navigate the debug browser to a URL")
+    nav_parser.add_argument("url", help="URL to navigate to")
 
     args = parser.parse_args(argv)
 
@@ -579,6 +603,8 @@ def main(argv: list[str] | None = None) -> int:
         return asyncio.run(cmd_watch(args))
     elif args.command == "learn":
         return asyncio.run(cmd_learn(args))
+    elif args.command == "navigate":
+        return asyncio.run(cmd_navigate(args))
     else:
         parser.print_help()
         return 1

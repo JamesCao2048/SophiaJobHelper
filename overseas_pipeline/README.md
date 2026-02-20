@@ -31,6 +31,8 @@
 
 整个过程你**不需要写任何代码**，只需要用自然语言告诉 Claude Code 做什么。
 
+> **与表单填写工具的关系**：本模块（`overseas_pipeline`）负责**准备**定制化申请材料，配套的 `job_filling/` 工具负责**提交**申请（自动填写学校在线申请系统的网页表单）。完整申请流程：先用本模块生成材料 → 再用 `job_filling` 填写网页表单。
+
 ---
 
 ## 整体工作流程
@@ -456,3 +458,16 @@ A: 澳洲大多数大学要求申请人逐条回应 JD 中列出的 Essential Cr
 **Q: 生成的 PDF 在哪里？**
 
 A: 在 `output/{school_id}/{dept_id}/materials/{材料名}/` 目录下，文件名通常是 `main.pdf` 或 `Teaching_Statement.pdf`。可以在 Finder 中导航到 `overseas_pipeline/output/` 找到对应学校目录。
+
+---
+
+**Q: 材料准备好了，怎么填写学校的在线申请系统？**
+
+A: 使用配套的 `job_filling/` 工具，它专门负责自动填写网页表单：
+
+```bash
+cd ../job_filling
+claude --dangerously-skip-permissions
+```
+
+启动后告诉 Claude Code："帮我填写表单"，AI 会读取你的个人资料和申请材料，自动填写当前打开的表单页面。详见 [`job_filling/README.md`](../job_filling/README.md)。

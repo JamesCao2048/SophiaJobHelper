@@ -1,1 +1,4 @@
 加拿大可能也有类似毛利人之类的合约，后续要考虑
+分院系策略
+提醒Sophia找澳洲新西兰老师，提取他们申请过程中的implicitknowlege
+job_filling READEME.md编写
