@@ -220,6 +220,57 @@ python overseas_pipeline/src/course_catalog_scraper.py \
 - **notes**: 其他备注（如 PVC(Māori) 审查权限等）
 ```
 
+### 10.6 AU Indigenous Signal Assessment（仅 region=australia 时执行）
+
+读取策略文件：`overseas_pipeline/strategies/au_indigenous_strategy.md`
+
+#### A. JD 信号检测
+
+1. 读取已爬取的 `raw/jd_*.md`（若尚未爬取，执行爬取）
+2. 扫描策略文件 §一 中的关键词清单（核心词 + 辅助词）
+3. 按位置权重规则判定 `jd_signal` level：
+   - Essential Criteria / Key Responsibilities / Selection Criteria → `explicit`
+   - Desirable / Nice-to-have / About the University → `boilerplate`
+   - 仅 EEO 样板 / 页脚 → `no_mention`
+4. 对每个命中词记录：原文文本 + 所在板块/bullet 位置
+5. 写入 `faculty_data.json → au_indigenous.jd_signal`（含 evidence 数组，格式见策略文件 §七）
+
+#### B. 学校信号检测
+
+1. 检查学校卡 `region_knowledge/schools/{school_id}/{dept_id}.md` 是否已有 `AU Indigenous 学校信号` 字段，且 `assessed_date` 在 6 个月内
+   - 如有 → 读取复用，写入 `faculty_data.json → au_indigenous.school_signal`，跳到 C
+   - 如无或已过期 → 继续
+2. 查策略文件 §八 学校种子表，按 school_id 匹配已知 RAP/Indigenous Strategy URL
+3. 爬取种子 URL（五层 fallback）
+4. 如种子不足或种子全部失败，搜索补充：
+   - `"{school_name} Reconciliation Action Plan"`
+   - `"{school_name} Indigenous strategy"`
+   - `"{school_name} Aboriginal Torres Strait Islander employment"`
+5. Agent 基于爬取内容评定 `school_signal` level（见策略文件 §一 1.2 评级标准）
+6. 摘录原文证据（至少 2 条），记录来源 URL 和文档名
+7. 识别 RAP tier、原住民战略名称、学术支持中心名称
+8. **双写入：**
+   - 写入 `region_knowledge/schools/{school_id}/{dept_id}.md → ## AU Indigenous 学校信号`（格式见策略文件 §七 7.2）
+   - 写入 `output/{school_id}/{dept_id}/knowledge/{dept_id}.md`（同步）
+9. 写入 `faculty_data.json → au_indigenous.school_signal`
+
+#### C. 预判策略标签
+
+1. 查策略文件 §二 矩阵，根据 jd_signal × school_signal 得出初步 strategy label
+2. 如为 `strong` 或 `full_rap` → **在 `step1_summary.md` 顶部标注中断警告**
+3. 写入 `faculty_data.json → au_indigenous.strategy`
+4. 留空 `au_indigenous.strategy_rationale`（Step 2 填充）
+
+#### D. Step 1 Summary 新增行
+
+在 `step1_summary.md` 中追加：
+- `"AU Indigenous: JD=[level], School=[level] → [strategy_label]（初步）"`
+- 如 strong/full_rap: `"⚠ AU Indigenous 高级别信号，需用户审查 step1_summary 后手动触发 Step 2"`
+
+#### E. 全量模式中断判定
+
+如 strategy_label ∈ {strong, full_rap} → **全量模式下 pipeline 在 Step 1 完成后自动中断**，不进入 Step 2，等待用户审查 step1_summary 后手动触发继续。
+
 ---
 
 ## 数据质量评估（Step 1 完成后必须执行）
