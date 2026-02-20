@@ -94,6 +94,17 @@
 - Diversity Statement（除非 JD 明确要求）
 - 德式详细个人信息（照片、婚姻状况等）
 
+### 3.7 原住民文化胜任力策略
+- **状态**: 取决于 JD 信号强度和学校信号强度的矩阵交叉结果
+- **详细策略**: 见 `overseas_pipeline/strategies/au_indigenous_strategy.md`
+- **核心原则**:
+  - 不能写成美式 DEI Statement；必须基于 RAP 和解框架而非多元文化框架
+  - 澳洲原住民不具有 NZ 毛利人的宪法条约地位，话语锚点是"推进和解"而非"条约合规"
+  - Country / Elders / Traditional Custodians / First Nations 必须首字母大写
+  - 区分 Acknowledgement of Country（任何人可做）与 Welcome to Country（仅 Traditional Custodians）
+- **Pipeline 行为**: Step 1（Step 10.6）自动检测 JD/学校信号，Step 2 产出策略标签和 per-document 建议
+- **影响文档**: Cover Letter, Research Statement, Teaching Statement, KSC Response（按策略级别递进）
+
 ---
 
 ## 4. 评审重点
@@ -102,6 +113,8 @@
 1. **KSC 合规性**（门槛，不合规直接出局）([R19](https://www.csu.edu.au/jobs/applying/how-to-apply/how-to-address-selection-criteria))
 2. **ARC Category 1 Funding 潜力**（能否拿到 ARC grant 是核心评估维度）([R22](https://academia.stackexchange.com/questions/90610/))
 3. **教学能力**（40% 教学负担，教学不是附带的）([海外教职策略](../general/research_job_rules/海外教职申请机制与策略.md) L105)
+4. **文化胜任力**（越来越多职位将其列为 Essential Criteria）
+   — 详见 `overseas_pipeline/strategies/au_indigenous_strategy.md`
 
 ### HCI 会议论文认可度
 - 澳洲 HCI 社区活跃，墨大、悉大、QUT、Monash 均有 HCI group ([海外教职策略](../general/research_job_rules/海外教职申请机制与策略.md) L126)

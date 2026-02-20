@@ -63,9 +63,25 @@ Step 1 已完成（`output/{school_id}/{dept_id}/faculty_data.json` 存在）
       - 典型维持：school_signal=`strong` 但 JD 无任何条约词 → 维持矩阵结果（不下调）
    d. 填充 `faculty_data.json → te_tiriti.strategy_rationale`
    e. 在 fit_report 中生成 **Te Tiriti 评估** 专节（格式见下）
+   f. **Per-document 建议必须为每个文档提供具体修辞指令**（不能只写 Cover Letter 建议而留空 Research Statement / Teaching Statement）
 
-9. 生成 `output/{school_id}/{dept_id}/fit_report.md`（见格式规范）
-9. 生成 `output/{school_id}/{dept_id}/fit_report.sources.md`
+9. **AU Indigenous 矩阵分析（仅 region=australia）：**（原步骤编号顺延）
+
+   a. 读取 `faculty_data.json → au_indigenous` 块（Step 1 已填充的 jd_signal、school_signal、strategy）
+   b. 读取 Sophia 材料识别可 Claim 的经历锚点（`materials/Research_Statement.md`, `materials/Teaching_Statement.md`）
+   c. 确认/调整策略标签：
+      - Agent 可上调**至多一级**，仅限 skip→subtle 或 subtle→moderate
+      - **禁止** agent 自行上调到 strong 或 full_rap
+      - 典型上调场景：JD 是 `boilerplate` 但该校已知面试考文化胜任力
+      - 上调必须在 `strategy_rationale` 中注明理由
+   d. 如策略为 `strong`：在 fit_report 中显示升级门槛验证提示（见策略文件 §三）
+   e. 如策略为 `full_rap`：**暂停并询问用户确认**后才写入最终策略标签（见策略文件 §三）
+   f. 填充 `faculty_data.json → au_indigenous.strategy_rationale`
+   g. 在 fit_report 中生成 **AU Indigenous 评估** 专节（格式见下）
+   h. **Per-document 建议必须为每个文档提供具体修辞指令，含 KSC Response 建议**
+
+10. 生成 `output/{school_id}/{dept_id}/fit_report.md`（见格式规范）
+10. 生成 `output/{school_id}/{dept_id}/fit_report.sources.md`
 
 ---
 
@@ -141,6 +157,33 @@ Step 1 已完成（`output/{school_id}/{dept_id}/faculty_data.json` 存在）
 - **Research Statement**: {是否需要独立小节，节名，字数范围}
 - **Teaching Statement**: {是否需要 Māori/Pasifika 段，字数范围}
 - **该校术语提醒**: {如需引用专有术语，列出术语 + 来源 URL}
+
+### AU Indigenous 评估（仅 region=australia）
+
+**JD 信号: `{level}`**
+> "{原文摘录}" ({所在板块/bullet})
+> "{原文摘录}" ({所在板块/bullet})
+<!-- 若 no_mention：说明"实质性板块未发现原住民相关关键词，仅有 EEO 样板" -->
+
+**学校信号: `{level}`**（来源：学校卡，assessed {date}）
+> "{原文摘录}" ([{文档名}]({URL}))
+> "{原文摘录}" ([{文档名}]({URL}))
+> RAP tier: {tier} | 原住民战略: {名称或N/A} | 学术支持中心: {名称或N/A}
+<!-- 若 light：说明"仅发现标准 Acknowledgement of Country，无专门战略文件" -->
+
+**矩阵结果: `{strategy_label}`**
+<!-- 如有上调，注明理由；如为 strong/full_rap，显示升级门槛验证提示 -->
+
+**Sophia 经历锚点（Step 3 参考，参照 strategies/au_indigenous_strategy.md §五）：**
+- Relationships 可 Claim：{参与式设计长期合作 / 跨文化协作经历}（来自 Research_Statement.md）
+- Respect 可 Claim：{trustworthy AI 研究 / MindCoder.ai/CollabCoder 人类控制权设计}
+- Opportunities 可 Claim：{AI 偏见批判性研究立场 / 多元背景学生指导经验}
+
+**Per-document 建议（参照 strategies/au_indigenous_strategy.md §六 `{strategy_label}` 节）：**
+- **Cover Letter**: {具体指示，标注哪些用 Claim 框架，哪些用 Aspire 框架，字数范围}
+- **Research Statement**: {是否需要独立小节，节名，字数范围}
+- **Teaching Statement**: {是否需要 First Nations 学生支持段，字数范围}
+- **KSC Response**: {如有原住民相关 criteria，推荐 STAR/CAR 结构 + 具体 Claim 锚点}
 
 ### 关键决策人分析（材料写给谁看）
 
