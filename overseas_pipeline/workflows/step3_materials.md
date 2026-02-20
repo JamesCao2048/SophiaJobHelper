@@ -42,12 +42,15 @@ Sophia 现有的真实申请材料文本，Step 3 从这里提取内容填入模
 ## 执行步骤
 
 1. 读取 `output/{school_id}/{dept_id}/fit_report.md` 中的"各材料调整建议"和页数要求（含 JD 覆盖值）
+   - **NZ 职位**：明确记录 fit_report 中 Te Tiriti 专节对每个文档的建议（Cover Letter / Research Statement / Teaching Statement）
+   - **AU 职位**：明确记录 fit_report 中 AU Indigenous 专节对每个文档的建议（Cover Letter / Research Statement / Teaching Statement / KSC Response）
 2. 读取 Sophia 现有材料（`overseas_pipeline/materials/*.md`）
 3. 读取区域规则卡（`../region_knowledge/regions/{region}.md`）
 4. 读取 `strategies/hci_density_strategy.md`
    - 从 `faculty_data.json` 获取 `hci_density.strategy` 和 `department_courses`
 5. 读取内容来源 LaTeX 源文件（见"内容来源"表格）
 6. 为每份材料生成初稿 + notes（**Step 3a**）
+   - **NZ/AU 职位**：生成每个文档时，必须**显式检查** fit_report 中对应文档的 Te Tiriti / AU Indigenous 建议是否已执行
 7. Humanizer 处理（**Step 3a 收尾**，强制）
 8. 复制格式模板 + 填入内容 + 编译 PDF + 验证页数（**Step 3b**）
 9. 同校多系一致性检查（如 `related_applications` 字段存在）
@@ -173,6 +176,15 @@ Sophia 现有的真实申请材料文本，Step 3 从这里提取内容填入模
   - [ ] Aspire 部分有具体学习计划，非空洞的 "I am committed to learning"
   - [ ] 如引用了其他文化的平行经验，后面有"Te Tiriti 独特性"声明
   - [ ] 未把 Sophia 的参与式设计/trustworthy AI 工作夸大为"Data Sovereignty 实践"
+  - [ ] 所有被 fit_report 标记需要 Te Tiriti 调整的文档是否都已执行（Cover Letter / Research Statement / Teaching Statement 三者必须逐一核查）
+- [ ] **【仅 AU 职位】AU Indigenous 段落诚实度：**
+  - [ ] 无伪装成已有原住民社区合作经验的表述（如 "I have worked with Aboriginal communities..."）
+  - [ ] 无混淆 Welcome to Country 与 Acknowledgement of Country（前者只能由 Traditional Custodians/Elders 主持）
+  - [ ] 无缺陷视角（deficit-based language）描述原住民，使用优势视角（Strengths-based）
+  - [ ] Aspire 部分有具体学习计划（引用学校具体培训项目或原住民研究中心），非空洞承诺
+  - [ ] 大写规则：Country / Elders / Traditional Custodians / First Nations / Dreaming 在原住民语境中首字母大写
+  - [ ] 无将 NZ 条约术语错误套用到 AU 语境（不可说 "treaty obligations"）
+  - [ ] 所有被 fit_report 标记需要 AU Indigenous 调整的文档是否都已执行（Cover Letter / Research Statement / Teaching Statement / KSC Response 四者必须逐一核查）
 
 ---
 

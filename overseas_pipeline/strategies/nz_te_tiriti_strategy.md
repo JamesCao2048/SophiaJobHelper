@@ -64,6 +64,59 @@ Te Reo, iwi, hapū, whānau, data sovereignty, indigenous, kaitiakitanga, whanau
 
 ---
 
+## 二.五、升级门槛规则
+
+**核心原则：** `moderate` 是默认天花板。升级到 `strong` 或 `full_treaty` 必须满足明确的证据门槛，且系统必须向用户显式说明升级理由。
+
+### `strong` 触发条件（必须同时满足）
+
+1. JD 或 School signal 中至少有一个 ≥ `explicit` 或 `strong`（矩阵硬性要求）
+2. fit_report 中必须列出触发升级的**具体原文证据**（不能是 agent 的推测）
+3. Step 2 在 fit_report 中用醒目标记提示用户：
+
+```
+⚠ 策略升级: moderate → strong
+触发证据:
+  - JD Essential Criteria: "Demonstrated understanding of Te Tiriti o Waitangi
+    and its application to tertiary education" (jd_main.md, bullet 4)
+  - 学校: VUW Te Tiriti Statute（校董会正式立法）
+建议: 材料中需要三条款结构化段落。请确认是否采纳。
+```
+
+### `full_treaty` 触发条件（最严格）
+
+1. JD signal = `explicit` **且** School signal = `strong`（矩阵唯一入口，不接受 agent 上调）
+2. JD 中必须有**至少 2 条**独立的条约相关要求出现在 Essential Criteria
+3. fit_report 中必须**暂停并询问用户确认**后才写入最终策略标签：
+
+```
+⚠ 最高级策略触发: full_treaty
+触发证据:
+  - JD Essential Criteria #3: "Demonstrated understanding of Te Tiriti o Waitangi..."
+  - JD Essential Criteria #6: "Commitment to bicultural practice..."
+  - 学校: Auckland Waipapa Taumata Rau 战略框架 + PVC(Māori) 参与审查
+此级别将在 Cover Letter 中加入 200-250 词专门段落、Research Statement
+中加入 300-400 词独立小节。
+请确认: 采纳 full_treaty / 降级为 strong / 用户自定
+```
+
+### Agent 上调限制
+
+- Agent 可将矩阵结果上调**至多一级**，且仅限 skip→subtle 或 subtle→moderate
+- **禁止** agent 自行上调到 strong 或 full_treaty
+- 所有上调必须在 `strategy_rationale` 中注明理由
+
+### 全量模式中断规则
+
+当 Step 10.5（NZ）的矩阵初判结果为 `strong` 或 `full_treaty` 时：
+
+1. Step 1 正常完成所有其他子步骤
+2. 在 `step1_summary.md` 顶部醒目标注中断警告
+3. **全量模式（一键/全流程）下**：pipeline 在 Step 1 完成后**自动中断**，不进入 Step 2，等待用户审查 step1_summary 后手动触发继续
+4. **单步模式下**：Step 1 正常结束，用户自然会在触发 Step 2 前看到 summary 中的警告
+
+---
+
 ## 三、Sophia 背景校准：Claim vs Aspire
 
 基于 Sophia 的真实研究经历（`materials/Research_Statement.md`, `materials/Teaching_Statement.md`）。

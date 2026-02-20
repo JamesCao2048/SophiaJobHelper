@@ -91,5 +91,22 @@
 
 ---
 
+## AU Indigenous 学校信号（仅 region=australia）
+
+- **signal_level**: strong | moderate | light
+- **assessed_date**: YYYY-MM-DD
+- **rap_tier**: Stretch | Innovate | Reflect | Elevate | none
+- **rap_document**: RAP 文档名称（如 "Innovate RAP 2024-2026"，无则填 N/A）
+- **indigenous_strategy**: 原住民战略名称（如 "Murmuk Djerring"，无则填 N/A）
+- **indigenous_centre**: 原住民学术支持中心（如 "Murrup Barak"，无则填 N/A）
+- **evidence**:
+  1. "原文摘录（英文原文）"
+     - source: [文档名](URL)
+  2. "原文摘录（英文原文）"
+     - source: [文档名](URL)
+- **notes**: 其他备注（如 DVC(Indigenous) 审查权限、特定 KPI、学院级原住民战略等）
+
+---
+
 ## 变更记录
 - YYYY-MM-DD：初始化

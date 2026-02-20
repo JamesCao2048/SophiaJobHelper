@@ -168,9 +168,14 @@ python overseas_pipeline/src/course_catalog_scraper.py \
 #### C. 预判策略标签
 
 1. 查策略文件 §二 矩阵，根据 jd_signal × school_signal 得出初步 strategy label
-2. 写入 `faculty_data.json → te_tiriti.strategy`
-3. 留空 `te_tiriti.strategy_rationale`（Step 2 填充）
-4. 在 `step1_summary.md` 中追加一行：`Te Tiriti: JD=[level], School=[level] → [strategy]（初步）`
+2. 如为 `strong` 或 `full_treaty` → **在 `step1_summary.md` 顶部标注中断警告**：
+   ```
+   ⚠ NZ Te Tiriti 高级别信号（[strategy]），需用户审查后手动触发 Step 2
+   ```
+3. 写入 `faculty_data.json → te_tiriti.strategy`
+4. 留空 `te_tiriti.strategy_rationale`（Step 2 填充）
+5. 在 `step1_summary.md` 中追加一行：`Te Tiriti: JD=[level], School=[level] → [strategy]（初步）`
+6. **全量模式中断判定**：如 strategy ∈ {strong, full_treaty} → 全量模式下 pipeline 在 Step 1 完成后**自动中断**，不进入 Step 2，等待用户审查 step1_summary 后手动触发继续
 
 #### faculty_data.json te_tiriti 块格式
 
