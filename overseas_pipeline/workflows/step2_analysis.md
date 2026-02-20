@@ -19,6 +19,7 @@ Step 1 已完成（`output/{school_id}/{dept_id}/faculty_data.json` 存在）
    - `overseas_pipeline/strategies/hci_density_strategy.md`（所有地区）
      - 根据 `hci_density.strategy` 确定点名优先级和课程匹配顺序
    - `overseas_pipeline/strategies/nz_te_tiriti_strategy.md`（仅 region=new_zealand）
+   - `overseas_pipeline/strategies/au_indigenous_strategy.md`（仅 region=australia）
 5. 爬取职位 JD 原文：
    - `python overseas_pipeline/src/faculty_scraper.py --url "{job_url}" --output-type raw`
    - 或请用户提供 JD 文本
