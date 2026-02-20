@@ -1,0 +1,242 @@
+% FDUletter_example.tex - an example latex file to illustrate FDUletter.cls
+% OUCletter_example.tex - an example latex file to illustrate OUCletter.cls
+%
+% Template by Brian Wood (brian.wood@oregonstate.edu).  Please feel free to send suggestions for changes; this template/cls is not exactly elegantly done!
+% Modified by Huang Weiran (huangweiran1998@outlook.com) to fit the need of FDU students.
+% Modified by Tim (qt@stu.ouc.edu.cn) to fit the need of OUC students.
+
+
+\documentclass[11pt]{OUCletter}
+\usepackage{fontspec} 
+\usepackage{tikz} 
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,        % 让链接用颜色而不是方框标出
+  linkcolor=black,        % 内部链接颜色（例如目录、交叉引用）
+  citecolor=blue,         % 文献引用颜色
+  urlcolor=blue, % 超链接颜色，保持和 scured 一致
+  filecolor=magenta,      % 文件链接颜色
+  pdfborder={0 0 0},      % 移除链接的边框
+  breaklinks=true,        % 允许长链接换行
+  bookmarksopen=true,     % 打开 PDF 书签
+  bookmarksnumbered=true  % 书签带编号
+}
+
+	\definecolor{scured}{RGB}{1, 45, 114}
+\usepackage{lipsum}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{eso-pic}
+%
+% This section is just a bunch of busywork so that the second and following pages read ``Page X of Y''
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\cfoot{\thepage\ / \pageref{LastPage}}
+\rhead{\includegraphics[height=0.4in]{jhu-icon.pdf}}
+
+
+\newcommand{\searchingfocus}{\textbf{data science and natural language processing}}
+\newcommand{\departmentname}{Computer Science in the Courant Institute \& the Tandon School of Engineering}
+\newcommand{\universityname}{New York University}
+%
+%
+% Set custom font here. Comment this line out if you do not have a Cambria font (originally included with this template) installed; computer modern (or whatever your current default font is) will be substituted.
+%
+%\setmainfont{[Cambria.ttf]}[BoldFont  = [CambriaBold.ttf], ItalicFont  = [CambriaItalic.ttf], BoldItalicFont = [CambriaBoldItalic.ttf] ]
+
+% \newcommand{\watermark}[3]{\AddToShipoutPictureBG{
+% \parbox[b][\paperheight]{\paperwidth}{
+% \vfill%
+% \centering%
+% \begin{tikzpicture}
+%     \path (0,0) -- (\paperwidth,\paperheight);
+%     \node[opacity=.05] at (current page.center)
+%     {\includegraphics[width=0.55\textwidth]{background-OUC.pdf}};   % sculogo watermark
+%     \end{tikzpicture}
+% \vfill}}}
+
+% The material below is a whole big dang thing whose purpose is just to set up a fixed coordinate system for \tikz so that you can put the Department or School address in the upper right-hand side without it moving all around every time you change something in the page.  I think it works.
+% Defining a new coordinate system for the page:
+%
+% --------------------------
+% |(-1,1)    (0,1)    (1,1)|
+% |                        |
+% |(-1,0)    (0,0)    (1,0)|
+% |                        |
+% |(-1,-1)   (0,-1)  (1,-1)|
+% --------------------------
+\makeatletter
+\def\parsecomma#1,#2\endparsecomma{\def\page@x{#1}\def\page@y{#2}}
+\tikzdeclarecoordinatesystem{page}{
+	\parsecomma#1\endparsecomma
+	\pgfpointanchor{current page}{north east}
+	% Save the upper right corner
+	\pgf@xc=\pgf@x%
+	\pgf@yc=\pgf@y%
+	% save the lower left corner
+	\pgfpointanchor{current page}{south west}
+	\pgf@xb=\pgf@x%
+	\pgf@yb=\pgf@y%
+	% Transform to the correct placement
+	\pgfmathparse{(\pgf@xc-\pgf@xb)/2.*\page@x+(\pgf@xc+\pgf@xb)/2.}
+	\expandafter\pgf@x\expandafter=\pgfmathresult pt
+	\pgfmathparse{(\pgf@yc-\pgf@yb)/2.*\page@y+(\pgf@yc+\pgf@yb)/2.}
+	\expandafter\pgf@y\expandafter=\pgfmathresult pt
+}
+\makeatother
+
+
+%%------------------------------------------------------------------------------%%
+%
+
+%%%%%%%%%%% Put Recommender(your mentor) Information Here %%%%%%%%%%%
+%
+\def\name{\textbf{Jie Gao} \\[10pt]
+	\small Malone Postdoctoral Fellow \\
+	Department of Computer Science \\
+    Malone Center for Engineering in Healthcare \\
+    Center for Language and Speech Processing \\
+    Johns Hopkins University \\
+    jgao77@jh.edu \\
+    \href{https://gaojie058.github.io/}{https://gaojie058.github.io/} \\
+    
+}
+%
+% List your degree(s), licences, etc. here if you like.
+%\def\What{, Your degrees, etc.} 
+%
+% Set the name of your Department or School here
+% I honestly don't know why the negative spacing is necessary to get the alignment of the first line correct.  This must be a ``\tikz'' thing.
+%%%%%%%%%%%%%%%%%%  School or Department %%%%%%%%%%%%%%%
+\def\Where{\hspace{-1.2mm}\textbf{\color{scured}Department of Computer Science}, \\
+        \textbf{\color{scured}Johns Hopkins University} 
+} 
+
+%%%%%%%%%%%%  Additional Contact Information %%%%%%%%%%%
+%
+% Set your preferred primary contact address here.
+\def\Address{Malone Hall, 3400 N Charles St} 
+%
+\def\CityZip{Baltimore, MD 21218, USA %\\
+%	P.R.China
+} 
+%
+% Set your OUC e-mail here
+\def\Email{\textbf{\color{scured}E-mail}: jgao77@jh.edu}
+%
+% Set your preferred contact number here
+\def\TEL{\textbf{\color{scured}Phone}: +1 (410)710-0555}
+%
+% Set your department or personal website here
+\def\URL{\textbf{\color{scured}Website}: {https://gaojie058.github.io/}}
+%
+
+%%%%%%%%%%%%%%%%  Footer information  %%%%%%%%%%%%%%%%%%
+%
+%  The next line is for your college, used as a footer.  If you prefer not to have this, just comment out these lines in favor of the line labeled "[[Alternate]]" below
+\def\school{\small{
+		OUC $\cdot$
+		~Department of xxxxx $\cdot$
+		~No. 238 Songling Road $\cdot$
+		~Qingdao, China P.R} } 
+% \def\school{~}  % [[Alternate]]
+%
+
+%%%%%%%%%%%%%%%%%%%%%  Signature line  %%%%%%%%%%%%%%%%%%%%%
+%
+% Set your signature line here.
+% One can add a signature image in a PDF file using the following code; this requires a file called "signature_block.pdf" to be installed in the same folder as the .tex file.  The vertical spacing (\vspace) and the scaling will have to be adjusted to get things to look correct for your particular signature image. Alternatively, comment out the following line in favor of the one labeled "[[Alternate]]" if you want to sign a paper copy of the letter.
+%
+\signature{
+	\vspace{2mm}\includegraphics[scale=0.3]{signature.pdf}\\\vspace{2mm}
+	\name
+}
+%\signature{\name}  % [[Alternate]]
+%%------------------------------------------------------------------------------%%
+
+
+
+% This block sets up the address on the right-hand side of the header. 
+%
+% The following lines just compile the information you set up into the LaTex letter variable "address" for later use.
+%
+%The following command "clears out" the default address so that it can be better set using \tikz
+\address{}
+
+\def\newaddress{
+	\Where\\ 
+	\Address\\ 
+	\CityZip\\ 
+	\TEL\\ 
+	\Email\\ 
+	\URL 
+}
+%
+%%%%%%%%%%%  DATE  %%%%%%%%%%%%%%%%%%%%%%%%%
+% If you want a date different from the current date, comment out the next line in favor of the line labeled "[[Alternate]]".  The ``\vspace{10mm}'' just moves the date down a tiny bit so it doesn't interfere with the header.  This can be adjusted to your preference.
+%
+\date{\vspace{10mm} \today}
+%\date{\vspace{10mm} 20 September 2020}  %[[Alternate]]
+%
+%%%%%%%%%%% Set the subject here if there is one  %%%%
+%\subject{Stuff} % optional subject line
+
+
+
+%%-----------------------------------------------------------------------------------------%%
+%
+\begin{document}
+	%
+	%
+	%%%%%%%%  The "To" address goes here.
+	%
+	\begin{letter}{
+			\textit{Faculty Search Committee}, \\
+            \departmentname{}, \\
+            \universityname
+		%	IOP Publishing%\\ 
+			%SomeTown, SomeState 					       				  		 ~~SomeZip
+		}
+
+		%\begin{tikzpicture}[remember picture,overlay,,every node/.style={anchor=center}]
+		%\node[text width=7cm] at (page cs:0.5,0.73){\small \newaddress};
+		%\end{tikzpicture} 
+		
+		%%%%%%  The ``opening'' is just the method of address you would like to use at the start of the letter.
+		%
+		\opening{Dear Members of Search Committee, }
+		
+		
+		%%%%%%%%%% Body of letter   %%%%%%%%%%%%%%
+		% Remove it if you do not want watermark
+		% \watermark{}{}{}
+		
+		%%%%%%%%%%% 	Text   %%%%%%%%%%%%%%
+        It is with great enthusiasm that I apply for the \href{https://apply.interfolio.com/177246}{\textbf{Tenure-Track Assistant Professor}} position in  \departmentname{} at \textbf{\universityname}. I am currently a \href{https://malonecenter.jhu.edu/people-2/members/#postdoctoral-members}{Malone Postdoctoral Fellow} at Johns Hopkins University, where my work focuses on \textbf{human-AI collaboration}, \textbf{responsible and trustworthy AI}, \textbf{human aspects of software engineering} and \textbf{computational social science}. 
+        I believe I am a strong candidate for this position because my research vision aligns closely with \departmentname’s searching focus in \searchingfocus. Drawing on training in HCI, NLP, and Software Engineering, my work examines how AI-mediated workflows support human agency in data analysis and develops human-centered systems that strengthen trust, transparency, and equal participation in AI-enabled data analysis work.
+
+        Specifically, I present my core strengths for this position.
+        
+        \textbf{(1) My work on human–AI collaboration and trustworthy AI in enhancing ``Qualitative Data Analysis" methodology has strong potential to address fundamental societal challenges across healthcare, social science, public policy, and psychology.} For example, clinical conversations between doctors and patients contain rich signals that can inform diagnoses and improve quality of care, yet, extracting insights from such unstructured and qualitative data remains difficult due to its scale, complexity, nuance, and lack of structure. This motivates a central question in my research: \textit{How can we design AI systems that strengthen human capabilities in analyzing complex unstructured data?} To address this question, my projects, \href{https://dl.acm.org/doi/abs/10.1145/3617362}{CoAIcoder} (TOCHI 2023), \href{https://dl.acm.org/doi/abs/10.1145/3613904.3642002}{CollabCoder} (CHI 2024), and \href{https://arxiv.org/abs/2501.00775}{MindCoder} (2025), develop AI systems that support \textbf{efficient, transparent, and trustworthy} human-centric analytic workflows. Two of these systems, \href{https://gaojie058.github.io/CollabCoder/}{CollabCoder} and \href{https://mindcoder.ai/}{MindCoder}, have been publicly released as \textbf{open-source} or \textbf{publicly deployed tool} to support real-world use. As some of the earliest investigations in this space, my CHI and TOCHI publications have been well cited and influential in our domain, inspiring a growing body of follow-up research on human-centered AI for qualitative and interpretive work. Looking ahead, I am committed to advancing cross-disciplinary, high-impact research by \textbf{designing next-generation human–AI collaboration systems that support scalable, human-enabled analysis and richer understanding of increasingly complex data}. In addition, I plan to build evaluation frameworks for human–AI systems, especially those involving large language models, to guide the development of reliable and human-centered AI technologies.
+
+
+        \textbf{(2) My capability to generalize research beyond disciplinary boundaries.} My unique HCI perspective enables me to bridge social science methodologies with technical problem spaces and develop innovative solutions to complex socio-technical challenges. For example, one of my recent projects brings a unique HCI perspective to Software Engineering. \href{https://arxiv.org/abs/2504.04553}{“Understanding Codebase Like a Professional!”} explores how expert developers’ code-understanding behaviors can inform the design of AI-powered tools for codebase comprehension, thereby supporting novice developers. In another example, my mentored student's position paper: \href{https://aclanthology.org/2025.hcinlp-1.20.pdf}{Enriching Subjective Data Annotation through Qualitative Analysis} generalize social science research methods for application in subjective data annotation in SE and NLP domain. Together, these works demonstrate that my research is generalizable across disciplines in both its methodology and underlying mindset, indicating strong potential for broad impact.
+        
+
+        \textbf{(3) Strong record of my professional connections, academic service, and teaching and mentoring.} 
+        Globally, I have built professional connections with researchers across countries and institutions, such as MIT, Singapore–MIT Alliance for Research and Technology (SMART), University of Notre Dame, National University of Singapore (NUS), Singapore Management University (SMU), The Pennsylvania State University, and North Carolina State University. My previous role at SMART, which also gave me first hand experience collaborating with industry partners such as Singapore Changi Airport and Synergy Marine Group, further equipped me with the ability to translate research into industry relevant problems. \textbf{Within \universityname, I am particularly interested in the work of \href{https://engineering.nyu.edu/faculty/graham-dove}{Graham Dove}, \href{https://engineering.nyu.edu/faculty/oded-nov}{Oded Nov} and \href{https://qisun.me/}{Qi Sun}, and I hope to explore further collaboration opportunities with them.} Apart from collaboration, I am also consistently committed to academic service, including reviewing more than 80 papers and serving four times as an associate chair for top-tier conferences (CHI 2025–2026 for the main track and CHI 2022–2023 for the Late-Breaking Work). Moreover, I have a strong record of mentoring more than 10 students across diverse backgrounds and career stages. 
+        
+        Thank you for considering my application. I am confident that I can contribute to \departmentname’s future growth in HCI and AI by conducting high-impact research in human-AI collaboration and trustworthy AI, and pursuing competitive funding opportunities such as the NSF CAREER Award and NSF Computer and Information Science and Engineering. I would also be honored to discuss how my research and teaching align with \universityname’s mission.
+
+        %  
+
+		\closing{Sincerely yours,}	
+	\end{letter}
+	
+\end{document}
+%
+%%-----------------------------------------------------------------------------------------%%

@@ -6,7 +6,7 @@ Step 2 已完成（`output/{school_id}/{dept_id}/fit_report.md` 存在）
 
 ---
 
-## 可用材料库（overleaf-projects/Faculty Position/）
+## 可用材料库（overseas_pipeline/overleaf-projects/Faculty Position/）
 
 | 目录 | 用途 | 备注 |
 |------|------|------|
@@ -24,7 +24,7 @@ Step 2 已完成（`output/{school_id}/{dept_id}/fit_report.md` 存在）
 ## 执行步骤
 
 1. 读取 `output/{school_id}/{dept_id}/fit_report.md` 中的"各材料调整建议"
-2. 读取 Sophia 现有材料（`job_filling/materials/*.md`）
+2. 读取 Sophia 现有材料（`overseas_pipeline/materials/*.md`）
 3. 读取区域规则卡（`region_knowledge/regions/{region}.md`）
 4. 读取 `overseas_pipeline/strategies/hci_density_strategy.md`
    - 从 `faculty_data.json` 获取 `hci_density.strategy` 和 `department_courses`
@@ -150,7 +150,7 @@ Step 2 已完成（`output/{school_id}/{dept_id}/fit_report.md` 存在）
 
 **执行流程：**
 
-1. 从 `overleaf-projects/Faculty Position/` 复制完整 LaTeX 项目到 `output/{school_id}/{dept_id}/materials/`
+1. 从 `overseas_pipeline/overleaf-projects/Faculty Position/` 复制完整 LaTeX 项目到 `output/{school_id}/{dept_id}/materials/`
 2. 用 Step 3a 生成的 .tex 内容**替换**复制后目录中对应的 .tex 文件
 3. 检查样式一致性（preamble 包/颜色/页边距/字体）
 4. 编译 PDF：
@@ -185,7 +185,7 @@ notes.md 是给 Sophia 审核的"修改日志"，必须让她无需打开 .tex �
 |---|------|------|-----------|
 | R1 | 区域规则卡 | {地区}规则卡 Section X（行号）| region_knowledge/regions/{region}.md L58-138 |
 | R2 | Fit Report | 匹配分析 | output/{school}/{dept}/fit_report.md |
-| R3 | Sophia 材料 | Research Statement | job_filling/materials/Research_Statement.md |
+| R3 | Sophia 材料 | Research Statement | overseas_pipeline/materials/Research_Statement.md |
 <!-- 必须标注具体章节/行号 -->
 
 ## 逐段修改说明

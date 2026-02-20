@@ -2,6 +2,24 @@
 
 AI 辅助的学术教职求职全流程工具，覆盖国内 + 海外双线申请，从职位搜集、材料准备到表单自动填写的完整闭环。
 
+## 如何启动 Claude Code
+
+本项目各子模块均通过 Claude Code CLI 驱动。**从对应子项目目录内启动**，确保相对路径正确解析：
+
+```bash
+# 海外教职申请流水线（主要工作区）
+cd overseas_pipeline
+claude --dangerously-skip-permissions
+
+# 追踪系统（查看申请状态）
+cd ..   # 回到项目根目录
+python -m tracking.cli dashboard
+```
+
+> `--dangerously-skip-permissions` 跳过每次操作的权限确认弹窗，是在本地受信任环境下高效使用 AI 流水线的标准启动方式。**请勿在不信任的机器或共享环境中使用此参数。**
+
+---
+
 ## 子项目
 
 ### [`china_job_hunting/`](./china_job_hunting/) — 国内教职搜集与材料生成
@@ -65,9 +83,9 @@ Claude Code 驱动的海外教职申请材料准备流水线，目标将每所�
 
 ---
 
-### [`overleaf-projects/`](./overleaf-projects/) — LaTeX 申请材料（参考模板）
+### [`overseas_pipeline/overleaf-projects/`](./overseas_pipeline/overleaf-projects/) — LaTeX 申请材料
 
-本地 Overleaf 项目同步目录。**完整内容通过 Google Drive 管理**，git 仅保留 3 个参考模板的 `.tex` 源码：
+本地 Overleaf 项目同步目录，已整合进 `overseas_pipeline/` 以便流水线直接访问。**完整内容通过 Google Drive 管理**，git 仅保留 3 个参考模板的 `.tex` 源码：
 
 | 保留项目 | 用途 |
 |----------|------|
@@ -100,7 +118,7 @@ SophiaJobHelper/
 ├── faculty-application_script/ # 每日职位监控脚本
 ├── google-sheets-sync/       # Google Sheets 数据同步
 ├── general/                  # 通用规划与知识文档
-├── overleaf-projects/        # LaTeX 材料（Google Drive 管理，git 仅存参考模板）
+├── overseas_pipeline/overleaf-projects/  # LaTeX 材料（已移入 overseas_pipeline）
 └── .gitignore
 ```
 
@@ -113,7 +131,7 @@ SophiaJobHelper/
 | 申请材料 PDF | `materials/`（除参考 .tex 外） |
 | 生成草稿 | `china_job_hunting/drafts/`、`overseas_pipeline/output/` |
 | 数据文件 | `*.xlsx`、`*.csv`（职位数据库） |
-| Overleaf 完整项目 | `overleaf-projects/`（除 3 个参考模板） |
+| Overleaf 完整项目 | `overseas_pipeline/overleaf-projects/`（除 3 个参考模板） |
 | 敏感信息 | `profile.yaml`、`.env`、`credentials/`（API 密钥） |
 | 运行日志 | `faculty-application_script/monitor_log.txt` |
 | 系统文件 | `.DS_Store`、`__pycache__/` 等 |

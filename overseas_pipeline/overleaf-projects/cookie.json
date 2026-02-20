@@ -1,0 +1,27 @@
+[
+    {
+        "domain": "www.overleaf.com",
+        "hostOnly": true,
+        "httpOnly": true,
+        "name": "GCLB",
+        "path": "/",
+        "sameSite": null,
+        "secure": false,
+        "session": true,
+        "storeId": null,
+        "value": "CMKpzdeV0pO7FRAD"
+    },
+    {
+        "domain": ".overleaf.com",
+        "expirationDate": 1771863115.166558,
+        "hostOnly": false,
+        "httpOnly": true,
+        "name": "overleaf_session2",
+        "path": "/",
+        "sameSite": "lax",
+        "secure": true,
+        "session": false,
+        "storeId": null,
+        "value": "s%3A0r2p_zXgzkxx_1kLfXoUYUfWrs_3_6oO.rQozIAKWmf83Qn4rvzY4%2F9k1qrq7JnqvBWwo5rfcIXA"
+    }
+]

@@ -10,7 +10,11 @@ Step 1 已完成（`output/{school_id}/{dept_id}/faculty_data.json` 存在）
 
 1. 读取 `output/{school_id}/{dept_id}/faculty_data.json`（含 `hci_density` 和 `department_courses` 字段）
 2. 确定 region → 读取 `region_knowledge/regions/{region}.md`
-3. 检查 `region_knowledge/schools/{school_id}.md` 是否存在，如存在则读取（用于覆盖地区卡差异）
+3. 读取院系规则卡（用于覆盖地区卡差异）：
+   - 主路径：`region_knowledge/schools/{school_id}/{dept_id}.md`
+   - 副本路径：`output/{school_id}/{dept_id}/knowledge/{dept_id}.md`
+   - 若主路径不存在但副本存在，读取副本并在 `step2_summary.md` 标注 "using_output_copy"
+   - 若两者都不存在，按 "无院系覆盖规则" 继续并在 `step2_summary.md` 标注缺失
 4. 读取 HCI 密度策略文件：`overseas_pipeline/strategies/hci_density_strategy.md`
    - 根据 `hci_density.strategy` 确定点名优先级和课程匹配顺序
 5. 爬取职位 JD 原文：
@@ -18,10 +22,10 @@ Step 1 已完成（`output/{school_id}/{dept_id}/faculty_data.json` 存在）
    - 或请用户提供 JD 文本
    - 保存到 `output/{school_id}/{dept_id}/raw/jd_*.md`
 6. 读取 Sophia 全套材料：
-   - `job_filling/materials/Research_Statement.md`
-   - `job_filling/materials/Teaching_Statement.md`
-   - `job_filling/materials/cv_latest.md`
-   - `job_filling/materials/Impact_Statement.md`（如存在）
+   - `overseas_pipeline/materials/Research_Statement.md`
+   - `overseas_pipeline/materials/Teaching_Statement.md`
+   - `overseas_pipeline/materials/cv_latest.md`
+   - `overseas_pipeline/materials/Impact_Statement.md`（如存在）
 7. **⚠ 规则冲突检查（关键）**：
    - 比较 JD 要求与地区规则卡的规则
    - 如发现冲突，**立即暂停**，显示冲突详情和处理选项（见下）

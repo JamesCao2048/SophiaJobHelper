@@ -1,0 +1,77 @@
+\documentclass[10pt]{OUCletter}
+\usepackage{fontspec}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+% ---- Font: Cambria to match CV ----
+\setmainfont{Cambria}[
+  Path=content/,
+  BoldFont=CambriaBold.ttf,
+  ItalicFont=CambriaItalic.ttf,
+  BoldItalicFont=CambriaBoldItalic.ttf
+]
+
+% ---- Colors ----
+\definecolor{cvcopper}{RGB}{196, 140, 86}
+
+% ---- Spacing ----
+\usepackage{setspace}
+\setstretch{1.25}           % line spacing
+\setlength{\parskip}{10pt}  % paragraph spacing
+\setlength{\parindent}{0pt} % no indent
+
+% ---- Hyperlinks ----
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=cvcopper,
+  urlcolor=cvcopper,
+  filecolor=cvcopper,
+  pdfborder={0 0 0},
+  breaklinks=true,
+}
+
+% ---- Signature ----
+\signature{
+  \vspace{2mm}\includegraphics[scale=0.3]{signature.pdf}\\\vspace{2mm}
+  \textit{Jie Gao} \\[4pt]
+  {\small Malone Postdoctoral Fellow \\
+  Johns Hopkins University}
+}
+
+% ---- Recipient / position info ----
+\newcommand{\departmentname}{Department of Data Science and AI, Faculty of Information Technology}
+\newcommand{\universityname}{Monash University}
+
+% ---- Letter header config ----
+\address{}
+\date{\today}
+
+% ============================================================
+\begin{document}
+
+\begin{letter}{
+    \textit{Faculty Search Committee}, \\
+    \departmentname{} \\
+    \universityname
+  }
+
+  \opening{Dear Members of Search Committee,}
+
+  It is with great enthusiasm that I apply for the \href{https://careers.pageuppeople.com/513/cw/en/job/688354/lead-innovate-the-future-three-lecturer-positions-in-ai-iot-software-systems}{Lecturer in Agentic AI} position in the \departmentname{} at \universityname. I am currently a \href{https://malonecenter.jhu.edu/people-2/members/#postdoctoral-members}{Malone Postdoctoral Fellow} at the Johns Hopkins University, where my work focuses on building \textit{LLM-powered interactive systems} for \textit{human-AI collaboration}, with an emphasis on \textit{NLP} and \textit{responsible AI}. With a multidisciplinary background spanning HCI, NLP, and Software Engineering, my research has produced LLM-powered collaborative tools that support humans in complex analytical and software engineering tasks. This experience, grounded in understanding how humans interact with, delegate to, and oversee AI systems, provides a strong foundation for advancing research in agentic AI, the core focus of this role.
+
+  Specifically, my projects, \href{https://dl.acm.org/doi/abs/10.1145/3617362}{CoAIcoder} (TOCHI 2023), \href{https://dl.acm.org/doi/abs/10.1145/3613904.3642002}{CollabCoder} (CHI 2024), and \href{https://arxiv.org/abs/2501.00775}{MindCoder} (2025), develop LLM-powered agentic systems where AI agents collaborate with humans through structured planning, persistent memory of analytical context, and dynamic tool use to support complex analytical workflows. These systems address core challenges in agentic AI: how agents plan multi-step reasoning tasks, maintain contextual memory across sessions, safely invoke external tools, and produce transparent, evaluable outputs. \textit{Two of these systems, \href{https://gaojie058.github.io/CollabCoder/}{CollabCoder} and \href{https://mindcoder.ai/}{MindCoder.ai}, have been publicly released as open-source or publicly deployed tools to support real-world use.} As one of the earliest investigations in this space, my CHI and TOCHI publications have been well cited in our domain (280 citations in total), inspiring a growing body of follow-up research. My recent work further extends to LLM-powered agents for software comprehension (\href{https://arxiv.org/abs/2504.04553}{``Understanding Codebase Like a Professional!''}, accepted at the International Conference on Program Comprehension 2026), where agentic AI assists developers through intelligent code navigation and reasoning.
+
+  \textbf{Future Research Agenda:} Building on my experience in designing LLM-powered collaborative systems and studying how humans work with AI, my future research agenda centers on \textit{human-agent collaboration}, an increasingly critical direction as agentic systems grow more autonomous yet demand human oversight for safety and reliability. Specifically, I plan to investigate: (1)~\textit{mixed-initiative interaction designs} that enable humans to fluidly intervene in, steer, and delegate to AI agents during complex multi-step tasks; (2)~\textit{human-agent team evaluation}, moving beyond agent-only benchmarks to holistic metrics that capture the effectiveness of human-agent teams; and (3)~\textit{AI-generated data analysis}, developing methods to systematically collect, analyze, and interpret data produced by agentic systems,such as agent behavior traces, response patterns, and decision logs, to diagnose failures, uncover biases, and inform iterative agent improvement. This agenda leverages my unique position at the intersection of HCI and agentic AI, a combination that is essential for building agent systems people can actually trust and work with, yet remains underexplored in the field.
+
+  \textbf{Potential Collaboration and Service:} I am excited about the opportunity to join the \departmentname{}, whose world-leading expertise in AI and data science provides an ideal environment for advancing agentic AI research. My work on LLM-powered agent frameworks with NLP foundations naturally complements Prof.~Reza Haffari's research in NLP and language technology, particularly in advancing LLM capabilities for dialogue, reasoning, and agent communication. My focus on safety-aware and transparent AI agent design connects with the department's broader mission on trustworthy AI, and I see strong collaboration potential with the Monash AI Institute on responsible deployment of agentic systems. Beyond the department, my interdisciplinary HCI perspective enables collaboration with the Department of Human-Centred Computing on human-agent interaction design, and with Prof.~John Grundy's \textit{HumaniSE} Lab on AI agents for software engineering. I am also enthusiastic about contributing to teaching in AI, NLP, and data science, and supporting the Faculty's educational mission.
+
+  Globally, I have built professional connections with researchers across countries and institutions, such as Johns Hopkins University, MIT, National University of Singapore, University of Notre Dame, and Singapore Management University.
+  I am also consistently committed to academic service, including reviewing more than 80 papers and serving four times as an associate chair for top-tier conferences (CHI 2025--2026 for the main track and CHI 2022--2023 for the Late-Breaking Work). Moreover, I have a strong record of mentoring more than 10 students across diverse backgrounds and career stages.
+
+  Thank you for considering my application. I am confident that I can contribute to the \departmentname{}'s future growth by conducting high-impact research in agentic AI and LLM-powered intelligent systems, and by pursuing competitive funding opportunities such as the Australian Research Council (ARC) Discovery and DECRA grants.
+
+  \closing{Sincerely yours,}
+\end{letter}
+
+\end{document}

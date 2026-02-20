@@ -12,7 +12,7 @@
 
 - `school_id`：snake_case，如 `monash_university`
 - `dept_id`：目标院系英文缩写，snake_case，如 `dsai`、`hcc`、`cs`
-- 输出目录：`output/{school_id}/{dept_id}/`（单系学校可省略 `dept_id` 层）
+- 输出目录：`output/{school_id}/{dept_id}/`（单系学校也保留 `dept_id` 层）
 
 ### 1b. 扫描同校已有院系产物（如 `output/{school_id}/` 已存在）
 
@@ -27,6 +27,28 @@
 - 预填充步骤：从已有院系的 `cross_department_collaborators` 中，找出 `department` 字段匹配当前院系的成员，将其基础信息作为当前院系 `faculty` 数组的**起点**
 - 预填充只是起点，仍需：① 重新判断 `overlap_with_sophia`；② 重新搜索 `overlapping_papers`
 - 已下载的论文 PDF 可直接复用（复制到当前 `papers/`），无需重新下载
+
+**跨系规则卡复用约定（新增）：**
+- 除了扫描 `output/{school_id}/` 的已有 `dept_id`，还要扫描 `region_knowledge/schools/{school_id}/` 的已有院系规则卡
+- 若发现同校前序院系规则卡，先读取其 `decision_makers`、`hci_ecosystem`、`teaching_context`、`risks_and_unknowns` 中可复用内容
+- 复用时必须标注来源院系（如 `source_dept: hcc`），并重新校验对当前院系是否仍成立
+- 当前院系规则卡优先级高于同校其他院系继承内容
+
+### 1c. 检查已有地区规则卡（强制）
+
+- 从 JD 或学校信息确定 `region`（如 `new_zealand`、`australia`）
+- 使用**绝对路径**检查地区规则卡是否存在：
+  ```
+  ../region_knowledge/regions/{region}.md
+  ```
+- ⚠️ **不要用相对路径**（工作目录是 `overseas_pipeline/`，`region_knowledge/` 在项目根目录）
+- 如果存在：
+  - 读取并记录关键信息（薪资基准、特殊材料要求、评审重点）
+  - 在 `step1_summary.md` 中标注：地区规则卡已存在 + 路径
+  - 将地区卡中的特殊要求（如 NZ 的 Te Tiriti、澳洲的 KSC）传递给后续步骤
+- 如果不存在：
+  - 在 `step1_summary.md` 中标注：地区规则卡不存在，Step 2 前需创建
+  - 提示用户
 
 ### 2. 爬取院系页面（五层 fallback）
 
@@ -43,7 +65,7 @@
 ### 3. Claude Code 分析
 
 - 读取爬取的 markdown 内容
-- 读取 `job_filling/materials/Research_Statement.md` 了解 Sophia 的研究方向
+- 读取 `overseas_pipeline/materials/Research_Statement.md` 了解 Sophia 的研究方向
 - 识别 faculty 列表，对每人判断 `overlap_with_sophia`（high/medium/low/none）
 - 识别标准：Human-AI collaboration / HCI / CSCW / AI / NLP / qualitative methods 相关
 - 对 overlap=high 的 faculty（≤5人）记录详细的 `overlapping_papers` 信息
@@ -60,7 +82,19 @@
 
 ### 6. 生成 faculty_data.sources.md（标注每位 faculty 信息的来源 URL）
 
-### 7. 检查 region_knowledge/schools/{school_id}.md，如不存在则创建框架
+### 7. 生成并同步院系规则卡（强制）
+
+- 规则卡主路径：`region_knowledge/schools/{school_id}/{dept_id}.md`
+- 运行期副本路径：`output/{school_id}/{dept_id}/knowledge/{dept_id}.md`
+- 若主路径不存在：按 `templates/knowledge/department_rule_card_template.md` 创建
+- 若主路径已存在：在其基础上增量更新，不覆盖手工补充内容
+- Step 1 完成后执行双写入同步：
+  1. 先写入 `output/{school_id}/{dept_id}/knowledge/{dept_id}.md`
+  2. 再同步到 `region_knowledge/schools/{school_id}/{dept_id}.md`
+- `step1_summary.md` 需记录：
+  - 本次是否复用了同校其他院系规则卡
+  - 复用了哪些字段
+  - 双写入同步是否成功
 
 ### 8. HCI 密度分类
 

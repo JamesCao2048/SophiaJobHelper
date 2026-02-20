@@ -1,0 +1,197 @@
+\documentclass[10pt]{OUCletter}
+\usepackage{fontspec} 
+\usepackage{tikz} 
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,        % 让链接用颜色而不是方框标出
+  linkcolor=black,        % 内部链接颜色（例如目录、交叉引用）
+  citecolor=blue,         % 文献引用颜色
+  urlcolor=blue, % 超链接颜色，保持和 scured 一致
+  filecolor=magenta,      % 文件链接颜色
+  pdfborder={0 0 0},      % 移除链接的边框
+  breaklinks=true,        % 允许长链接换行
+  bookmarksopen=true,     % 打开 PDF 书签
+  bookmarksnumbered=true  % 书签带编号
+}
+
+\definecolor{scured}{RGB}{1, 45, 114}
+\usepackage{lipsum}
+\usepackage{fancyhdr}
+% \usepackage{lastpage}
+\usepackage{eso-pic}
+%
+% This section is just a bunch of busywork so that the second and following pages read ``Page X of Y''
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+% \cfoot{\thepage\ / \pageref{LastPage}}
+\rhead{\includegraphics[height=0.4in]{jhu-icon.pdf}}
+
+
+% --------------------------
+% \makeatletter
+% \def\parsecomma#1,#2\endparsecomma{\def\page@x{#1}\def\page@y{#2}}
+% \tikzdeclarecoordinatesystem{page}{
+% 	\parsecomma#1\endparsecomma
+% 	\pgfpointanchor{current page}{north east}
+% 	% Save the upper right corner
+% 	\pgf@xc=\pgf@x%
+% 	\pgf@yc=\pgf@y%
+% 	% save the lower left corner
+% 	\pgfpointanchor{current page}{south west}
+% 	\pgf@xb=\pgf@x%
+% 	\pgf@yb=\pgf@y%
+% 	% Transform to the correct placement
+% 	\pgfmathparse{(\pgf@xc-\pgf@xb)/2.*\page@x+(\pgf@xc+\pgf@xb)/2.}
+% 	\expandafter\pgf@x\expandafter=\pgfmathresult pt
+% 	\pgfmathparse{(\pgf@yc-\pgf@yb)/2.*\page@y+(\pgf@yc+\pgf@yb)/2.}
+% 	\expandafter\pgf@y\expandafter=\pgfmathresult pt
+% }
+% \makeatother
+
+
+
+%%%%%%%%%%% Put Recommender(your mentor) Information Here %%%%%%%%%%%
+%
+\def\name{\textit{Jie Gao} \\[10pt]
+	\small Malone Postdoctoral Fellow \\
+	Department of Computer Science \\
+    Malone Center for Engineering in Healthcare \\
+    Center for Language and Speech Processing \\
+    Johns Hopkins University \\
+    jgao77@jh.edu \\
+    \href{https://gaojie058.github.io/}{https://gaojie058.github.io/} \\
+    
+}
+
+%%%%%%%%%%%%%%%%%%  School or Department %%%%%%%%%%%%%%%
+\def\Where{\hspace{-1.2mm}\textit{\color{scured}Department of Computer Science}, \\
+        \textit{\color{scured}Johns Hopkins University} 
+} 
+
+%%%%%%%%%%%%  Additional Contact Information %%%%%%%%%%%
+%
+% Set your preferred primary contact address here.
+\def\Address{Malone Hall, 3400 N Charles St} 
+%
+\def\CityZip{Baltimore, MD 21218, USA %\\
+%	P.R.China
+} 
+%
+% Set your OUC e-mail here
+\def\Email{\textit{\color{scured}E-mail}: jgao77@jh.edu}
+%
+% Set your preferred contact number here
+\def\TEL{\textit{\color{scured}Phone}: +1 (410)710-0555}
+%
+% Set your department or personal website here
+\def\URL{\textit{\color{scured}Website}: {https://gaojie058.github.io/}}
+%
+
+%%%%%%%%%%%%%%%%  Footer information  %%%%%%%%%%%%%%%%%%
+%
+%  The next line is for your college, used as a footer.  If you prefer not to have this, just comment out these lines in favor of the line labeled "[[Alternate]]" below
+\def\school{\small{
+		OUC $\cdot$
+		~Department of xxxxx $\cdot$
+		~No. 238 Songling Road $\cdot$
+		~Qingdao, China P.R} } 
+% \def\school{~}  % [[Alternate]]
+%
+
+%%%%%%%%%%%%%%%%%%%%%  Signature line  %%%%%%%%%%%%%%%%%%%%%
+%
+% Set your signature line here.
+% One can add a signature image in a PDF file using the following code; this requires a file called "signature_block.pdf" to be installed in the same folder as the .tex file.  The vertical spacing (\vspace) and the scaling will have to be adjusted to get things to look correct for your particular signature image. Alternatively, comment out the following line in favor of the one labeled "[[Alternate]]" if you want to sign a paper copy of the letter.
+%
+\signature{
+	\vspace{2mm}\includegraphics[scale=0.3]{signature.pdf}\\\vspace{2mm}
+	\name
+}
+%\signature{\name}  % [[Alternate]]
+%%------------------------------------------------------------------------------%%
+
+
+
+% This block sets up the address on the right-hand side of the header. 
+%
+% The following lines just compile the information you set up into the LaTex letter variable "address" for later use.
+%
+%The following command "clears out" the default address so that it can be better set using \tikz
+\address{}
+
+\def\newaddress{
+	\Where\\ 
+	\Address\\ 
+	\CityZip\\ 
+	\TEL\\ 
+	\Email\\ 
+	\URL 
+}
+%
+%%%%%%%%%%%  DATE  %%%%%%%%%%%%%%%%%%%%%%%%%
+% If you want a date different from the current date, comment out the next line in favor of the line labeled "[[Alternate]]".  The ``\vspace{10mm}'' just moves the date down a tiny bit so it doesn't interfere with the header.  This can be adjusted to your preference.
+%
+\date{\today}
+% \date{\vspace{10mm} January 12, 2026}  %[[Alternate]]
+%
+%%%%%%%%%%% Set the subject here if there is one  %%%%
+%\subject{Stuff} % optional subject line
+
+
+\newcommand{\searchingfocus}{\textit{Information Technology}}
+\newcommand{\departmentname}{Department of Computer Science and Informatics}
+\newcommand{\universityname}{Jönköping University}
+
+%
+\begin{document}
+	%
+	%
+	%%%%%%%%  The "To" address goes here.
+	%
+     
+	\begin{letter}{
+			\textit{Faculty Search Committee}, \\
+            \departmentname{} \\
+            \universityname
+		}
+
+       
+		\opening{Dear Members of Search Committee, }
+		
+        It is with great enthusiasm that I apply for the \href{https://academicpositions.com/ad/jonkoping-university/2025/assistant-professor-in-human-computer-interaction/242809}{Tenure-track Assistant Professor} position in the \departmentname{} at the \universityname. I am currently a \href{https://malonecenter.jhu.edu/people-2/members/#postdoctoral-members}{Malone Postdoctoral Fellow} at Johns Hopkins University, where my work focuses on \textit{human-AI collaboration}, \textit{responsible and trustworthy AI}. With a multidisciplinary background in HCI, NLP, and Software Engineering, my work focuses on designing AI systems that support human cognitive capabilities in data analysis, such as reasoning and reflection, to enhance efficiency and trust. Below, I present my core strengths.
+        
+        % I believe I am a strong candidate for this position. 
+        % I believe I am a strong candidate for this position because my research vision aligns closely with \departmentname’s searching focus in \searchingfocus.
+        % Having worked in \textit{human-AI collaboration} area since 2021, my work is \textit{one of the most original contributions in the domain}, opening a new research direction and inspiring a growing body of follow-up work. Since the emergence of ChatGPT, my domain has become increasingly popular.
+        
+
+        
+        \textbf{Research:} Social media posts, customer reviews, and clinical interviews often contain rich signals that can inform technology design, policy-making, and healthcare provision. Yet, extracting insights from such unstructured qualitative data remains difficult due to its scale, complexity, nuance, and lack of structure. This motivates my central research motivation: \textit{designing AI systems that analyze real-world unstructured data while maintaining human-level quality.} My projects, \href{https://dl.acm.org/doi/abs/10.1145/3617362}{CoAIcoder} (TOCHI 2023), \href{https://dl.acm.org/doi/abs/10.1145/3613904.3642002}{CollabCoder} (CHI 2024), and \href{https://arxiv.org/abs/2501.00775}{MindCoder} (2025), develop AI systems that support efficient, transparent, and trustworthy human-centric analytic workflows. \textit{Two of these systems, \href{https://gaojie058.github.io/CollabCoder/}{CollabCoder} and \href{https://mindcoder.ai/}{MindCoder.ai}, have been publicly released as \textit{open-source} or \textit{publicly deployed tool} to support real-world use.} As one of the earliest investigations in this space, my CHI and TOCHI publications have been well cited in our domain (280 citations in total), inspiring a growing body of follow-up research. My recent work also extends to trustworthy AI (\href{https://arxiv.org/abs/2501.00775}{MindCoder}) and LLM for programming understanding (\href{https://arxiv.org/abs/2504.04553}{``Understanding Codebase Like a Professional!"}, accepted at the International Conference on Program Comprehension 2026).
+        Looking ahead, I aim to \textit{design trustworthy human–AI collaboration systems that support real-world complex tasks}.
+        % In addition, I plan to build evaluation frameworks for human–AI systems, especially those involving large language models, to guide the development of reliable and trustworthy AI technologies.
+
+
+        % \textit{Interdisciplinary Work:} My unique HCI perspective enables me to bridge social science methodologies with technical problem spaces and develop innovative solutions to complex socio-technical challenges. \textit{For example, one of my recent projects brings a unique HCI perspective to Software Engineering.} \href{https://arxiv.org/abs/2504.04553}{“Understanding Codebase Like a Professional!”} explores how expert developers’ code-understanding behaviors can inform the design of AI-powered tools for codebase comprehension, thereby supporting novice developers. This demonstrates that my research is generalizable across disciplines, indicating strong potential for broad impact.
+        
+
+        \textbf{Potential Collaboration and Service:} I am excited about the opportunity to contribute to the newly established 
+\textbf{Human-Centered Technology (HCT) Group}, whose mission, designing, developing, and evaluating technologies with people in mind, aligns closely with my research philosophy. My work on human–AI collaborative systems for qualitative analysis directly complements the group's ongoing projects. For example, my research on how users form expectations of AI behavior and how to design transparent AI workflows resonates with Prof.\textbf{ Maria Riveiro}'s work on tailoring AI explanations to user expectations and evaluating human–ML system collaboration; my findings on balancing AI efficiency with human analytical rigor can inform the design of explainable and adaptable AI systems; my experience studying how AI tools reshape professional workflows (e.g., qualitative researchers, software engineers) can contribute to understanding AI integration in organizational contexts.
+        Globally, I have built professional connections with researchers across countries and institutions, such as Johns Hopkins University, MIT,  National University of Singapore, University of Notre Dame, and Singapore Management University. 
+        I am also consistently committed to academic service, including reviewing more than 80 papers and serving four times as an associate chair for top-tier conferences (CHI 2025–2026 for the main track and CHI 2022–2023 for the Late-Breaking Work). Moreover, I have a strong record of mentoring more than 10 students across diverse backgrounds and career stages. 
+        
+        Thank you for considering my application. I am confident that I can contribute to \departmentname’s future growth by conducting high-impact research and pursuing competitive funding opportunities.
+        % such as the NSF CAREER Award and NSF Computer and Information Science and Engineering. 
+        % I would also be honored to discuss how my research and teaching align with \universityname’s mission.
+
+        %  
+
+		\closing{Sincerely yours,}	
+	\end{letter}
+	
+\end{document}
+%
+%%-----------------------------------------------------------------------------------------%%

@@ -63,10 +63,15 @@
 - 专门开辟一节讨论"Indigenizing Computing"或"Data Sovereignty" ([亚洲教职分析](../general/research_job_rules/亚洲及中东教职招聘分析.md) L177)
 - 引用毛利学者（如 Tahu Kukutai）关于 Māori Data Sovereignty 的研究，表明做了功课
 
-### 3.4 特色材料（关键！）
+### 3.4 特色材料
 
 #### Bicultural Statement / Te Tiriti Commitment Statement
-- **状态**: **必须提交**（几乎所有 NZ 公立大学招聘简章都明确要求）([亚洲教职分析](../general/research_job_rules/亚洲及中东教职招聘分析.md) L166)
+- **状态**: 取决于 JD 是否明确要求（见下方优先级判断）
+- **优先级判断规则**（⚠️ 流水线必须遵守）：
+  - **高优先级**：JD 明确提及 Te Tiriti / Māori / Pasifika / Bicultural / Treaty → 必须准备专门段落，三条款逐一回应
+  - **中优先级**：JD 未提及上述关键词 → 在 Cover Letter 中用 1-2 句简要展示文化敏感度即可，不需大篇幅；如篇幅紧张可省略
+  - 流水线 Step 2 分析时，**必须检查 JD 原文**是否包含关键词，并在 fit_report 中标注实际优先级，提示用户
+- 参考来源：([亚洲教职分析](../general/research_job_rules/亚洲及中东教职招聘分析.md) L166)
 - **⚠️ 错误写法**: 把它写成美国式的 Diversity Statement（多元化声明），只谈"包容少数族裔"= 直接低分出局
 - **正确写法**: 必须具体引用条约的三个条款 ([亚洲教职分析](../general/research_job_rules/亚洲及中东教职招聘分析.md) L173):
   - **Kāwanatanga (Governance/Partnership)**：你如何在教学和科研管理中与毛利人建立伙伴关系？

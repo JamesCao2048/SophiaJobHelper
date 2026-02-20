@@ -7,9 +7,7 @@ SQLite-backed 申请全生命周期追踪，与 `faculty_monitor`、`overseas_pi
 ## Quick Start
 
 ```bash
-# 从项目根目录运行
-cd /Users/junming/code/SophiaJobHelper
-
+# 从项目根目录运行（替换为实际路径，或 cd 到该目录后运行）
 # 查看当前全局状态（核心命令，每天打开看一眼）
 python -m tracking.cli dashboard
 
@@ -193,7 +191,6 @@ python -m tracking.sheets_export --output tracking/export_tracking.xlsx
 ```bash
 cd google-sheets-sync && python export_excel.py   # 原有方式，从云端拉
 # 或反向推送：
-cd /Users/junming/code/SophiaJobHelper
 python -m tracking.sheets_export --gsheets --spreadsheet-id <ID>
 ```
 
