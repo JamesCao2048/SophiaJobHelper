@@ -1,187 +1,115 @@
 % ============================================================
-% Overseas Pipeline -- Cover Letter Template
+% Cover Letter — Base Template (Caramel style)
+% Content source: Cover Letter - King's College London
+% Target: 2 pages
 %
-% 使用方法（由 Claude Code 在 Step 3 生成时替换占位符）：
-%
-% 占位符说明：
-%   {{POSITION_TITLE}}     - 职位名称，如 "Lecturer (Level B)"
-%   {{POSITION_REF}}       - 职位 Reference 号（如有），如 "Ref: 688354"
-%   {{DEPARTMENT_NAME}}    - 院系名称，如 "Department of Data Science and AI"
-%   {{UNIVERSITY_NAME}}    - 学校名称，如 "Monash University"
-%   {{SEARCHING_FOCUS}}    - 该职位的研究重点描述
-%   {{FACULTY_OVERLAP}}    - 与 faculty 的具体 overlap 段落（1-2 句）
-%   {{CLOSING_PARA}}       - 结尾段落（感谢 + 期望讨论）
-%   {{JOB_URL}}            - 职位链接
-%   {{GRANT_MENTION}}      - 资助计划提及（如澳洲的 ARC DECRA）
-%
-% 编译：xelatex main.tex
+% HOW TO USE (Step 3):
+%   1. Copy this directory to output/{school}/{dept}/materials/Cover Letter/
+%   2. Update \universityname, \departmentname, and school-specific paragraph
+%   3. Compile: xelatex main_template.tex && xelatex main_template.tex
+%   4. Verify page count: target 2 pages (1.5–2 pages acceptable; never exceed 2)
 % ============================================================
 
-\documentclass[11pt]{OUCletter}
+\documentclass[10pt]{OUCletter}
+
 \usepackage{fontspec}
-\usepackage{tikz}
 \usepackage{xcolor}
 \usepackage{hyperref}
+\usepackage{fancyhdr}
 
 \hypersetup{
   colorlinks=true,
-  linkcolor=black,
-  citecolor=blue,
-  urlcolor=blue,
-  filecolor=magenta,
+  linkcolor=[HTML]{B87350},
+  citecolor=black,
+  urlcolor=[HTML]{B87350},
   pdfborder={0 0 0},
   breaklinks=true,
-  bookmarksopen=true,
-  bookmarksnumbered=true
 }
 
-\definecolor{scured}{RGB}{1, 45, 114}
-\usepackage{fancyhdr}
-\usepackage{lastpage}
-\usepackage{eso-pic}
+\definecolor{caramel}{HTML}{B87350}
 
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
-\rhead{Page \thepage \hspace{1pt} of \pageref{LastPage}}
+\rhead{\includegraphics[height=0.4in]{jhu-icon.pdf}}
 
 % ============================================================
-% 自定义变量 -- Claude Code 在生成时替换这些值
+% SCHOOL / DEPARTMENT — update per application
 % ============================================================
-\newcommand{\searchingfocus}{\textbf{{{SEARCHING_FOCUS}}}}
-\newcommand{\departmentname}{{{DEPARTMENT_NAME}}}
-\newcommand{\universityname}{{{UNIVERSITY_NAME}}}
+\newcommand{\universityname}{King's College London}
+\newcommand{\departmentname}{Department of Informatics}
 
 % ============================================================
-% 申请人信息（Sophia 固定信息，通常不需要修改）
+% SENDER INFORMATION
 % ============================================================
-\def\name{\textbf{Jie Gao} \\[10pt]
-    Malone Postdoctoral Fellow \\
+\def\name{\textit{Jie Gao} \\[8pt]
+    \small Malone Postdoctoral Fellow \\
     Department of Computer Science \\
     Malone Center for Engineering in Healthcare \\
-    Center for Language and Speech Processing \\
     Johns Hopkins University \\
     jgao77@jh.edu \\
-    \href{https://gaojie058.github.io/}{https://gaojie058.github.io/} \\
+    \href{https://gaojie058.github.io/}{gaojie058.github.io}
 }
 
-\def\Where{\hspace{-1.2mm}\textbf{\color{scured}%
-        {Department of Computer Science}, \\
-        {Johns Hopkins University}
-}}
-
+\def\Where{\hspace{-1.2mm}\textit{\color{caramel}\departmentname}, \\
+        \textit{\color{caramel}\universityname}
+}
 \def\Address{Malone Hall, 3400 N Charles St}
 \def\CityZip{Baltimore, MD 21218, USA}
-\def\Email{\textbf{\color{scured}E-mail}: jgao77@jh.edu}
-\def\TEL{\textbf{\color{scured}Phone}: +1 (410)710-0555}
-\def\URL{\textbf{\color{scured}Website}: {https://gaojie058.github.io/}}
+\def\Email{\textit{\color{caramel}E-mail}: jgao77@jh.edu}
+\def\TEL{\textit{\color{caramel}Phone}: +1 (410) 710-0555}
+\def\URL{\textit{\color{caramel}Website}: {gaojie058.github.io}}
 
 % ============================================================
-% Signature（使用图片签名或文字签名）
+% SIGNATURE
 % ============================================================
-% 如果 signature.pdf 存在，使用图片签名：
-% \signature{\vspace{2mm}\includegraphics[scale=0.3]{signature.pdf}\\\vspace{2mm}\name}
-% 否则使用文字签名：
-\signature{\name}
-
-% ============================================================
-% TikZ 坐标系（用于右上角地址块）
-% ============================================================
-\makeatletter
-\def\parsecomma#1,#2\endparsecomma{\def\page@x{#1}\def\page@y{#2}}
-\tikzdeclarecoordinatesystem{page}{
-    \parsecomma#1\endparsecomma
-    \pgfpointanchor{current page}{north east}
-    \pgf@xc=\pgf@x%
-    \pgf@yc=\pgf@y%
-    \pgfpointanchor{current page}{south west}
-    \pgf@xb=\pgf@x%
-    \pgf@yb=\pgf@y%
-    \pgfmathparse{(\pgf@xc-\pgf@xb)/2.*\page@x+(\pgf@xc+\pgf@xb)/2.}
-    \expandafter\pgf@x\expandafter=\pgfmathresult pt
-    \pgfmathparse{(\pgf@yc-\pgf@yb)/2.*\page@y+(\pgf@yc+\pgf@yb)/2.}
-    \expandafter\pgf@y\expandafter=\pgfmathresult pt
-}
-\makeatother
+\signature{\vspace{2mm}\includegraphics[scale=0.3]{signature.pdf}\\\vspace{2mm}\name}
 
 \address{}
-
-\def\newaddress{
-    \Where\\
-    \Address\\
-    \CityZip\\
-    \TEL\\
-    \Email\\
-    \URL
-}
-
-\date{\vspace{10mm} \today}
+\date{January 2026}
 
 % ============================================================
-% 正文
+% DOCUMENT
 % ============================================================
 \begin{document}
 
     \begin{letter}{
-            \textit{Selection Panel Chair}, \\
-            \departmentname{}, \\
-            \universityname
-        }
+        \textit{Faculty Search Committee}, \\
+        \departmentname \\
+        \universityname
+    }
 
-        \begin{tikzpicture}[remember picture,overlay,,every node/.style={anchor=center}]
-        \node[text width=7cm] at (page cs:0.5,0.73){\small \newaddress};
-        \end{tikzpicture}
+    \opening{Dear Members of the Search Committee,}
 
-        \opening{Dear Selection Committee,}
+    I am writing to apply for the faculty position at \universityname. As a Malone Postdoctoral Fellow at Johns Hopkins University, working at the intersection of {\color{caramel}Human-Computer Interaction} and {\color{caramel}Natural Language Processing}, I am deeply motivated by the challenge of designing AI systems that are not only powerful but also trustworthy and human-centred. My research vision, \textit{placing humans at the center of AI-supported work}, directly addresses one of the most pressing questions in computing today: How can we harness AI's efficiency while preserving human agency, interpretive judgment, and trust?
 
-        % --------------------------------------------------------
-        % 第一段：开头定调（简洁，直接点明职位和身份）
-        % --------------------------------------------------------
-        I write to apply for the \href{{{JOB_URL}}}{\textbf{{{POSITION_TITLE}}}} position
-        ({{POSITION_REF}}) in \departmentname{} at \textbf{\universityname}.
-        I am currently a \href{https://malonecenter.jhu.edu/people-2/members/#postdoctoral-members}{Malone Postdoctoral Fellow}
-        at Johns Hopkins University, specializing in \textbf{human-AI collaboration},
-        \textbf{responsible and trustworthy AI}, and \textbf{human-centered computing}.
-        My research directly aligns with \departmentname's focus in \searchingfocus.
+    \textbf{\color{caramel}Research Interests and Contributions}
 
-        % --------------------------------------------------------
-        % 第二段：研究核心贡献（高影响，具体成果）
-        % --------------------------------------------------------
-        \textbf{(1) My research addresses fundamental challenges at the intersection of HCI and AI.}
-        A central question driving my work is: \textit{How can we design AI systems that strengthen
-        human capabilities in analyzing complex unstructured data?} To address this, I have developed
-        human-AI partnership systems: \href{https://dl.acm.org/doi/abs/10.1145/3617362}{CoAIcoder}
-        (TOCHI 2023) and \href{https://dl.acm.org/doi/abs/10.1145/3613904.3642002}{CollabCoder}
-        (CHI 2024), which support efficient, transparent, and trustworthy human-AI analytical workflows.
-        Two of these systems---\href{https://gaojie058.github.io/CollabCoder/}{CollabCoder} and
-        \href{https://mindcoder.ai/}{MindCoder}---have been publicly deployed as open-source tools,
-        demonstrating real-world impact beyond publication. My CHI and TOCHI publications are
-        well-cited and have attracted researchers across software engineering, healthcare, and education.
+    My research focuses on {\color{caramel}human-AI collaboration} for unstructured data analysis. Over 90\% of organizational data is unstructured, including social media posts, clinical interviews, customer reviews, and code repositories, and its volume continues to grow rapidly. While AI offers efficiency, it often fails to capture the depth and nuance that human experts provide. My work addresses this gap by developing systems where AI acts as a collaborative partner, supporting human cognitive processes like sensemaking, reasoning, and reflection.
 
-        % --------------------------------------------------------
-        % 第三段：与该校 faculty 的具体 overlap（个性化，Step 3 填充）
-        % --------------------------------------------------------
-        \textbf{(2) Research fit with \universityname{}.}
-        {{FACULTY_OVERLAP}}
+    My foundational contributions include {\color{caramel}\textbf{CoAIcoder}} (TOCHI 2023, 100 citations), the first work to formally define AI-assisted human-to-human collaboration in qualitative data analysis, and {\color{caramel}\textbf{CollabCoder}} (CHI 2024, 181 citations), the first end-to-end LLM-powered workflow supporting all stages of collaborative qualitative analysis. I have also developed a systematic {\color{caramel}\textbf{taxonomy for human-LLM interaction modes}} (CHI EA 2024, 81 citations). My ongoing work includes {\color{caramel}\textbf{MindCoder.ai}}, a publicly accessible platform prioritizing verifiability over accuracy, and research extending human-AI collaboration to code comprehension (ICPC 2026).
 
-        % --------------------------------------------------------
-        % 第四段：资助潜力（澳洲需要提 ARC）
-        % --------------------------------------------------------
-        \textbf{(3) Research funding potential.}
-        As an early-career researcher with a strong publication record at top-tier venues
-        (CHI, TOCHI, UIST), I am well-positioned to pursue competitive funding.
-        {{GRANT_MENTION}}
-        I also have strong potential to pursue ARC Linkage Projects through collaborations
-        with industry partners, building on my prior experience at the Singapore--MIT Alliance
-        (SMART), where I collaborated directly with Changi Airport and Synergy Marine Group.
+    \textbf{\color{caramel}Future Research Ambitions}
 
-        % --------------------------------------------------------
-        % 结尾
-        % --------------------------------------------------------
-        {{CLOSING_PARA}}
+    As a faculty member, I plan to lead a research lab advancing three interconnected directions: (1) {\color{caramel}\textbf{Next Generation Human-AI Collaborative Systems}}, building theoretical and empirical foundations for human-AI joint activity and cognitive responsibility allocation; (2) {\color{caramel}\textbf{Evaluation Frameworks for Human-AI Systems}}, developing rigorous frameworks combining qualitative research theory with scalable AI based evaluators; and (3) {\color{caramel}\textbf{Broader Sensemaking Domains}}, extending human-AI collaboration to software engineering, AI agent trajectory analysis, and multimodal information interpretation.
 
-        \closing{Sincerely yours,}
+    \textbf{\color{caramel}Interdisciplinary Experience and Collaboration}
+
+    I believe that achieving trustworthy human-AI collaboration requires a \textbf{multidisciplinary effort} that bridges AI, data, and system-centred fields (e.g., NLP, Software Engineering) with human-centred domains (e.g., Psychology, Social Sciences). My experiences across multiple institutions have equipped me with the mindset and skills needed to collaborate effectively across these disciplines. At {\color{caramel}\textbf{Johns Hopkins University}}, I work with advisors spanning NLP (Mark Dredze), HCI (Ziang Xiao), and Robotics/Healthcare (Chien-Ming Huang). My postdoctoral work at the \textbf{Singapore-MIT Alliance (SMART)} with Thomas W. Malone provided foundational understanding of collective intelligence and cognitive science. I have collaborated with researchers across \textbf{5+ institutions} including visiting positions at NUS and Notre Dame, and co-organized the CHI 2024 workshop ``LLMs as Research Tools,'' fostering an interdisciplinary community around responsible AI usage in data work.
+
+    \textbf{\color{caramel}Alignment with \universityname}
+
+    My research aligns strongly with the {\color{caramel}\textbf{\departmentname}}. My work directly complements the department's strengths in human-centred computing, AI, and software systems. The department's emphasis on empirical design, human factors, and the development of systems that humans interact with in complex ways resonates deeply with my approach of grounding AI systems in rigorous user studies and qualitative methods. I see strong potential for collaboration across the department's research groups on topics such as human-AI collaboration, data visualisation for complex information, trustworthy AI systems, and multimodal interaction. I am also excited about potential engagement with the department's cross cutting hubs, particularly the Health Hub for applying human-AI collaboration to healthcare contexts.
+
+    \textbf{\color{caramel}Teaching and Mentoring}
+
+    I am committed to creating interactive, supportive learning environments. I have mentored 10 students across undergraduate, master's, and PhD levels, with several achieving significant outcomes including workshop publications and career advancement. I am prepared to teach core computer science and artificial intelligence courses, including \textbf{Introduction to Artificial Intelligence}, \textbf{Introduction to Software Engineering}, \textbf{Data Science}, \textbf{Human-Centered AI}, \textbf{Human-AI Interaction and Collaboration}. I am also able to provide other courses like User Research, Computational Qualitative Analysis, and Human Aspects of Software Engineering.
+
+    My long-term goal is to develop new forms of critical human-AI collaboration that drive society's AI transformation by advancing efficiency, fostering trust, and generating meaningful social impact. I would welcome the opportunity to discuss how my research and teaching can contribute to \universityname's vision for human-centred computing and responsible AI.
+
+    \closing{Sincerely yours,}
+
     \end{letter}
 
 \end{document}

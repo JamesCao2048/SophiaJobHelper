@@ -23,8 +23,9 @@ claude --dangerously-skip-permissions
 
 | 资源 | 相对路径 |
 |------|---------|
-| Sophia 现有材料 | `materials/` |
-| LaTeX 模板 | `overleaf-projects/Faculty Position/` |
+| Sophia 现有材料（Markdown） | `materials/` |
+| LaTeX 格式模板 | `templates/` |
+| LaTeX 内容来源 | `overleaf-projects/Faculty Position/` |
 | 地区规则卡 | `../region_knowledge/regions/{region}.md` |
 | 院系规则卡 | `../region_knowledge/schools/{school_id}/{dept_id}.md` |
 | 产出物 | `output/{school_id}/{dept_id}/` |
@@ -50,33 +51,42 @@ claude --dangerously-skip-permissions
 ```
 overseas_pipeline/           ← 本模块（所有资源自包含）
 ├── src/faculty_scraper.py   ← Step 1 爬取工具
-├── templates/cover_letter/  ← LaTeX 模板（OUCletter.cls + main_template.tex）
+├── templates/               ← Step 3 格式模板（Caramel 配色，独立可编译）
+│   ├── sophia-statement.sty             ← 共享样式包（颜色/字体/heading）
+│   ├── cover_letter/                    ← OUCletter.cls (Caramel) + main_template.tex
+│   ├── research_statement/              ← main.tex（4 页基础模板）
+│   ├── teaching_statement/              ← main.tex（2 页基础模板）
+│   ├── diversity_statement/             ← main.tex（1 页基础模板）
+│   └── selection_criteria_response/     ← main.tex（STAR 格式，澳洲用）
 ├── workflows/               ← 各步骤详细流程（按需读取）
 │   ├── step1_research.md
 │   ├── step2_analysis.md
 │   ├── step3_materials.md
 │   └── cv_strategy.md
-├── materials/               ← Sophia 现有申请材料
+├── materials/               ← Sophia 现有申请材料（Markdown 参考版）
 │   ├── cv_latest.md
 │   ├── Research_Statement.md
 │   ├── Teaching_Statement.md
 │   ├── Impact_Statement.md
 │   └── publication*.md
-├── overleaf-projects/Faculty Position/  ← LaTeX 源文件（Step 3 读取）
-│   ├── Cover Letter/                    ← 各校专属版
-│   ├── Research Statement/              ← 完整版（含图）
+├── overleaf-projects/Faculty Position/  ← LaTeX 内容来源（Step 3 提取真实文本）
+│   ├── Cover Letter/                    ← 各校专属版（优先用于 Cover Letter 内容）
+│   ├── Research Statement/              ← 完整版（含图，提取文本段落）
 │   ├── Teaching Statement/              ← 含 Zhiyao/Erika/Ruyuan 故事
-│   ├── DEI-structured-1p/               ← Diversity Statement 1 页（管道默认）
-│   ├── DEI-structured-2p/               ← Diversity Statement 2 页
+│   ├── DEI-structured-1p/               ← DEI 1 页内容文本
+│   ├── DEI-structured-2p/               ← DEI 2 页内容文本
 │   ├── DEI-prose-2p/                    ← 散文叙事版（备用参考）
-│   ├── CV_latest/                       ← CV 模块化源（Step 3 按需定制）
-│   └── templates/cover_letter/          ← Cover Letter 模板
+│   └── CV_latest/                       ← CV 模块化源（Step 3 按需定制）
 └── output/{school}/         ← 产出物（.gitignore，不提交）
 
 region_knowledge/                  ← 区域知识库（项目根目录）
 ├── regions/{region}.md            ← 地区规则卡（Step 2/3 读取）
 └── schools/{school_id}/{dept_id}.md  ← 院系规则卡（同校多院系）
 ```
+
+**templates/ vs overleaf-projects/ 分工：**
+- `templates/`：**只管格式**。统一 Caramel 配色、lmodern 字体、CV 风格 section heading。Step 3 以此为起点复制到 `output/`。
+- `overleaf-projects/`：**只管内容**。Sophia 真实申请材料的 LaTeX 文本。Step 3 从这里提取段落填入模板。
 
 ## 产出物结构
 

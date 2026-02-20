@@ -1,3 +1,11 @@
+% OUCletter.cls — Caramel variant
+% Modified for Sophia's application pipeline: color scheme unified to CV_latest Caramel (#B87350)
+%
+% Changes vs original:
+%   - slcolor: #882B21 → #B87350 (Caramel, matching CV_latest)
+%   - scured alias added for backward compat with main.tex that uses \color{scured}
+%   - Changed to a4paper
+
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{OUCletter}
 \RequirePackage{graphicx}
@@ -5,13 +13,16 @@
 \RequirePackage{epsfig}
 \RequirePackage{ifthen}
 \RequirePackage{xcolor}
-\definecolor{slcolor}{HTML}{882B21}
-%\RequirePackage{fontspec}
-\DeclareGraphicsExtensions {.png} %{.pdf}
+
+% --- COLOR: Caramel (matching CV_latest headingcolor) ---
+\definecolor{slcolor}{HTML}{B87350}
+\colorlet{scured}{slcolor}
+
+\DeclareGraphicsExtensions {.png}
 
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{letter}}
 \ProcessOptions
-\LoadClass[letterpaper]{letter} % we always use letter paper
+\LoadClass[a4paper]{letter}
 
 \newcommand{\subjectname}{Subject}
 \newcommand{\@subject}{}
@@ -22,13 +33,16 @@
     {\setboolean{logofound}{true}}
     {\setboolean{logofound}{false}}
 
-\setlength{\textwidth}{6.875in}
-\setlength{\textheight}{7.5in}
+\RequirePackage{lastpage}
+\RequirePackage{fancyhdr}
+
+\setlength{\textwidth}{7in}
+\setlength{\textheight}{10in}
 \setlength{\topskip}{0.0in}
-\setlength{\footskip}{0in}
+\setlength{\footskip}{0.4in}
 \setlength{\oddsidemargin}{-0.25in}
 \setlength{\evensidemargin}{-0.25in}
-\setlength{\topmargin}{-0.5in}
+\setlength{\topmargin}{-1.2in}
 
 \DeclareFixedFont{\xcmrbn}{OT1}{cmr}{b}{n}{10}
 \DeclareFixedFont{\xcmrmn}{OT1}{cmr}{m}{n}{10}
@@ -39,43 +53,35 @@
 \newsavebox{\emptyfoot}
 
 \sbox{\departmenthead}{
-    \begin{tabular*}{\textwidth}
-                    {@{}l@{\extracolsep{0.0in}}|@{\extracolsep{0.125in}}l@{}}
-
-    % \parbox{4.00in}
-    {\raggedright
+    \parbox[b]{\textwidth}{
+        \raggedleft
         \ifthenelse{\boolean{logofound}}
-           {\epsfig{file=jhu-icon.pdf, height=0.5in}}
-           {\parbox[c][2.0in][c]{4.0in}{\hfill}
-            \ClassWarning{OUCletter}{ouclogo.eps COULD NOT BE FOUND!}}
-    } &
-
-    \parbox[c][1.8in][c]{2.225in}{{~}\\
-}\\
-    \end{tabular*}
+           {\includegraphics[height=0.4in]{jhu-icon.pdf}}
+           {}
+        \par
+        \centering \large \textbf{\color{slcolor}Cover Letter}
+    }
 }
 
 \savebox{\emptyfoot}[\textwidth][c]{\ixcmrmn
     \hspace*{\textwidth}
 }
 
-% header and footer should be placed only on the first page
 \renewcommand{\ps@firstpage}{
-    \setlength{\headheight}{1.375in}
-    \setlength{\headsep}{1.0in}
+    \setlength{\headheight}{1.0in}
+    \setlength{\headsep}{0.1in}
     \renewcommand{\@oddhead}{\usebox{\departmenthead}}
-    \renewcommand{\@oddfoot}{\usebox{\departmentfoot}}
     \renewcommand{\@evenhead}{}
     \renewcommand{\@evenfoot}{}
 }
 
 \renewcommand{\ps@empty}{
-    \setlength{\headheight}{1.375in}
-    \setlength{\headsep}{0.5in}
+    \setlength{\headheight}{0.5in}
+    \setlength{\headsep}{0.2in}
     \renewcommand{\@oddhead}{}
-    \renewcommand{\@oddfoot}{\usebox{\emptyfoot}}
+    \renewcommand{\@oddfoot}{\hfil \thepage\ / \pageref{LastPage} \hfil}
     \renewcommand{\@evenhead}{}
-    \renewcommand{\@evenfoot}{\usebox{\emptyfoot}}
+    \renewcommand{\@evenfoot}{\hfil \thepage\ / \pageref{LastPage} \hfil}
 }
 
 \providecommand{\@evenhead}{}
@@ -85,19 +91,16 @@
 
 \pagestyle{empty}
 
-% we add the subject command to the opening
 \renewcommand{\opening}[1]{\thispagestyle{firstpage}%
     \ifx\@empty\fromaddress
-        %{\raggedleft\@date\par}%
-    \else  % home address
+    \else
         {\raggedleft
             \begin{tabular}{l@{}}\ignorespaces
             \fromaddress \\ *[1\parskip]%
-            %\@date
             \end{tabular}\par
         }%
+        \vspace{-6\parskip}
      \fi
-     \vspace{-6\parskip}
      \@date \vspace{2\parskip}\\
      {\raggedright \toname \\ \toaddress \par}%
      \vspace{1\parskip}%
@@ -108,12 +111,9 @@
 
 \renewcommand{\closing}[1]{%
   \par\vspace{\parskip}%
-  \stopbreaks
-  \noindent
   \parbox{0.6\textwidth}{%
     \raggedright
     \ignorespaces #1\par
-    \vspace{4\medskipamount}%
     \ifx\@empty\fromsig
       \fromname
     \else

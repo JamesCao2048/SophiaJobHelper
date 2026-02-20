@@ -6,32 +6,50 @@ Step 2 已完成（`output/{school_id}/{dept_id}/fit_report.md` 存在）
 
 ---
 
-## 可用材料库（overseas_pipeline/overleaf-projects/Faculty Position/）
+## 资源分工
 
-| 目录 | 用途 | 备注 |
-|------|------|------|
-| `Cover Letter/Cover Letter- {学校名}/` | 该校 Cover Letter（如已有） | 若不存在，用模板 |
-| `Research Statement/Research Statement/` | Research Statement 完整版 | 含图片 |
-| `Teaching Statement/Teaching Statement/` | Teaching Statement | 含 Zhiyao/Erika/Ruyuan 故事 |
-| `DEI-structured-1p/` | Diversity Statement 1 页版 | **管道默认 DEI** |
-| `DEI-structured-2p/` | Diversity Statement 2 页版 | JD 要求 2p 时使用 |
-| `DEI-prose-2p/` | DEI 散文叙事版（旧版，备用） | 内容角度不同，酌情参考 |
-| `CV_latest/CV_latest/` | CV 模块化 LaTeX 源 | Step 3 按需定制 |
-| `templates/cover_letter/` | Cover Letter 模板 | 该校无专属版时使用 |
+Step 3 使用两类资源，分工明确：
+
+### 格式模板（`templates/`）
+
+独立可编译的 LaTeX 项目，Caramel 配色（匹配 CV_latest），Step 3 以此为起点复制到 `output/`：
+
+| 路径 | 对应材料 | 目标页数 |
+|------|---------|---------|
+| `templates/cover_letter/` | Cover Letter | **2 页** |
+| `templates/research_statement/` | Research Statement | **4 页 TT / 2-3 页 NTT** |
+| `templates/teaching_statement/` | Teaching Statement | **2 页** |
+| `templates/diversity_statement/` | Diversity Statement | **1 页（可扩展至 2 页）** |
+| `templates/selection_criteria_response/` | Selection Criteria | 按 criteria 数量（6-10 页） |
+
+**页数默认值**：以上为 JD 未指定时的强制默认值。如 fit_report.md 中有 `⚠ JD 明确要求` 标注，以 JD 要求为准。
+
+### 内容来源（`overleaf-projects/Faculty Position/`）
+
+Sophia 现有的真实申请材料文本，Step 3 从这里提取内容填入模板：
+
+| 目录 | 用途 |
+|------|------|
+| `Cover Letter/Cover Letter- {学校名}/` | 该校已有 Cover Letter（优先使用，作为内容基础） |
+| `Research Statement/Research Statement/main.tex` | Research Statement 完整版文本（含图） |
+| `Teaching Statement/Teaching Statement/Teaching_Statement.tex` | Teaching Statement 文本 |
+| `DEI-structured-1p/content.tex` | DEI 1 页版内容文本 |
+| `DEI-structured-2p/content.tex` | DEI 2 页版内容文本 |
+| `CV_latest/CV_latest/` | CV 模块化 LaTeX 源 |
 
 ---
 
 ## 执行步骤
 
-1. 读取 `output/{school_id}/{dept_id}/fit_report.md` 中的"各材料调整建议"
+1. 读取 `output/{school_id}/{dept_id}/fit_report.md` 中的"各材料调整建议"和页数要求（含 JD 覆盖值）
 2. 读取 Sophia 现有材料（`overseas_pipeline/materials/*.md`）
-3. 读取区域规则卡（`region_knowledge/regions/{region}.md`）
-4. 读取 `overseas_pipeline/strategies/hci_density_strategy.md`
+3. 读取区域规则卡（`../region_knowledge/regions/{region}.md`）
+4. 读取 `strategies/hci_density_strategy.md`
    - 从 `faculty_data.json` 获取 `hci_density.strategy` 和 `department_courses`
-5. 读取 overleaf 原始 LaTeX 源文件（见可用材料库）
+5. 读取内容来源 LaTeX 源文件（见"内容来源"表格）
 6. 为每份材料生成初稿 + notes（**Step 3a**）
 7. Humanizer 处理（**Step 3a 收尾**，强制）
-8. 复制 overleaf 项目 + 替换内容 + 编译 PDF（**Step 3b**）
+8. 复制格式模板 + 填入内容 + 编译 PDF + 验证页数（**Step 3b**）
 9. 同校多系一致性检查（如 `related_applications` 字段存在）
 
 ---
@@ -40,22 +58,27 @@ Step 2 已完成（`output/{school_id}/{dept_id}/fit_report.md` 存在）
 
 ### Cover Letter
 
-- 来源：该校专属版（如存在）或 `templates/cover_letter/main_template.tex`
+- **格式模板**：`templates/cover_letter/`（Caramel 配色 OUCletter.cls）
+- **内容来源**：该校专属版（`overleaf-projects/Cover Letter/Cover Letter- {学校名}/`，如存在）优先；否则以模板结构为基础全新撰写
 - 基于 fit_report 建议定制，按 HCI 密度策略调整修辞
-- 长度：1-2 页
+- **目标页数**：**2 页**（如 fit_report 中有 JD 覆盖值，以 JD 为准）
 - **OUCletter.cls 注意：** cls 已自动渲染信息栏，**不要**添加 tikz overlay，否则重叠。只需定义 `\signature{\name}` 供 closing 使用。
 - 同时生成 `cover_letter.notes.md`
 
 ### Research Statement / Research Interests
 
-- 来源：`Research Statement/Research Statement/main.tex`（完整版含图）
-- TT 岗：完整版，加 ARC/NSF/EPSRC 等对应地区的 grant 计划
-- NTT 岗：压缩为 Research Interests（2-3 页），删 grant 蓝图，加 Research-Teaching Connection 章节
+- **格式模板**：`templates/research_statement/main.tex`（Caramel 配色，pdflatex 编译）
+- **内容来源**：`overleaf-projects/Faculty Position/Research Statement/Research Statement/main.tex`（读取各 section 真实内容）
+- TT 岗：完整版（**目标 4 页**），加 ARC/NSF/EPSRC 等对应地区的 grant 计划
+- NTT 岗：压缩为 Research Interests（**目标 2-3 页**），删 grant 蓝图，加 Research-Teaching Connection 章节
+- **如 fit_report 有 JD 覆盖值，以 JD 页数为准**
 - 同时生成 `research_statement.notes.md`
 
 ### Teaching Statement
 
-- 来源：`Teaching Statement/Teaching Statement/Teaching_Statement.tex`
+- **格式模板**：`templates/teaching_statement/main.tex`（Caramel 配色，pdflatex 编译）
+- **内容来源**：`overleaf-projects/Faculty Position/Teaching Statement/Teaching Statement/Teaching_Statement.tex`
+- **目标页数**：**2 页**（NTT 可扩展至 2.5 页；如 fit_report 有 JD 覆盖值，以 JD 为准）
 - 修改点：补充该校课程编号（来自 `department_courses`）、加量化数据、按密度策略调整课程顺序
 - 澳洲：加 40/40/20 声明
 - NTT：Teaching Statement 是核心材料，扩充 advising 描述
@@ -66,16 +89,18 @@ Step 2 已完成（`output/{school_id}/{dept_id}/fit_report.md` 存在）
 **触发条件：** JD 明确要求提交
 
 若 JD 要求：
-1. 检查 fit_report.md 中的页数要求（1p / 2p / 未指定）
-2. 选择基础版本：
-   - 1 页 → `DEI-structured-1p/`
-   - 2 页或未指定 → `DEI-structured-2p/`
-3. 定制内容（通常只需微调）：
+1. 检查 fit_report.md 中的页数要求
+2. **格式模板**：`templates/diversity_statement/main.tex`（Caramel 配色，pdflatex 编译）
+3. **内容来源**：
+   - 默认（1 页）：`overleaf-projects/Faculty Position/DEI-structured-1p/content.tex`
+   - 2 页时：`overleaf-projects/Faculty Position/DEI-structured-2p/content.tex`
+4. **目标页数**：**1 页**（默认）；JD 明确要求 2 页 → 使用 2 页内容，取消 `\section{Plans}` 注释
+   - 如 fit_report 有 JD 覆盖值，以 JD 页数为准
+5. 定制内容（通常只需微调）：
    - 在 Plans 部分提及该校具体 diversity 项目/学生构成（如知道）
    - 替换学校名称引用（如有）
-4. 输出到 `materials/Diversity Statement/`（从对应 DEI 目录复制后替换 content.tex）
-5. 编译：`pdflatex main.tex && pdflatex main.tex`
-6. 同时生成 `diversity_statement.notes.md`
+6. 输出到 `materials/Diversity Statement/`
+7. 同时生成 `diversity_statement.notes.md`
 
 若 JD 不要求：在 step3_summary.md 中标注"不提交（JD 未要求）"，**不生成文件**。
 
@@ -110,10 +135,10 @@ Step 2 已完成（`output/{school_id}/{dept_id}/fit_report.md` 存在）
 
 ### Selection Criteria Response（仅澳洲职位）
 
-- 从 JD 中提取所有 Essential 和 Desirable criteria
-- 全新生成 LaTeX 文件（使用与 Teaching Statement 一致的样式）
+- **格式模板**：`templates/selection_criteria_response/main.tex`（Caramel 配色，与所有 Statement 一致）
+- 从 JD 中提取所有 Essential 和 Desirable criteria，逐条回应
 - 格式：逐条用 STAR 法则回应（Situation → Task → Action → Result）
-- 长度：6-10 页
+- 长度：6-10 页（按 criteria 数量决定，无固定上限）
 - **这是澳洲申请的核心文件，不提交直接出局**
 - 同时生成 `selection_criteria_response.notes.md`
 
@@ -143,28 +168,57 @@ Step 2 已完成（`output/{school_id}/{dept_id}/fit_report.md` 存在）
 - [ ] 无对话残留（"I hope this helps / let me know"）
 - [ ] 结尾段有具体内容，非泛泛 "I look forward to..."
 - [ ] 句子长度有变化（非全是同等长度的复合句）
+- [ ] **【仅 NZ 职位】Te Tiriti 段落诚实度：**
+  - [ ] 无伪装成已有毛利社区合作经验的表述（如 "I have worked with iwi..."）
+  - [ ] Aspire 部分有具体学习计划，非空洞的 "I am committed to learning"
+  - [ ] 如引用了其他文化的平行经验，后面有"Te Tiriti 独特性"声明
+  - [ ] 未把 Sophia 的参与式设计/trustworthy AI 工作夸大为"Data Sovereignty 实践"
 
 ---
 
-## Step 3b: 复制模板 + 编译 PDF
+## Step 3b: 复制模板 + 填入内容 + 编译 PDF + 验证页数
 
 **执行流程：**
 
-1. 从 `overseas_pipeline/overleaf-projects/Faculty Position/` 复制完整 LaTeX 项目到 `output/{school_id}/{dept_id}/materials/`
+1. 从 `templates/{doc_type}/` 复制完整 LaTeX 项目到 `output/{school_id}/{dept_id}/materials/{材料名}/`
 2. 用 Step 3a 生成的 .tex 内容**替换**复制后目录中对应的 .tex 文件
-3. 检查样式一致性（preamble 包/颜色/页边距/字体）
+3. 将 `templates/sophia-statement.sty` 复制到各材料目录（或用相对路径 `../../sophia-statement.sty` 引用）
 4. 编译 PDF：
 
    | 材料 | 编译器 | 命令 |
    |------|--------|------|
-   | Cover Letter | xelatex | `xelatex main.tex && xelatex main.tex` |
+   | Cover Letter | xelatex | `xelatex main_template.tex && xelatex main_template.tex` |
    | Research Statement | pdflatex | `pdflatex main.tex && pdflatex main.tex` |
-   | Teaching Statement | pdflatex | `pdflatex Teaching_Statement.tex && pdflatex Teaching_Statement.tex` |
+   | Teaching Statement | pdflatex | `pdflatex main.tex && pdflatex main.tex` |
    | Diversity Statement | pdflatex | `pdflatex main.tex && pdflatex main.tex` |
    | CV | xelatex | `xelatex main.tex && xelatex main.tex` |
-   | Selection Criteria | pdflatex | `pdflatex selection_criteria_response.tex && ...` |
+   | Selection Criteria | pdflatex | `pdflatex main.tex && pdflatex main.tex` |
 
-5. 验证 PDF 生成成功，检查页数是否合理
+5. **⚠ 页数验证（编译成功后必须执行）：**
+
+   用 `pdfinfo` 获取实际页数：
+   ```bash
+   pdfinfo output.pdf | grep Pages
+   # 或
+   python3 -c "import subprocess; r=subprocess.run(['pdfinfo','main.pdf'],capture_output=True,text=True); print([l for l in r.stdout.splitlines() if 'Pages' in l])"
+   ```
+
+   | 材料 | 目标 | 超出处理 | 明显不足处理 |
+   |------|------|---------|------------|
+   | Cover Letter | 2 页 | 精简段落，优先删 Service 段细节 | < 1.5 页：提示补充 Fit 段 |
+   | Research Statement | 4 页（TT）| 精简 Background 铺垫，删次要 subsection | < 3 页：提示补充 Future Plans |
+   | Teaching Statement | 2 页 | 精简 Mentorship 或 Course list | < 1.5 页：提示补充 |
+   | Diversity Statement | 1 页（默认）| 精简 Service 段；若 2 页目标则精简 Plans | < 0.8 页：提示补充 |
+   | Selection Criteria | 无固定 | 不触发，按 criteria 数量自然延伸 | — |
+
+   **超出处理优先级（精简顺序）：**
+   1. 删除或缩短"背景铺垫"段（读者已知的领域常识）
+   2. 合并相似 subsection
+   3. 缩短 Future Plans（保留 2-3 句而非完整段落）
+   4. 压缩 Service/Outreach 段到 1-2 句
+   5. 如仍超出：在 step3_summary.md 标注 `⚠ 页数超出，Sophia 需进一步精简`
+
+   **明显不足判断标准**：实际页数 < 目标页数 × 0.75（如目标 4 页但只有 3 页以下）
 
 ---
 

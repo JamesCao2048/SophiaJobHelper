@@ -15,6 +15,8 @@
 7. [如何给出调整意见](#如何给出调整意见)
 8. [常见问题](#常见问题)
 
+> **材料样式 / 模板相关内容** → 见 **[style.md](style.md)**
+
 ---
 
 ## 项目是什么
@@ -69,7 +71,13 @@ overseas_pipeline/
 │   ├── faculty_scraper.py
 │   ├── course_catalog_scraper.py
 │   └── hci_density_classifier.py
-├── templates/                   ← 文件模板
+├── templates/                   ← LaTeX 格式模板（Caramel 配色，Step 3 使用）
+│   ├── sophia-statement.sty         ← 共享样式包（颜色/字体/heading 格式）
+│   ├── cover_letter/                ← Cover Letter 模板（OUCletter.cls + main_template.tex）
+│   ├── research_statement/          ← Research Statement 模板（4 页）
+│   ├── teaching_statement/          ← Teaching Statement 模板（2 页）
+│   ├── diversity_statement/         ← Diversity Statement 模板（1 页默认）
+│   ├── selection_criteria_response/ ← Selection Criteria 模板（澳洲用）
 │   └── knowledge/
 │       └── department_rule_card_template.md  ← 院系规则卡模板
 ├── strategies/
@@ -83,14 +91,18 @@ overseas_pipeline/
         └── {dept_id}/
 ```
 
-### 本模块内部引用文件
+### LaTeX 资源分工
 
-| 目录 | 内容 | 说明 |
-|------|------|------|
-| `materials/` | 你现有的申请材料（Markdown 格式） | AI 读取，用于分析匹配度和生成材料 |
-| `overleaf-projects/Faculty Position/` | 所有材料的 LaTeX 源文件 | AI 基于此生成定制版 .tex 文件 |
+Step 3 生成材料时使用两类 LaTeX 资源，功能完全不同：
 
-> **注意**：`region_knowledge/` 在项目根目录，路径为 `../region_knowledge/`，AI 会自动使用绝对路径访问。
+| 目录 | 作用 |
+|------|------|
+| `templates/` | **格式**：视觉样式（配色、字体、标题格式）|
+| `overleaf-projects/Faculty Position/` | **内容**：Sophia 真实的申请材料文本 |
+
+详细说明和样式修改方法见 **[style.md](style.md)**。
+
+> **注意**：`region_knowledge/` 在项目根目录，路径为 `../region_knowledge/`，AI 会自动访问。
 
 **你现有材料的路径：**
 ```
@@ -100,18 +112,6 @@ overseas_pipeline/materials/
 ├── Teaching_Statement.md   ← 教学陈述
 ├── Impact_Statement.md     ← 影响力陈述
 └── publication*.md         ← 发表论文列表
-```
-
-**LaTeX 源文件路径（Step 3 生成材料的基础）：**
-```
-overseas_pipeline/overleaf-projects/Faculty Position/
-├── Cover Letter/                ← 各校已有的 Cover Letter（如有）
-├── Research Statement/          ← Research Statement 完整版（含图）
-├── Teaching Statement/          ← Teaching Statement
-├── DEI-structured-1p/           ← Diversity Statement 1 页版
-├── DEI-structured-2p/           ← Diversity Statement 2 页版
-├── CV_latest/                   ← CV 源文件
-└── templates/cover_letter/      ← Cover Letter 模板（新学校用）
 ```
 
 ---

@@ -76,5 +76,20 @@
 
 ---
 
+## Te Tiriti 学校信号（仅 region=new_zealand）
+
+- **signal_level**: strong | moderate | light
+- **assessed_date**: YYYY-MM-DD
+- **key_framework**: 框架名称（如 Waipapa Taumata Rau，无则填 N/A）
+- **key_values**: 术语1, 术语2, ...（无则填 N/A）
+- **evidence**:
+  1. "原文摘录（英文原文）"
+     - source: [文档名](URL)
+  2. "原文摘录（英文原文）"
+     - source: [文档名](URL)
+- **notes**: 其他备注（如 PVC(Māori) 审查权限、面试必考条约题等）
+
+---
+
 ## 变更记录
 - YYYY-MM-DD：初始化
