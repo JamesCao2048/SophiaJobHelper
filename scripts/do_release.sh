@@ -121,7 +121,8 @@ else
         git diff --staged --stat
         git restore --staged . > /dev/null 2>&1 || true  # unstage
     else
-        COMMIT_MSG="release: sync from main@${MAIN_COMMIT} (${RELEASE_DATE})"
+        LAST_COMMIT_MSG=$(git log -1 --pretty=format:"%s" "$MAIN_BRANCH")
+        COMMIT_MSG="release: ${LAST_COMMIT_MSG} (main@${MAIN_COMMIT})"
         git commit -m "$COMMIT_MSG"
         echo ""
         echo "✅ 已提交: $COMMIT_MSG"
@@ -140,6 +141,9 @@ git checkout "$MAIN_BRANCH"
 if [ "$AUTO_PUSH" -eq 1 ] && [ "$DRY_RUN" -eq 0 ]; then
     echo "🚀 推送到 origin/$RELEASE_BRANCH..."
     git push origin "$RELEASE_BRANCH"
+    echo "✅ 已推送"
+    echo "🚀 推送到 origin/$MAIN_BRANCH..."
+    git push origin "$MAIN_BRANCH"
     echo "✅ 已推送"
 fi
 
