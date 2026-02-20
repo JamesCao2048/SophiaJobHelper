@@ -30,7 +30,7 @@ MAIN_BRANCH="main"
 # 解析参数
 # ============================================================
 DRY_RUN=0
-AUTO_PUSH=0
+AUTO_PUSH=1
 for arg in "$@"; do
     case $arg in
         --dry-run) DRY_RUN=1 ;;
