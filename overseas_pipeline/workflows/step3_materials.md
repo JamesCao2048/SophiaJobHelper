@@ -8,8 +8,6 @@ Step 2 已完成（`output/{school_id}/{dept_id}/fit_report.md` 存在）
 
 ## 资源分工
 
-Step 3 使用两类资源，分工明确：
-
 ### 格式模板（`templates/`）
 
 独立可编译的 LaTeX 项目，Caramel 配色（匹配 CV_latest），Step 3 以此为起点复制到 `output/`：
@@ -17,7 +15,7 @@ Step 3 使用两类资源，分工明确：
 | 路径 | 对应材料 | 目标页数 |
 |------|---------|---------|
 | `templates/cover_letter/` | Cover Letter | **2 页** |
-| `templates/research_statement/` | Research Statement | **4 页 TT / 2-3 页 NTT** |
+| `templates/research_statement/` | Research Statement | **5 页 TT / 2-3 页 NTT** |
 | `templates/teaching_statement/` | Teaching Statement | **2 页** |
 | `templates/diversity_statement/` | Diversity Statement | **1 页（可扩展至 2 页）** |
 | `templates/selection_criteria_response/` | Selection Criteria | 按 criteria 数量（6-10 页） |
@@ -41,53 +39,93 @@ Sophia 现有的真实申请材料文本，Step 3 从这里提取内容填入模
 
 ## 执行步骤
 
-1. 读取 `output/{school_id}/{dept_id}/fit_report.md` 中的"各材料调整建议"和页数要求（含 JD 覆盖值）
-   - **NZ 职位**：明确记录 fit_report 中 Te Tiriti 专节对每个文档的建议（Cover Letter / Research Statement / Teaching Statement）
-   - **AU 职位**：明确记录 fit_report 中 AU Indigenous 专节对每个文档的建议（Cover Letter / Research Statement / Teaching Statement / KSC Response）
-2. 读取 Sophia 现有材料（`overseas_pipeline/materials/*.md`）
-3. 读取区域规则卡（`../region_knowledge/regions/{region}.md`）
-4. 读取 `strategies/hci_density_strategy.md`
-   - 从 `faculty_data.json` 获取 `hci_density.strategy` 和 `department_courses`
-5. 读取内容来源 LaTeX 源文件（见"内容来源"表格）
-6. 为每份材料生成初稿 + notes（**Step 3a**）
-   - **NZ/AU 职位**：生成每个文档时，必须**显式检查** fit_report 中对应文档的 Te Tiriti / AU Indigenous 建议是否已执行
-7. Humanizer 处理（**Step 3a 收尾**，强制）
-8. 复制格式模板 + 填入内容 + 编译 PDF + 验证页数（**Step 3b**）
-9. 同校多系一致性检查（如 `related_applications` 字段存在）
+### 1. 加载匹配报告与页数要求
 
----
+读取 `output/{school_id}/{dept_id}/fit_report.md` 中的"各材料调整建议"和页数要求（含 JD 覆盖值）
+- **NZ 职位**：明确记录 fit_report 中 Te Tiriti 专节对每个文档的建议（Cover Letter / Research Statement / Teaching Statement）
+- **AU 职位**：明确记录 fit_report 中 AU Indigenous 专节对每个文档的建议（Cover Letter / Research Statement / Teaching Statement / KSC Response）
 
-## Step 3a: 生成内容
+### 2. 加载 Sophia 现有材料
 
-### Cover Letter
+读取 `overseas_pipeline/materials/*.md`
+
+### 3. 加载区域规则卡
+
+读取 `../region_knowledge/regions/{region}.md`
+
+### 4. 加载策略文件
+
+两者都必须读取：
+- `strategies/dept_type_strategy.md`（**优先**）
+  - 从 `faculty_data.json` 获取 `dept_profile.dimensions`（QR / IO / SB / SI）
+  - 从 `fit_report.md` 的"院系类型策略分析"节确认：技术伪装程度、主推论文、经费叙事、术语体系
+- `strategies/hci_density_strategy.md`
+  - 从 `faculty_data.json` 获取 `hci_density.strategy` 和 `department_courses`
+  - 确认点名优先级和课程匹配顺序
+
+### 5. 加载 LaTeX 内容来源
+
+读取内容来源 LaTeX 源文件（见"内容来源"表格）
+
+### 6. 各材料初稿生成
+
+**NZ/AU 职位**：生成每个文档时，必须**显式检查** fit_report 中对应文档的 Te Tiriti / AU Indigenous 建议是否已执行。
+
+#### Cover Letter
 
 - **格式模板**：`templates/cover_letter/`（Caramel 配色 OUCletter.cls）
 - **内容来源**：该校专属版（`overleaf-projects/Cover Letter/Cover Letter- {学校名}/`，如存在）优先；否则以模板结构为基础全新撰写
-- 基于 fit_report 建议定制，按 HCI 密度策略调整修辞
+- **修辞基调（由 dept_type_strategy 驱动）**：
+  - QR=high → 技术语言为主，系统/算法贡献放首位，用户研究作为"科学验证"而非核心贡献
+  - QR=medium → 技术为主，定性洞察作为设计决策依据（三段式：定性洞察→系统设计→量化评估）
+  - QR=low → 可直接呈现定性方法，强调社会影响和应用价值
+- **跨学院合作段落（IO 驱动）**：
+  - IO=high → 必须包含跨学院合作段落，点名潜在合作院系和教授，说明具体协作角度
+  - IO=medium → 若 JD 有跨学科信号则加入，否则可省略
+  - IO=low → 不需要跨学院叙述
+- **院系战略对齐**（参照 fit_report 院系战略对齐节）：加入 1-2 句与目标院系/学校最新战略方向的对齐叙述
+- **点名结构**（由 hci_density 驱动）：按 fit_report 点名建议排序
+- **经费叙事**（参照 dept_type_strategy.md §五）：在 research vision 段落末尾自然融入
 - **目标页数**：**2 页**（如 fit_report 中有 JD 覆盖值，以 JD 为准）
 - **OUCletter.cls 注意：** cls 已自动渲染信息栏，**不要**添加 tikz overlay，否则重叠。只需定义 `\signature{\name}` 供 closing 使用。
-- 同时生成 `cover_letter.notes.md`
+- 同时生成 `cover_letter.notes.md`（格式见 `references/notes_and_output_spec.md`）
 
-### Research Statement / Research Interests
+#### Research Statement / Research Interests
 
 - **格式模板**：`templates/research_statement/main.tex`（Caramel 配色，pdflatex 编译）
 - **内容来源**：`overleaf-projects/Faculty Position/Research Statement/Research Statement/main.tex`（读取各 section 真实内容）
-- TT 岗：完整版（**目标 4 页**），加 ARC/NSF/EPSRC 等对应地区的 grant 计划
+- TT 岗：完整版（**目标 5 页**），加 ARC/NSF/EPSRC 等对应地区的 grant 计划
 - NTT 岗：压缩为 Research Interests（**目标 2-3 页**），删 grant 蓝图，加 Research-Teaching Connection 章节
 - **如 fit_report 有 JD 覆盖值，以 JD 页数为准**
+- **技术伪装处理（由 dept_type_strategy 驱动）**：
+  - QR=high → 系统架构 > 用户引语；"硬化"处理：加算法/模型/系统贡献段落，量化指标（准确率/效率提升）优先
+  - QR=medium → 三段式叙述：定性洞察（formative study）→ 系统设计决策 → 量化评估结果
+  - QR=low → 直接呈现定性方法，清晰解释 formative study 的科学性，与系统贡献并举（V5 原则：不伪装，但框定）
+- **主推论文顺序**（参照 fit_report 主推论文节 + dept_type_strategy.md §四）：
+  - TOCHI 论文在所有类型院系均为首推（体现 HCI 的系统性贡献）
+  - 根据 QR/SB 等级调整 P2、P3 顺序
+- **院系战略对齐段落（Future Work 节）**：
+  - 参照 `faculty_data.json → strategic_intelligence.clusters`，在 Future Work/Research Vision 节加入与目标院系最相关 cluster 的战略方向对齐（1-2 句）
+  - SB=high → 强调系统基础设施和工具贡献方向
+  - SI=high → 强调社会影响、政策影响、应用落地方向
 - 同时生成 `research_statement.notes.md`
 
-### Teaching Statement
+#### Teaching Statement
 
 - **格式模板**：`templates/teaching_statement/main.tex`（Caramel 配色，pdflatex 编译）
 - **内容来源**：`overleaf-projects/Faculty Position/Teaching Statement/Teaching Statement/Teaching_Statement.tex`
 - **目标页数**：**2 页**（NTT 可扩展至 2.5 页；如 fit_report 有 JD 覆盖值，以 JD 为准）
-- 修改点：补充该校课程编号（来自 `department_courses`）、加量化数据、按密度策略调整课程顺序
+- **课程顺序（由 hci_density_strategy 驱动）**：
+  - pioneer 系列（QR=high）→ CS 核心课（数据结构/软工/算法）在前，HCI 课作为"可开设新课"在后
+  - builder 系列 → 互补课程在前（填补 HCI Track 缺口），列课程编号（来自 `department_courses`）
+  - specialist → 高阶/研究生 HCI 课在前，工作室教学法/PBL 理念突出
+- **院系特色课程**（来自 `faculty_data.json → department_courses`）：将 `sophia_can_teach: true` 的课程按以上优先级顺序提及（列课程编号）
+- **博士指导理念**（specialist 时必须包含 / builder 时建议包含）：说明如何培育未来研究者
 - 澳洲：加 40/40/20 声明
 - NTT：Teaching Statement 是核心材料，扩充 advising 描述
 - 同时生成 `teaching_statement.notes.md`
 
-### Diversity Statement（按需）
+#### Diversity Statement（按需）
 
 **触发条件：** JD 明确要求提交
 
@@ -116,11 +154,11 @@ Sophia 现有的真实申请材料文本，Step 3 从这里提取内容填入模
 | Australia | JD 要求时提交，否则不主动 |
 | UK / Europe | 较少要求，有时合并在 Cover Letter 中 |
 
-### CV（按需定制）
+#### CV（按需定制）
 
 **判断流程：**
 1. 读取 fit_report.md 中的"CV 变体选择"建议
-2. 查阅 `workflows/cv_strategy.md` 确认变体操作步骤
+2. 查阅 `strategies/cv_strategy.md` 确认变体操作步骤
 3. 执行定制：
 
 | 变体 | 操作 |
@@ -136,7 +174,7 @@ Sophia 现有的真实申请材料文本，Step 3 从这里提取内容填入模
 
 **注意：** 几乎所有申请都需要 CV，`base` 变体无需每次修改，直接在材料目录中放一份编译好的 PDF 即可（可从 `CV_latest/CV_latest/main.pdf` 直接复制）。只有当变体≠base 时才需要重新定制编译。
 
-### Selection Criteria Response（仅澳洲职位）
+#### Selection Criteria Response（仅澳洲职位）
 
 - **格式模板**：`templates/selection_criteria_response/main.tex`（Caramel 配色，与所有 Statement 一致）
 - 从 JD 中提取所有 Essential 和 Desirable criteria，逐条回应
@@ -145,57 +183,25 @@ Sophia 现有的真实申请材料文本，Step 3 从这里提取内容填入模
 - **这是澳洲申请的核心文件，不提交直接出局**
 - 同时生成 `selection_criteria_response.notes.md`
 
----
-
-## Step 3a 收尾：Humanizer 处理（强制）
+### 7. Humanizer 去 AI 化处理（强制）
 
 **REQUIRED SKILL: 在写入 .tex 文件之前，对所有新增/修改的英文正文使用 `humanizer` skill。**
 
-处理范围：
-- Cover Letter 所有段落
-- Research Statement/Interests 新增/修改段落（原文保留的无需重处理）
-- Teaching Statement 新增/修改段落
-- Diversity Statement content.tex 中的修改部分
-- Selection Criteria Response 所有 STAR 段落
+完整检查清单见 `references/humanizer_checklist.md`。
 
-不处理范围：LaTeX 命令/环境声明、参考文献、课程代码、人名、数字/统计数据
+**⚠ 顺序强制：Humanizer 必须在编译和页数压缩之前完成。** 不可先编译再做 humanizer——humanizer 修改可能改变文本量，导致页数验证结论失效。
 
-**Humanizer 检查清单（写入 .tex 前必须全部确认）：**
-- [ ] 无 "pivotal / crucial / underscore / showcase / delve / landscape / testament / fostering" 等 AI 高频词
-- [ ] 无 "serves as / stands as / marks a / represents a" 等 copula 替代结构（改用 "is/are"）
-- [ ] 无 "Not only...but also..." / "It's not just...it's..." 负向并行结构
-- [ ] Em dash（—）每份材料不超过 2 处
-- [ ] 无模糊引用（"Experts argue / Industry reports" 等）
-- [ ] 无假深度 -ing 结尾（"highlights / underscores / reflecting"）
-- [ ] 无过度 hedging（"could potentially / might arguably"）
-- [ ] 无对话残留（"I hope this helps / let me know"）
-- [ ] 结尾段有具体内容，非泛泛 "I look forward to..."
-- [ ] 句子长度有变化（非全是同等长度的复合句）
-- [ ] **【仅 NZ 职位】Te Tiriti 段落诚实度：**
-  - [ ] 无伪装成已有毛利社区合作经验的表述（如 "I have worked with iwi..."）
-  - [ ] Aspire 部分有具体学习计划，非空洞的 "I am committed to learning"
-  - [ ] 如引用了其他文化的平行经验，后面有"Te Tiriti 独特性"声明
-  - [ ] 未把 Sophia 的参与式设计/trustworthy AI 工作夸大为"Data Sovereignty 实践"
-  - [ ] 所有被 fit_report 标记需要 Te Tiriti 调整的文档是否都已执行（Cover Letter / Research Statement / Teaching Statement 三者必须逐一核查）
-- [ ] **【仅 AU 职位】AU Indigenous 段落诚实度：**
-  - [ ] 无伪装成已有原住民社区合作经验的表述（如 "I have worked with Aboriginal communities..."）
-  - [ ] 无混淆 Welcome to Country 与 Acknowledgement of Country（前者只能由 Traditional Custodians/Elders 主持）
-  - [ ] 无缺陷视角（deficit-based language）描述原住民，使用优势视角（Strengths-based）
-  - [ ] Aspire 部分有具体学习计划（引用学校具体培训项目或原住民研究中心），非空洞承诺
-  - [ ] 大写规则：Country / Elders / Traditional Custodians / First Nations / Dreaming 在原住民语境中首字母大写
-  - [ ] 无将 NZ 条约术语错误套用到 AU 语境（不可说 "treaty obligations"）
-  - [ ] 所有被 fit_report 标记需要 AU Indigenous 调整的文档是否都已执行（Cover Letter / Research Statement / Teaching Statement / KSC Response 四者必须逐一核查）
+**并行化：** 多份材料（CL / RS / TS）可同时启动 subagent 并行检查，每个 subagent 负责一份材料的 humanizer 审核。所有材料通过后再统一进入编译阶段。
 
----
+### 8. 编译 PDF 与页数验证
 
-## Step 3b: 复制模板 + 填入内容 + 编译 PDF + 验证页数
+**执行顺序（严格按此顺序）：**
 
-**执行流程：**
-
-1. 从 `templates/{doc_type}/` 复制完整 LaTeX 项目到 `output/{school_id}/{dept_id}/materials/{材料名}/`
-2. 用 Step 3a 生成的 .tex 内容**替换**复制后目录中对应的 .tex 文件
-3. 将 `templates/sophia-statement.sty` 复制到各材料目录（或用相对路径 `../../sophia-statement.sty` 引用）
-4. 编译 PDF：
+1. Humanizer 检查全部通过（step 7）
+2. 从 `templates/{doc_type}/` 复制完整 LaTeX 项目到 `output/{school_id}/{dept_id}/materials/{材料名}/`
+3. 用 step 6 生成的 .tex 内容**替换**复制后目录中对应的 .tex 文件
+4. 将 `templates/sophia-statement.sty` 复制到各材料目录（或用相对路径 `../../sophia-statement.sty` 引用）
+5. 编译 PDF（各材料可并行执行）：
 
    | 材料 | 编译器 | 命令 |
    |------|--------|------|
@@ -206,147 +212,18 @@ Sophia 现有的真实申请材料文本，Step 3 从这里提取内容填入模
    | CV | xelatex | `xelatex main.tex && xelatex main.tex` |
    | Selection Criteria | pdflatex | `pdflatex main.tex && pdflatex main.tex` |
 
-5. **⚠ 页数验证（编译成功后必须执行）：**
+6. **⚠ 页数验证（编译成功后必须执行）**：完整 PDF 微调策略见 `references/pdf_tuning_guide.md`
 
-   用 `pdfinfo` 获取实际页数：
-   ```bash
-   pdfinfo output.pdf | grep Pages
-   # 或
-   python3 -c "import subprocess; r=subprocess.run(['pdfinfo','main.pdf'],capture_output=True,text=True); print([l for l in r.stdout.splitlines() if 'Pages' in l])"
-   ```
+### 9. 同校多系一致性检查
 
-   | 材料 | 目标 | 超出处理 | 明显不足处理 |
-   |------|------|---------|------------|
-   | Cover Letter | 2 页 | 精简段落，优先删 Service 段细节 | < 1.5 页：提示补充 Fit 段 |
-   | Research Statement | 4 页（TT）| 精简 Background 铺垫，删次要 subsection | < 3 页：提示补充 Future Plans |
-   | Teaching Statement | 2 页 | 精简 Mentorship 或 Course list | < 1.5 页：提示补充 |
-   | Diversity Statement | 1 页（默认）| 精简 Service 段；若 2 页目标则精简 Plans | < 0.8 页：提示补充 |
-   | Selection Criteria | 无固定 | 不触发，按 criteria 数量自然延伸 | — |
-
-   **超出处理分两层：先做 PDF-aware 微调（不改内容），再做内容精简。**
-
-   ---
-
-   ### 第一层：PDF-aware 排版微调（不改写内容）
-
-   编译后先检查**最后一页的实际行数**（用 `pdftotext` 或肉眼判断）。如果最后一页只有少量行（≤ 页面高度的 1/4），说明只需挤掉几行就能消除整页溢出——此时优先用排版手段，不删内容：
-
-   **微调手段（按推荐顺序）：**
-
-   | # | 手段 | 命令/操作 | 效果 | 适用场景 |
-   |---|------|----------|------|---------|
-   | T1 | **段落挤行** | 在溢出附近的长段落末尾加 `\looseness=-1` | 让该段少排 1 行 | 最常用，几乎无视觉差异 |
-   | T2 | **缩小段间距** | `\setlength{\parskip}{0.25em}`（局部或全局） | 每段间省 ~1pt | 段落多时效果累积显著 |
-   | T3 | **压缩列表间距** | `\setlist{itemsep=0.1em, parsep=0pt}` | 列表项更紧凑 | 有 itemize/enumerate 时 |
-   | T4 | **收紧 section 间距** | `\titlespacing*{\section}{0pt}{0.6em}{0.2em}` | 每个 section 省 ~2pt | section 多时 |
-   | T5 | **压缩图片周围空白** | wrapfigure 内 `\vspace{-1.5em}` 或减小图片宽度 | 图片周围回收空间 | RS 含图时 |
-   | T6 | **微调页边距** | geometry 选项 top/bottom 各减 0.05in | 每页多 ~2 行 | 差 2-3 行时 |
-
-   **操作流程：**
-   1. 编译 → `pdfinfo` 检查页数
-   2. 如超出目标且最后一页 ≤ 1/4 满 → 尝试 T1-T6（通常 T1+T2 即可）
-   3. 重新编译 → 再检查
-   4. 如果微调后仍超出 → 进入第二层（内容精简）
-
-   ---
-
-   ### 第二层：内容精简（改写/删除文本）
-
-   PDF-aware 微调无法解决时（超出 > 半页），按以下优先级精简内容：
-
-   1. 删除或缩短"背景铺垫"段（读者已知的领域常识）
-   2. 合并相似 subsection
-   3. 缩短 Future Plans（保留 2-3 句而非完整段落）
-   4. 压缩 Service/Outreach 段到 1-2 句
-   5. 如仍超出：在 step3_summary.md 标注 `⚠ 页数超出，Sophia 需进一步精简`
-
-   ---
-
-   **明显不足判断标准**：实际页数 < 目标页数 × 0.75（如目标 4 页但只有 3 页以下）
+如 `related_applications` 字段存在，执行一致性检查。完整格式见 `references/notes_and_output_spec.md`。
 
 ---
 
-## notes.md 格式（强制，不可简化）
+## 产出物清单
 
-notes.md 是给 Sophia 审核的"修改日志"，必须让她无需打开 .tex 文件就能理解所有修改。
+完整产出物清单格式见 `references/notes_and_output_spec.md`。
 
-```markdown
-# {材料名} 修改说明 -- {学校}
+## notes.md 格式
 
-## 生成日期
-
-## 总体策略
-<!-- 2-3 句话说明整体定制方向和关键定位决策 -->
-
-## 参考资料清单
-| # | 类型 | 资料 | 链接/路径 |
-|---|------|------|-----------|
-| R1 | 区域规则卡 | {地区}规则卡 Section X（行号）| region_knowledge/regions/{region}.md L58-138 |
-| R2 | Fit Report | 匹配分析 | output/{school}/{dept}/fit_report.md |
-| R3 | Sophia 材料 | Research Statement | overseas_pipeline/materials/Research_Statement.md |
-<!-- 必须标注具体章节/行号 -->
-
-## 逐段修改说明
-
-### 1. {段落标识} [NEW / MODIFIED / UNCHANGED]
-**原文：** > 引用原始文本（新增标注"无对应原文"）
-**修改为：** > 引用修改后的关键句子
-**原因：**
-- 引用 [R1: 具体章节/行号] ...
-
-### N. 未修改部分
-<!-- 必须列出所有未修改的主要段落，说明保留原因 -->
-
-## 样式说明与 Debug 记录
-<!-- 编译器选择、字体、编译问题修复 -->
-
-## 给 Sophia 的审核重点
-<!-- 3-5 条具体可操作的审核项，非泛泛"请审核" -->
-```
-
-**notes.md 质量自检（Step 3 完成前）：**
-- [ ] 每个修改段落都有原文 vs 修改的对比
-- [ ] 每个修改原因都引用了具体参考资料编号和章节
-- [ ] 未修改的部分也有说明（为什么保留）
-- [ ] 有编译/样式说明
-- [ ] "给 Sophia 的审核重点"包含具体可操作的审核项
-
----
-
-## 同校多系一致性检查
-
-如 `related_applications` 字段存在，在每份 notes.md 末尾追加：
-
-```markdown
-## 同校多系一致性检查
-- 本校另一份申请：{department}（{strategy} 策略）
-- 核心叙事一致性：✅/⚠ {说明}
-- 侧重点差异：本系版（{简述}）vs 另一系版（{简述}）
-- ⚠ 注意：{具体提醒}
-```
-
----
-
-## 产出物清单（step3_summary.md 记录）
-
-```
-materials/
-├── Cover Letter/
-│   ├── main.tex / main.pdf          ✅/❌
-│   └── cover_letter.notes.md
-├── Research Statement/              ✅/❌（或 Research Interests/）
-│   ├── main.tex / main.pdf
-│   └── research_statement.notes.md
-├── Teaching Statement/              ✅/❌
-│   ├── Teaching_Statement.tex / .pdf
-│   └── teaching_statement.notes.md
-├── Diversity Statement/             ✅/❌/不提交（JD 未要求）
-│   ├── main.tex / main.pdf
-│   └── diversity_statement.notes.md
-├── CV/                              ✅/❌/直接复制（base 变体）
-│   ├── main.tex / main.pdf
-│   └── cv.notes.md
-└── Selection Criteria Response/     ✅/❌/不适用（非澳洲）
-    ├── selection_criteria_response.tex / .pdf
-    └── selection_criteria_response.notes.md
-```
+完整 notes.md 格式规范见 `references/notes_and_output_spec.md`。

@@ -2,3 +2,5 @@
 分院系策略
 提醒Sophia找澳洲新西兰老师，提取他们申请过程中的implicitknowlege
 job_filling READEME.md编写
+
+教授pdf下载：支持ieee/acm付费论文（可能要接scihub)

@@ -1,106 +1,160 @@
-# University of Auckland — School of Computer Science 规则卡
+# 院系规则卡：University of Auckland — School of Computer Science
 
-## 元信息
-- school_id: university_of_auckland
-- dept_id: cs
-- region: new_zealand
-- version: v1
-- last_updated: 2026-02-20
-- status: draft
+**school_id**: university_of_auckland  
+**dept_id**: cs  
+**region**: new_zealand  
+**last_updated**: 2026-02-20  
+**status**: draft (Step 1 generated, Step 2 pending)
 
 ---
 
-## 1. 基本信息
+## 基本信息
 
-| 项目 | 内容 |
-|---|---|
-| 学校 | University of Auckland (Waipapa Taumata Rau) |
-| 院系 | School of Computer Science (Te Kura Mātai Rorohiko) |
-| 别名 | UoA CS |
-| 地点 | Auckland, New Zealand |
-| 类型 | 公立 |
-| 招聘主页 | https://jobs.smartrecruiters.com/TheUniversityOfAuckland/ |
-| 院系主页 | https://www.auckland.ac.nz/en/science/about-the-faculty/school-of-computer-science.html |
-
----
-
-## 2. 与地区卡差异（覆盖规则）
-
-| 规则 | 地区卡默认 | 本系覆盖 | 证据 |
-|---|---|---|---|
-| Lecturer 薪资 | NZD ~85-100k/年 | $99,788 - $112,730 NZD（略高于地区卡范围） | JD |
-| 养老金 | 6% KiwiSaver | 6.75% superannuation（更优） | JD: "Up to 6.75% company superannuation" |
-| 年假 | 地区卡未注明 | 5 周年假 | JD: "five weeks' annual leave" |
-| Te Tiriti 声明 | 必须提交 | JD 未明确要求单独声明，但多次提及 Māori/Pasifika 承诺 | JD equity section |
-| 申请材料 | 标准学术 | CV, Cover Letter, Teaching Philosophy, Research Statement | JD: "beneficial" = 强烈建议 |
+| 字段 | 值 |
+|------|-----|
+| 正式名称 | Te Kura Mātai Rorohiko / School of Computer Science |
+| 成立年份 | 1981 |
+| 大学 | Waipapa Taumata Rau / University of Auckland |
+| QS ranking (CS 2024) | #99 |
+| QS ranking (overall 2025) | #65 |
+| 教职规模 | 75+ academic staff |
+| 学院 | Faculty of Science |
+| 校区 | Auckland City Campus |
 
 ---
 
-## 3. 关键决策人
+## 职位信息（2026 Data Science/AI Lecturer）
 
-| 阶段 | 姓名 | 职务 | 范围 | 证据 |
-|---|---|---|---|---|
-| 初筛/面试 | Giovanni Russello | Head of School, Professor | 全系 | JD contact person |
-| 委员会 | 未知 | 搜索委员会 | 全系 | 标准流程推测 |
-
----
-
-## 4. HCI 生态与合作
-
-- 目标系 HCI 密度：few (3 人)
-- 学院范围 HCI 密度：few (1 人)
-- 策略：builder
-- 关键合作人：
-  - Danielle Lottridge（CS, Associate Prof, HCI/Human Factors/Emotion — high overlap）
-  - Jiamou Liu（CS, Associate Prof, NLP/Trustworthy AI/Social Computing — high overlap）
-  - Paul Denny（CS, Professor, CS Education/AI in Education/LLM Evaluation — high overlap）
-  - Michael Witbrock（CS, Professor, NLP/Reasoning/AI Social Impact — medium overlap）
-  - Jingfeng Zhang（CS, Lecturer, Trustworthy ML — medium overlap）
-  - Yun Suen Pai（CS, Senior Lecturer, HCI/XR/Physiological Computing — medium overlap）
-- 跨系合作：
-  - Mark Billinghurst（Bioengineering, Professor, AR/VR/Empathic Computing）
-  - Suranga Nanayakkara（Bioengineering, Associate Prof, Human-centered ML）
+| 字段 | 值 |
+|------|-----|
+| 职位 JD URL | https://jobs.smartrecruiters.com/TheUniversityOfAuckland/744000101730179-lecturer-data-science-ai-school-of-computer-science- |
+| Ref | REF38990C |
+| 级别（合同名） | Lecturer（实际 Grade: Senior Lecturer） |
+| 合同类型 | Permanent, Full-time |
+| 薪资 | NZD $99,788 – $112,730 |
+| 截止日期 | 2026-03-31 |
+| 联系人 | Prof. Giovanni Russello (g.russello@auckland.ac.nz) |
+| 申请材料 | CV、Cover Letter、Teaching Statement、Research Statement |
 
 ---
 
-## 5. 教学与课程
+## 院系画像（dept_profile）
 
-- 课程目录：https://study.auckland.ac.nz/ （需登录查看完整列表）
-- 可教授的现有课：
-  - COMPSCI 345 Human-Computer Interaction（核心匹配）
-  - COMPSCI 361 Machine Learning（AI/ML 方法）
-  - COMPSCI 367 Artificial Intelligence（trustworthy AI 角度）
-  - COMPSCI 760 Datamining and Machine Learning（研究生）
-  - DATASCI 399 Capstone: Data Science（指导 HCI/AI 项目）
-  - COMPSCI 399 Capstone: Computer Science（指导 HCI 项目）
-- 可提出的新课：
-  - Human-AI Collaboration（设计、构建和评估协作 AI 系统）
-  - Data Science for Social Good（结合定性和混合方法的应用数据科学）
+### 官方分类：`cs`
 
----
+### 四维评估
 
-## 6. 风险与待确认
+| 维度 | 等级 | 主要依据 |
+|------|------|---------|
+| 定量严谨性 (QR) | **medium** | AI/ML cluster 强但 HCI cluster 大（8人）；JD 无"mathematical foundations"要求 |
+| 跨学科开放度 (IO) | **medium** | AI/ML 组描述提 cognitive sciences/philosophy；JD 列 AI for health/sustainability；无明确 interdisciplinary 要求 |
+| 系统构建偏好 (SB) | **medium** | JD 含 MLOps/data engineering；同时强调 research-informed teaching；HCI 存在表明研究方法多元 |
+| 社会影响关注度 (SI) | **medium** | JD 明确列 "Responsible and trustworthy AI"；Treaty of Waitangi 义务；Māori/Pasifika 支持 |
 
-- 已确认：
-  - Lecturer 是永久全职职位（非 fixed-term）
-  - 75+ 学术人员，CS QS 排名 99（2024）
-  - 有独立的 HCI Lab（hci.auckland.ac.nz）和 ML Group（ml.auckland.ac.nz）
-  - JD 明确列出 "Responsible and trustworthy AI" 为感兴趣领域
-  - 截止日期 2026-03-31
-- 待确认：
-  - 新西兰 Lecturer 的 promotion pathway（地区卡确认 NZ 无 tenure 制度，permanent 即保障）
-  - 该校签证支持政策（international applicants）
-  - 是否有 startup package / research funding support
-  - 搜索委员会具体成员
-  - 是否要求 Position Description（JD 提到 SharePoint 链接但需 UoA 账号访问）
+### HCI 密度
+
+| 层级 | 等级 | 人数 | 成员 |
+|------|------|------|------|
+| 目标系 (CS) | **many** | ~7（更新：Lottridge 已离开去 AUT） | 见下方教职列表 |
+| 全院 | **none** | 0 跨系 | — |
+| 策略 | **specialist** | — | Sophia 以 HCI 专家身份加入成熟团队 |
 
 ---
 
-## 7. 同校复用记录
+## 教职列表（HCI Cluster，基于院系页面 2026-02-20）
 
-- 无同校前序院系
+| 姓名 | 职级 | overlap | 备注 |
+|------|------|---------|------|
+| **Yun Suen Pai** | Dr | **high** | CSCW 2025 "Introspectus AI"(AI-driven dialogue+reflection)；TOCHI, CHI, IMWUT；VR+AI+affective computing |
+| Robert Amor | Prof | low | HCI cluster head; 具体方向待确认 |
+| Allan Fowler | Dr | low | Games-based learning |
+| ~~Danielle Lottridge~~ | ~~Assoc Prof~~ | — | **已移至 AUT**（院系页面未更新） |
+| Mark van der Klei | Dr | low | HCI；具体方向待确认 |
+| Jim Warren | Prof | medium | 健康信息学 + 对话代理 + XAI；2025 新作：chatbot 疗愈关系(JMIR)、GPT-4o 情感解释(Nature npj)、XAI 理论(arXiv)；发表于 JMIR/npj/arXiv（非 CHI 体系）|
+| Gerald Weber | Dr | **low** ↓ | 注视交互(gaze)为主，近年以 WebAssembly/数据库为主，无 Human-AI 交集；个别分析后下调 |
+| Burkhard Wuensche | Assoc Prof | low | HCI+AI；cross-cluster（HCI+AI/ML+Computing Ed） |
+
+## 教职列表（AI/ML Cluster，部分）
+
+| 姓名 | 职级 | overlap | 备注 |
+|------|------|---------|------|
+| Gillian Dobbie | Prof | low | Data science, databases, data mining |
+| Yun Sing Koh | Prof | low | Data streams, fairness in ML, recommender systems |
+| Mark Gahegan | Prof | low | Geospatial data mining |
+| Michael Witbrock | Prof | low | General AI, knowledge representation |
+| Jingfeng Zhang | Dr | low | Adversarial learning |
+| Jiamou Liu | Assoc Prof | low | Multi-agent systems, computational social science |
+| Miao Qiao | Dr | none | Graph data management |
+| Ninh Pham | Dr | none | ML algorithms |
+| (其余 ~10+ AI/ML 成员) | — | none | 暂未个别分析 |
 
 ---
 
-## 变更记录
-- 2026-02-20：初始化（Step 1 Research）
+## 研究 Clusters
+
+| Cluster | 与 Sophia 相关性 | 关键信息 |
+|---------|----------------|---------|
+| Human-Computer Interaction | **high** | Yun Suen Pai (CSCW); HCI methods, VR, affective computing, AI-driven dialogue |
+| AI & Machine Learning | **medium** | ML Group (ml.auckland.ac.nz); NLP, fairness, sustainability; 无直接 Human-AI collaboration 方向 |
+| Cybersecurity | low | 网安为主；JD 提及 AI for cybersecurity |
+| Computing Education | low | CS 教育研究；Fowler, Tempero, Denny 等；Sophia 可教相关课程但非研究方向 |
+| Computational Biology | none | 生信为主 |
+| Computer Networks | none | 网络/移动计算 |
+| Computer Vision | none | 图像处理 |
+| Software Engineering | none | 软件工程 |
+| Theoretical CS | none | 理论计算机 |
+
+---
+
+## Te Tiriti 学校信号
+
+**school_signal**: `strong`  
+**assessed_date**: 2026-02-20
+
+| 证据 | 来源 |
+|------|------|
+| "Our fundamental principles reflect our foundational relationship with tangata whenua and our commitment to Te Tiriti" | UoA Strategic Plan |
+| 大学双语名称：Waipapa Taumata Rau；战略框架：Waipapa framework | 战略计划制度化 |
+| Te Ao Māori Principles 核心化：Manaakitanga, Whanaungatanga, Kaitiakitanga | 战略计划 §Te Ao Māori |
+| 招聘程序 §47：同等实力候选人中 Māori/equity group 优先录用 | Academic Recruitment Procedures |
+| 招聘程序 §31：面试 whānau 安排，PVC(Māori) 咨询 | Academic Recruitment Procedures |
+| Tuākana Māori and Pacific support programme（旗舰项目） | JD + 院系页面 |
+
+**学校专有术语**：Waipapa framework、Manaakitanga、Whanaungatanga、Kaitiakitanga、Tuākana
+
+---
+
+## 申请战略备注
+
+- **HCI 密度策略**：`specialist`（成熟 HCI 团队，Sophia 以专家定位进入，而非先驱者）
+- **Te Tiriti 策略**：`strong`（boilerplate × strong school = strong；Auckland 面试必考 Treaty 题）
+- **院系维度**：medium QR/IO/SB/SI → 可用 HCI + AI 双语言叙述，无需过度技术化
+- **点名首选**：Yun Suen Pai（CSCW 2025 "Introspectus AI" — 直接交集；3 篇论文已下载）
+- **次选**：Jim Warren（chatbot 疗愈关系 + GPT-4o 情感解释 + XAI；3 篇论文已下载）
+- **不推荐**：Gerald Weber（注视交互/系统研究，无 Human-AI 交集，overlap 已下调为 low）
+- **注意**：Danielle Lottridge 已离开 UoA，不得在申请材料中将其列为 UoA 合作伙伴
+
+---
+
+## 课程体系（已验证 2026-02-20）
+
+| 课程代码 | 名称 | 级别 | Sophia 相关性 |
+|----------|------|------|--------------|
+| COMPSCI 345 | Human-computer Interaction | UG Stage 3 | 直接教学领域 |
+| COMPSCI 361 | Machine Learning | UG Stage 3 | JD 核心方向 |
+| COMPSCI 367 | Artificial Intelligence | UG Stage 3 | JD 核心方向 |
+| COMPSCI 704 | Fundamentals in HCI | PG Stage 7 | 直接教学领域 |
+| COMPSCI 705 | Advanced Topics in HCI | PG Stage 7 | 可开设 Human-AI 专题 |
+| COMPSCI 703 | Generalising AI | PG Stage 7 | 可教授 AI 方面 |
+| DATASCI 100 | Data Science for Everyone | UG Stage 1 | JD 要求 foundational DS |
+
+⚠ COMPSCI 330 不存在；HCI 本科课为 **COMPSCI 345**。
+
+---
+
+## 已知问题（待验证）
+
+- [ ] Danielle Lottridge 是否正式更新了离职？UoA 院系页面是否需要更新？
+- [x] ~~课程目录编号待手动确认~~ → 已通过 WebSearch 验证（2026-02-20）
+- [ ] 其余 AI/ML cluster 成员（约 10+ 人）未个别分析
+- [x] ~~School 是否有专门的 Data Science 课程序列（DATASCI 前缀）？~~ → 是，DATASCI 100 已确认

@@ -11,6 +11,8 @@ cd overseas_pipeline
 claude --dangerously-skip-permissions
 ```
 
+> **模型选择建议**：Step 1 涉及大量网页爬取，token 消耗大，建议用 **Sonnet** 节省费用；Step 2/3 需要深度推理和写作，建议切换到 **Opus**。在 Claude Code 中输入 `/model` 即可切换。
+
 启动后直接用中文告诉 Claude 你要做什么，例如：
 
 ```

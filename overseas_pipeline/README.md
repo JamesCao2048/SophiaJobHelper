@@ -65,12 +65,27 @@ overseas_pipeline/
 ├── README.md                    ← 本文件
 ├── CLAUDE.md                    ← AI 指令（不需要手动修改）
 ├── workflows/                   ← 各步骤详细流程（AI 自动读取）
-│   ├── step1_research.md        ← Step 1 执行规范
+│   ├── step1_research.md        ← Step 1 总入口（Phase 概览 + 分派）
+│   ├── step1/                   ← Step 1 子步骤（AI 按 Phase 按需读取）
+│   │   ├── step1a_setup.md          ← Phase A: 初始化与数据准备
+│   │   ├── step1b_scrape_analyze.md ← Phase B: 爬取与分析
+│   │   ├── step1c_profiling.md      ← Phase C: 分类与画像
+│   │   └── step1d_regional_signals.md ← Phase D: 地区信号（NZ/AU）
 │   ├── step2_analysis.md        ← Step 2 执行规范
 │   ├── step3_materials.md       ← Step 3 执行规范
-│   └── cv_strategy.md           ← CV 变体选择说明
+│   └── references/              ← 参考文件（JSON schema、模板、检查清单）
+│       ├── faculty_data_schema.md     ← faculty_data.json 完整格式
+│       ├── data_quality_spec.md       ← 数据质量分级标准
+│       ├── regional_signal_schemas.md ← Te Tiriti / AU Indigenous JSON 格式
+│       ├── fit_report_template.md     ← fit_report.md 完整模板
+│       ├── step2_message_templates.md ← 页数偏差 / 规则冲突对话模板
+│       ├── humanizer_checklist.md     ← Humanizer 去 AI 化检查清单
+│       ├── pdf_tuning_guide.md        ← PDF 排版微调策略
+│       └── notes_and_output_spec.md   ← notes.md 格式 + 产出物清单
 ├── src/                         ← 爬取工具代码（AI 自动调用）
-│   ├── faculty_scraper.py
+│   ├── page_scraper.py             ← 爬取院系页面 & JD 原文
+│   ├── faculty_scraper.py          ← 教授个人信息抓取 & 论文下载
+│   ├── web_fetch_utils.py          ← 五层 fallback 通用抓取工具
 │   ├── course_catalog_scraper.py
 │   └── hci_density_classifier.py
 ├── templates/                   ← LaTeX 格式模板（Caramel 配色，Step 3 使用）
@@ -83,7 +98,9 @@ overseas_pipeline/
 │   └── knowledge/
 │       └── department_rule_card_template.md  ← 院系规则卡模板
 ├── strategies/
-│   └── hci_density_strategy.md  ← HCI 策略说明（AI 读取）
+│   ├── hci_density_strategy.md  ← HCI 密度策略（AI 读取）
+│   ├── dept_type_strategy.md    ← 院系类型四维策略（AI 读取）
+│   └── cv_strategy.md           ← CV 变体选择说明（AI 读取）
 └── output/                      ← ★ 所有产出物在这里（见下方）
     ├── university_of_auckland/
     │   └── cs/                  ← cs = Computer Science 院系
@@ -133,6 +150,18 @@ claude --dangerously-skip-permissions
 启动后，Claude Code 的工作目录固定在 `overseas_pipeline/`，所有文件路径都基于此目录解析。
 
 > **注意**：`--dangerously-skip-permissions` 允许 AI 自动执行文件读写、运行脚本等操作，无需逐一确认。这是本流水线的设计前提，在受信任的本地环境中使用是安全的。
+
+### 推荐模型选择
+
+不同步骤对模型的需求不同，合理切换可节省大量 token 费用：
+
+| 步骤 | 推荐模型 | 原因 |
+|------|----------|------|
+| **Step 1** 院系研究 | **Sonnet** | 大量网页爬取，重复性任务，token 消耗大，Sonnet 性价比更高 |
+| **Step 2** 匹配分析 | **Opus** | 需要深度推理，综合判断 JD 与你的材料的匹配度 |
+| **Step 3** 材料生成 | **Opus** | 写作质量要求高，Opus 生成的英文更地道、论证更严密 |
+
+**切换方法**：在 Claude Code 聊天界面输入 `/model`，然后从弹出的列表中选择目标模型。
 
 ---
 

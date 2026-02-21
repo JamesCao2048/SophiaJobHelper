@@ -2,6 +2,11 @@
 
 本文件被 Step 2（分析）和 Step 3（材料生成）读取，根据目标院系 HCI 研究者密度指导申请材料的修辞策略。
 
+**与 `dept_type_strategy.md` 的分工：**
+- **本文件负责**：点名策略（点谁）、课程呈现顺序、Teaching Statement 结构
+- **dept_type_strategy.md 负责**：技术伪装程度、术语体系、主推论文、经费叙事
+- Step 2/3 先读 dept_type_strategy 确定基调，再读本文件叠加点名/课程细节
+
 ## 一、密度等级定义
 
 | level | 人数 | 含义 |
@@ -22,16 +27,20 @@
 
 ## 三、各策略详细指南
 
+> ⚠ **重要**：以下每个策略的 Cover Letter 指南**仅覆盖点名和定位相对已有 HCI 教授的策略**。
+> 技术伪装程度（用多硬核的语言）和经费叙事方向，由 `dept_type_strategy.md` 的四维评分决定。
+> 同一密度策略在不同维度组合下的语气可能完全不同：
+> - `pure_pioneer` + `quantitative_rigor=high` → 全面技术语言
+> - `pure_pioneer` + `quantitative_rigor=low` → 可适当用社科语言，重点论证 HCI 的增量价值
+
 ### pure_pioneer（target=none, faculty=none）
 
 **人设：** 开拓者。院系所有评委都是非 HCI 人士。
 
 #### Cover Letter
-- 全面技术伪装：避免 "HCI"、"用户体验" 等感性词汇
-  - ✅ "human-in-the-loop computing" / "interactive systems architecture"
-  - ❌ "UX research" / "design thinking"
-- 论证 HCI 对院系的**增量价值**：可申请社科/医学基金（传统 CS 难触及）
-- 点名目标系内有研究交集的教授（即使非 HCI 方向）
+- 点名目标系内有研究交集的教授（即使非 HCI 方向）——这是唯一的锚点
+- 论证 HCI 对院系的**增量价值**：方法论互补、可申请额外经费来源（具体见 dept_type_strategy §五）
+- 语言硬核程度：参见 `dept_type_strategy.md §二 2.1` quantitative_rigor 维度
 
 #### Research Statement
 - "硬化"处理：系统架构图 > 用户引语；强调算法/模型/系统贡献

@@ -24,20 +24,17 @@ course_catalog_scraper.py -- Step 1 辅助：课程体系抓取
 
 import argparse
 import json
-import os
 import re
 import sys
 from datetime import datetime
 from pathlib import Path
 
 try:
-    import requests
+    from web_fetch_utils import fetch_with_fallback, log
 except ImportError:
-    print("ERROR: pip install requests", file=sys.stderr)
-    sys.exit(1)
-
-TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
-TIMEOUT = 20
+    import os
+    sys.path.insert(0, os.path.dirname(__file__))
+    from web_fetch_utils import fetch_with_fallback, log
 
 HCI_COURSE_KEYWORDS = [
     "hci", "human-computer", "interaction design", "user experience",
@@ -45,154 +42,6 @@ HCI_COURSE_KEYWORDS = [
     "interface", "user interface", "human-ai", "conversational",
     "visualization", "information design", "human centered",
 ]
-
-BROWSER_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.9",
-}
-
-
-def log(msg: str) -> None:
-    print(f"[course_scraper] {msg}", flush=True)
-
-
-def is_blocked(text: str) -> bool:
-    signals = [
-        "just a moment", "cf_chl_opt", "challenge-platform",
-        "enable javascript", "403 forbidden", "access denied",
-    ]
-    low = text.lower()
-    return any(s in low for s in signals) or len(text) < 300
-
-
-def layer1_curl(url: str) -> str | None:
-    log(f"Layer 1: curl {url}")
-    try:
-        resp = requests.get(url, headers=BROWSER_HEADERS, timeout=TIMEOUT)
-        if is_blocked(resp.text):
-            log("  ✗ Blocked (Cloudflare/WAF)")
-            return None
-        log(f"  ✓ {len(resp.text)} chars")
-        return resp.text
-    except Exception as e:
-        log(f"  ✗ {e}")
-        return None
-
-
-def layer1_5_jina(url: str) -> str | None:
-    log("Layer 1.5: Jina Reader")
-    try:
-        resp = requests.get(
-            f"https://r.jina.ai/{url}",
-            headers={"User-Agent": BROWSER_HEADERS["User-Agent"]},
-            timeout=TIMEOUT,
-        )
-        if len(resp.text) < 500 or "error" in resp.text[:200].lower():
-            log("  ✗ Jina returned short/error response")
-            return None
-        log(f"  ✓ {len(resp.text)} chars")
-        return resp.text
-    except Exception as e:
-        log(f"  ✗ {e}")
-        return None
-
-
-def layer2_tavily_extract(url: str) -> str | None:
-    if not TAVILY_API_KEY:
-        log("  ⚠ TAVILY_API_KEY not set, skipping Layer 2")
-        return None
-    log("Layer 2: Tavily Extract")
-    try:
-        resp = requests.post(
-            "https://api.tavily.com/extract",
-            headers={
-                "Authorization": f"Bearer {TAVILY_API_KEY}",
-                "Content-Type": "application/json",
-            },
-            json={"urls": [url]},
-            timeout=TIMEOUT,
-        )
-        data = resp.json()
-        results = data.get("results", [])
-        if not results:
-            log("  ✗ No results")
-            return None
-        content = results[0].get("raw_content", "")
-        log(f"  ✓ {len(content)} chars")
-        return content
-    except Exception as e:
-        log(f"  ✗ {e}")
-        return None
-
-
-def layer2_5_wayback(url: str) -> str | None:
-    log("Layer 2.5: Wayback Machine")
-    for year in ["2024", "2023"]:
-        wayback_url = f"https://web.archive.org/web/{year}/{url}"
-        try:
-            resp = requests.get(wayback_url, headers=BROWSER_HEADERS, timeout=TIMEOUT)
-            if not is_blocked(resp.text) and len(resp.text) > 500:
-                log(f"  ✓ {len(resp.text)} chars (year={year})")
-                return resp.text
-        except Exception as e:
-            log(f"  ✗ year={year}: {e}")
-    return None
-
-
-def layer3_tavily_search(url: str, school: str = "") -> str | None:
-    if not TAVILY_API_KEY:
-        log("  ⚠ TAVILY_API_KEY not set, skipping Layer 3")
-        return None
-    domain = url.split("/")[2] if "//" in url else url
-    query = f"site:{domain} course catalog {school} courses list"
-    log(f"Layer 3: Tavily Search '{query}'")
-    try:
-        resp = requests.post(
-            "https://api.tavily.com/search",
-            headers={
-                "Authorization": f"Bearer {TAVILY_API_KEY}",
-                "Content-Type": "application/json",
-            },
-            json={"query": query, "max_results": 5, "include_raw_content": True},
-            timeout=TIMEOUT,
-        )
-        data = resp.json()
-        results = data.get("results", [])
-        if not results:
-            log("  ✗ No results")
-            return None
-        combined = "\n\n".join(r.get("content", "") for r in results)
-        log(f"  ✓ {len(combined)} chars from {len(results)} results")
-        return combined
-    except Exception as e:
-        log(f"  ✗ {e}")
-        return None
-
-
-def fetch_with_fallback(url: str, school: str = "") -> tuple[str | None, str]:
-    """五层 fallback，返回 (content, layer_used)"""
-    content = layer1_curl(url)
-    if content:
-        return content, "layer1_curl"
-
-    content = layer1_5_jina(url)
-    if content:
-        return content, "layer1.5_jina"
-
-    content = layer2_tavily_extract(url)
-    if content:
-        return content, "layer2_tavily_extract"
-
-    content = layer2_5_wayback(url)
-    if content:
-        return content, "layer2.5_wayback"
-
-    content = layer3_tavily_search(url, school)
-    if content:
-        return content, "layer3_tavily_search"
-
-    return None, "all_failed"
 
 
 def is_hci_course(name: str) -> bool:

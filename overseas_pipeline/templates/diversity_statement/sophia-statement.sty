@@ -24,6 +24,7 @@
 \RequirePackage[utf8]{inputenc}
 \RequirePackage[T1]{fontenc}
 \RequirePackage{lmodern}              % lmodern font (matches CV_latest)
+\RequirePackage{anyfontsize}          % allows arbitrary font sizes (e.g., 10.5pt)
 \RequirePackage{microtype}
 \RequirePackage[dvipsnames]{xcolor}
 \RequirePackage{hyperref}
@@ -37,6 +38,9 @@
 \RequirePackage[a4paper, top=0.65in, bottom=0.65in, left=0.75in, right=0.75in]{geometry}
 \setlength{\parskip}{0.35em}
 \setlength{\parindent}{0pt}
+
+% --- Body font size: 10.5pt (documentclass stays at 11pt for heading scale) ---
+\AtBeginDocument{\fontsize{10.5}{13.5}\selectfont}
 
 % ============================================================
 % COLOR DEFINITIONS — Coffee title + Caramel accent (from CV_latest)
