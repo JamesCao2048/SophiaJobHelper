@@ -1,30 +1,35 @@
 #!/usr/bin/env python3
 """
-faculty_scraper.py -- Step 1: Research
+faculty_scraper.py -- 教授个人信息抓取 & 论文下载
 
-使用 Jina Reader API 将院系 faculty 页面转成 markdown，供 Claude Code 分析。
-Python 只负责数据获取，分析和结构化由 Claude Code 完成。
+针对 faculty_data.json 中的教授列表，批量抓取个人主页、Google Scholar、DBLP，
+以及按需下载论文 PDF。Python 负责数据获取，研究背景分类（major/minor）由 LLM 完成。
 
 用法:
-  # 爬取院系 faculty 页面
-  python faculty_scraper.py --school "Monash University" --url "https://www.monash.edu/it/about-us/schools/dsai/people"
+  # 批量抓取教授个人信息（主页 + Scholar + DBLP）
+  python faculty_scraper.py profiles \
+    --input output/{school_id}/{dept_id}/faculty_data.json \
+    --output-dir output/{school_id}/{dept_id}/raw/faculty_profiles/
 
-  # 爬取职位 JD
-  python faculty_scraper.py --url "https://careers.pageuppeople.com/..." --output-type raw
+  # 下载单篇论文 PDF
+  python faculty_scraper.py download-paper \
+    --url "https://arxiv.org/pdf/2401.12345" \
+    --output output/{school_id}/{dept_id}/papers/Smith_2024_title.pdf
 
-  # 指定输出目录（默认: overseas_pipeline/output/{school_id}/raw/）
-  python faculty_scraper.py --school "Monash University" --url "..." --output-dir /path/to/dir
+  # 批量下载论文（从 JSON manifest）
+  python faculty_scraper.py download-papers \
+    --manifest papers_to_download.json \
+    --output-dir output/{school_id}/{dept_id}/papers/
 """
 
 import argparse
 import json
-import os
 import re
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote_plus
 
 try:
     import requests
@@ -32,98 +37,45 @@ except ImportError:
     print("ERROR: requests library not found. Please run: pip install requests", file=sys.stderr)
     sys.exit(1)
 
+try:
+    from web_fetch_utils import fetch_with_fallback, log, BROWSER_HEADERS
+except ImportError:
+    import os
+    sys.path.insert(0, os.path.dirname(__file__))
+    from web_fetch_utils import fetch_with_fallback, log, BROWSER_HEADERS
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
-JINA_API_BASE = "https://r.jina.ai/"
-REQUEST_TIMEOUT = 30  # seconds
-REQUEST_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; SophiaJobHelper/1.0)",
-    "Accept": "text/plain",
-    # Jina Reader 免费版不需要 API key，加了 Accept 头会返回更干净的 markdown
-}
-
-# 从本文件位置推断项目根目录
-SCRIPT_DIR = Path(__file__).parent
-PROJECT_ROOT = SCRIPT_DIR.parent.parent  # overseas_pipeline/src/ -> overseas_pipeline/ -> project root
-OUTPUT_BASE = SCRIPT_DIR.parent / "output"
+PAPER_DOWNLOAD_TIMEOUT = 60
+POLITE_DELAY = 1.5  # seconds between requests
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
-def school_to_id(school_name: str) -> str:
-    """将学校名转换为 snake_case ID，如 'Monash University' -> 'monash_university'"""
-    s = school_name.lower().strip()
+def slugify(name: str, max_len: int = 40) -> str:
+    """Convert a name to a filesystem-safe slug."""
+    s = name.lower().strip()
     s = re.sub(r"[^a-z0-9\s]", "", s)
     s = re.sub(r"\s+", "_", s)
-    return s
+    return s[:max_len]
 
 
-def log(msg: str):
-    """打印带时间戳的日志"""
-    ts = datetime.now().strftime("%H:%M:%S")
-    print(f"[{ts}] {msg}", flush=True)
-
-
-def fetch_via_jina(url: str) -> tuple[str | None, str]:
-    """
-    通过 Jina Reader API 获取页面内容，转为 markdown。
-    返回 (markdown_content, method_used)
-    """
-    jina_url = JINA_API_BASE + url
-    log(f"Fetching via Jina Reader: {jina_url}")
-
-    try:
-        resp = requests.get(
-            jina_url,
-            headers=REQUEST_HEADERS,
-            timeout=REQUEST_TIMEOUT
-        )
-        resp.raise_for_status()
-        content = resp.text
-        log(f"  ✓ Got {len(content)} chars via Jina Reader")
-        return content, "jina_reader"
-    except requests.exceptions.Timeout:
-        log(f"  ✗ Jina Reader timeout after {REQUEST_TIMEOUT}s")
-        return None, "timeout"
-    except requests.exceptions.HTTPError as e:
-        log(f"  ✗ Jina Reader HTTP error: {e}")
-        return None, f"http_error_{e.response.status_code}"
-    except requests.exceptions.RequestException as e:
-        log(f"  ✗ Jina Reader error: {e}")
-        return None, f"error_{type(e).__name__}"
-
-
-def fetch_direct(url: str) -> tuple[str | None, str]:
-    """
-    直接 HTTP GET（兜底），返回 HTML 文本。
-    Jina Reader 失败时使用。
-    """
-    log(f"Trying direct fetch: {url}")
-    try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        }
-        resp = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
-        resp.raise_for_status()
-        log(f"  ✓ Direct fetch got {len(resp.text)} chars (HTML)")
-        return resp.text, "direct_html"
-    except Exception as e:
-        log(f"  ✗ Direct fetch failed: {e}")
-        return None, f"direct_error"
+def extract_lastname(full_name: str) -> str:
+    """Extract last name from full name for file naming."""
+    parts = full_name.strip().split()
+    titles = {"prof.", "professor", "dr.", "dr", "associate", "assistant"}
+    clean_parts = [p for p in parts if p.lower().rstrip(".") not in titles]
+    return clean_parts[-1] if clean_parts else parts[-1]
 
 
 def save_content(content: str, output_path: Path, url: str, method: str):
-    """保存内容到文件，并创建 sources 记录"""
     output_path.parent.mkdir(parents=True, exist_ok=True)
-
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(content)
-
-    # 同时写一个 meta 文件记录来源
     meta_path = output_path.with_suffix(".meta.json")
     meta = {
         "source_url": url,
@@ -134,119 +86,266 @@ def save_content(content: str, output_path: Path, url: str, method: str):
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2, ensure_ascii=False)
 
-    log(f"  → Saved to: {output_path}")
-    log(f"  → Meta: {meta_path}")
-
 
 # ---------------------------------------------------------------------------
-# Main scraping logic
+# Profile scraping
 # ---------------------------------------------------------------------------
 
-def scrape_page(url: str, output_path: Path) -> bool:
+def build_scholar_url(scholar_link: str) -> str | None:
+    """Extract or build a Google Scholar profile URL."""
+    if not scholar_link:
+        return None
+    if "scholar.google" in scholar_link:
+        return scholar_link
+    return None
+
+
+def build_dblp_search_url(name: str) -> str:
+    """Build a DBLP author search URL."""
+    return f"https://dblp.org/search?q={quote_plus(name)}"
+
+
+def scrape_single_profile(faculty: dict, output_dir: Path) -> dict:
     """
-    爬取单个页面，尝试 Jina Reader，失败则直接 fetch。
-    成功返回 True，失败返回 False。
+    Scrape all available pages for a single faculty member.
+    Returns a result dict with status for each source.
     """
-    # Layer 1: Jina Reader
-    content, method = fetch_via_jina(url)
+    name = faculty.get("name", "Unknown")
+    lastname = extract_lastname(name)
+    slug = slugify(lastname)
 
-    # Layer 2: Direct fetch (fallback)
-    if content is None:
-        log("Jina Reader failed, trying direct fetch...")
-        content, method = fetch_direct(url)
-
-    if content is None:
-        log(f"  ✗ All methods failed for: {url}")
-        return False
-
-    save_content(content, output_path, url, method)
-    return True
-
-
-def scrape_faculty_page(school_name: str, url: str, output_dir: Path) -> dict:
-    """
-    爬取院系 faculty 主页面（以及可能的子页面）。
-    返回爬取结果摘要。
-    """
-    school_id = school_to_id(school_name)
-    raw_dir = output_dir / school_id / "raw"
-    raw_dir.mkdir(parents=True, exist_ok=True)
-
-    log(f"=== Step 1: Research -- {school_name} ===")
-    log(f"School ID: {school_id}")
-    log(f"Target URL: {url}")
-    log(f"Output dir: {raw_dir}")
-
-    results = {
-        "school": school_name,
-        "school_id": school_id,
-        "urls_scraped": [],
-        "urls_failed": [],
-        "output_dir": str(raw_dir),
-        "scrape_date": datetime.now().strftime("%Y-%m-%d"),
+    result = {
+        "name": name,
+        "homepage": {"status": "skipped", "path": None},
+        "scholar": {"status": "skipped", "path": None},
+        "dblp": {"status": "skipped", "path": None},
     }
 
-    # 主页面
-    main_filename = "faculty_page.md"
-    main_path = raw_dir / main_filename
-    success = scrape_page(url, main_path)
+    # 1. Homepage
+    homepage = faculty.get("homepage")
+    if homepage:
+        out_path = output_dir / f"{slug}_homepage.md"
+        if out_path.exists():
+            log(f"  [{name}] homepage: already exists, skipping")
+            result["homepage"] = {"status": "cached", "path": str(out_path)}
+        else:
+            content, method = fetch_with_fallback(homepage)
+            if content:
+                save_content(content, out_path, homepage, method)
+                log(f"  [{name}] homepage: ✓ ({method}, {len(content)} chars)")
+                result["homepage"] = {"status": "ok", "path": str(out_path), "method": method}
+            else:
+                log(f"  [{name}] homepage: ✗ ({method})")
+                result["homepage"] = {"status": "failed", "method": method, "url": homepage}
+            time.sleep(POLITE_DELAY)
 
-    if success:
-        results["urls_scraped"].append(url)
+    # 2. Google Scholar
+    scholar_url = build_scholar_url(faculty.get("google_scholar", ""))
+    if scholar_url:
+        # Append sortby=pubdate to get recent publications
+        sep = "&" if "?" in scholar_url else "?"
+        recent_url = f"{scholar_url}{sep}sortby=pubdate&view_op=list_works&pagesize=20"
+        out_path = output_dir / f"{slug}_scholar.md"
+        if out_path.exists():
+            log(f"  [{name}] scholar: already exists, skipping")
+            result["scholar"] = {"status": "cached", "path": str(out_path)}
+        else:
+            content, method = fetch_with_fallback(recent_url)
+            if content:
+                save_content(content, out_path, recent_url, method)
+                log(f"  [{name}] scholar: ✓ ({method}, {len(content)} chars)")
+                result["scholar"] = {"status": "ok", "path": str(out_path), "method": method}
+            else:
+                log(f"  [{name}] scholar: ✗ ({method})")
+                result["scholar"] = {"status": "failed", "method": method, "url": recent_url}
+            time.sleep(POLITE_DELAY)
+
+    # 3. DBLP
+    dblp_url = build_dblp_search_url(name)
+    out_path = output_dir / f"{slug}_dblp.md"
+    if out_path.exists():
+        log(f"  [{name}] dblp: already exists, skipping")
+        result["dblp"] = {"status": "cached", "path": str(out_path)}
     else:
-        results["urls_failed"].append(url)
+        content, method = fetch_with_fallback(dblp_url)
+        if content:
+            save_content(content, out_path, dblp_url, method)
+            log(f"  [{name}] dblp: ✓ ({method}, {len(content)} chars)")
+            result["dblp"] = {"status": "ok", "path": str(out_path), "method": method}
+        else:
+            log(f"  [{name}] dblp: ✗ ({method})")
+            result["dblp"] = {"status": "failed", "method": method, "url": dblp_url}
+        time.sleep(POLITE_DELAY)
 
-    # 写摘要
-    summary_path = output_dir / school_id / "scrape_summary.json"
+    return result
+
+
+def cmd_profiles(args):
+    """Batch scrape faculty profiles from faculty_data.json."""
+    input_path = Path(args.input)
+    if not input_path.exists():
+        print(f"ERROR: {input_path} not found", file=sys.stderr)
+        sys.exit(1)
+
+    with open(input_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    faculty_list = data.get("faculty", [])
+    if not faculty_list:
+        print("WARNING: No faculty entries found in JSON", file=sys.stderr)
+        sys.exit(0)
+
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    log(f"=== Faculty Profile Scraping ===")
+    log(f"Input: {input_path}")
+    log(f"Faculty count: {len(faculty_list)}")
+    log(f"Output dir: {output_dir}")
+
+    results = []
+    stats = {"ok": 0, "failed": 0, "cached": 0, "skipped": 0}
+
+    for i, faculty in enumerate(faculty_list):
+        name = faculty.get("name", f"Unknown_{i}")
+        log(f"\n[{i+1}/{len(faculty_list)}] {name}")
+        result = scrape_single_profile(faculty, output_dir)
+        results.append(result)
+
+        for source in ["homepage", "scholar", "dblp"]:
+            status = result[source]["status"]
+            if status in stats:
+                stats[status] += 1
+
+    # Write summary
+    summary_path = output_dir / "_scrape_summary.json"
+    summary = {
+        "scrape_date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "input_file": str(input_path),
+        "faculty_count": len(faculty_list),
+        "stats": stats,
+        "results": results,
+    }
     with open(summary_path, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2, ensure_ascii=False)
+        json.dump(summary, f, indent=2, ensure_ascii=False)
 
-    return results
+    # Print summary
+    print(f"\n{'='*60}")
+    print(f"Profile scraping complete!")
+    print(f"  OK: {stats['ok']}  |  Cached: {stats['cached']}  |  Failed: {stats['failed']}  |  Skipped: {stats['skipped']}")
+    print(f"  Summary: {summary_path}")
 
+    # Report failures for web-fetch-fallback skill
+    failed_urls = []
+    for r in results:
+        for source in ["homepage", "scholar", "dblp"]:
+            if r[source]["status"] == "failed" and "url" in r[source]:
+                failed_urls.append({"name": r["name"], "source": source, "url": r[source]["url"]})
 
-def scrape_raw(url: str, output_dir: Path) -> bool:
-    """
-    爬取任意 URL（用于 JD 等），保存为原始内容。
-    """
-    log(f"=== Fetching raw content ===")
-    log(f"URL: {url}")
-
-    # 从 URL 生成文件名
-    parsed = urlparse(url)
-    filename = re.sub(r"[^a-z0-9]", "_", parsed.path.lower()).strip("_")[:50]
-    if not filename:
-        filename = "page"
-    output_path = output_dir / f"{filename}.md"
-
-    return scrape_page(url, output_path)
+    if failed_urls:
+        print(f"\n⚠ {len(failed_urls)} URLs failed (use web-fetch-fallback skill for these):")
+        for item in failed_urls:
+            print(f"  - [{item['name']}] {item['source']}: {item['url']}")
 
 
 # ---------------------------------------------------------------------------
-# Additional scraping for individual faculty homepages
+# Paper downloading
 # ---------------------------------------------------------------------------
 
-def scrape_faculty_profiles(school_id: str, faculty_urls: list[str], output_dir: Path):
+def download_single_paper(url: str, output_path: Path) -> bool:
+    """Download a single paper PDF."""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if output_path.exists():
+        log(f"  Already exists: {output_path.name}")
+        return True
+
+    # Try direct download first (most paper sources support this)
+    try:
+        headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+        resp = requests.get(url, headers=headers, timeout=PAPER_DOWNLOAD_TIMEOUT, stream=True)
+        resp.raise_for_status()
+
+        # Check content type
+        content_type = resp.headers.get("Content-Type", "")
+        if "pdf" in content_type or url.endswith(".pdf"):
+            with open(output_path, "wb") as f:
+                for chunk in resp.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            size_kb = output_path.stat().st_size / 1024
+            log(f"  ✓ Downloaded: {output_path.name} ({size_kb:.0f} KB)")
+            return True
+        else:
+            # Might be HTML redirect (e.g., ACM paywall)
+            log(f"  ✗ Not a PDF (Content-Type: {content_type})")
+            return False
+
+    except requests.exceptions.RequestException as e:
+        log(f"  ✗ Download failed: {e}")
+        return False
+
+
+def cmd_download_paper(args):
+    """Download a single paper PDF."""
+    output_path = Path(args.output)
+    log(f"=== Download Paper ===")
+    log(f"URL: {args.url}")
+    log(f"Output: {output_path}")
+
+    success = download_single_paper(args.url, output_path)
+    if not success:
+        print(f"\n✗ Failed to download. Try manually or use web-fetch-fallback skill.", file=sys.stderr)
+        sys.exit(1)
+
+
+def cmd_download_papers(args):
+    """Batch download papers from a JSON manifest.
+
+    Manifest format:
+    [
+      {"url": "https://arxiv.org/pdf/...", "filename": "Smith_2024_title.pdf"},
+      ...
+    ]
     """
-    爬取单个 faculty 的主页（用于获取更详细的研究信息）。
-    在 Claude Code 分析主页面后，如果需要更多信息时调用。
-    """
-    profiles_dir = output_dir / school_id / "raw" / "profiles"
-    profiles_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = Path(args.manifest)
+    if not manifest_path.exists():
+        print(f"ERROR: {manifest_path} not found", file=sys.stderr)
+        sys.exit(1)
 
-    for url in faculty_urls:
-        parsed = urlparse(url)
-        name_slug = re.sub(r"[^a-z0-9]", "_", parsed.path.lower()).strip("_")[-30:]
-        output_path = profiles_dir / f"{name_slug}.md"
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        papers = json.load(f)
 
-        if output_path.exists():
-            log(f"  → Already scraped: {output_path.name}")
-            continue
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-        success = scrape_page(url, output_path)
-        if not success:
-            log(f"  ✗ Failed to scrape: {url}")
+    log(f"=== Batch Paper Download ===")
+    log(f"Manifest: {manifest_path}")
+    log(f"Papers: {len(papers)}")
+    log(f"Output dir: {output_dir}")
 
-        time.sleep(1)  # polite delay
+    ok, failed = 0, 0
+    failed_list = []
+
+    for i, paper in enumerate(papers):
+        url = paper["url"]
+        filename = paper.get("filename", f"paper_{i}.pdf")
+        output_path = output_dir / filename
+
+        log(f"\n[{i+1}/{len(papers)}] {filename}")
+        success = download_single_paper(url, output_path)
+        if success:
+            ok += 1
+        else:
+            failed += 1
+            failed_list.append({"url": url, "filename": filename})
+        time.sleep(POLITE_DELAY)
+
+    print(f"\n{'='*60}")
+    print(f"Download complete: {ok} ok, {failed} failed")
+    if failed_list:
+        print(f"\n⚠ Failed downloads:")
+        for item in failed_list:
+            print(f"  - {item['filename']}: {item['url']}")
 
 
 # ---------------------------------------------------------------------------
@@ -255,70 +354,46 @@ def scrape_faculty_profiles(school_id: str, faculty_urls: list[str], output_dir:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="faculty_scraper.py -- Overseas Pipeline Step 1: Research\n"
-                    "使用 Jina Reader API 将页面转为 markdown，供 Claude Code 分析。",
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        description="faculty_scraper.py -- 教授个人信息抓取 & 论文下载",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
-    parser.add_argument("--url", required=True, help="要爬取的页面 URL（院系 faculty 页面或职位 JD URL）")
-    parser.add_argument("--school", help="学校名（如 'Monash University'）；--output-type=raw 时可省略")
-    parser.add_argument(
-        "--output-type",
-        choices=["faculty", "raw"],
-        default="faculty",
-        help="输出类型：faculty（完整 Step 1 流程）或 raw（仅爬取内容，不创建学校目录）"
+    # profiles
+    p_profiles = subparsers.add_parser(
+        "profiles",
+        help="Batch scrape faculty profiles (homepage + Scholar + DBLP)",
     )
-    parser.add_argument(
-        "--output-dir",
-        default=str(OUTPUT_BASE),
-        help=f"输出根目录（默认: {OUTPUT_BASE}）"
+    p_profiles.add_argument("--input", required=True, help="Path to faculty_data.json")
+    p_profiles.add_argument("--output-dir", required=True, help="Output directory for profile markdown files")
+
+    # download-paper
+    p_single = subparsers.add_parser(
+        "download-paper",
+        help="Download a single paper PDF",
     )
-    parser.add_argument(
-        "--faculty-profiles",
-        nargs="*",
-        help="额外爬取的 faculty 主页 URL 列表（用空格分隔）"
+    p_single.add_argument("--url", required=True, help="Paper PDF URL")
+    p_single.add_argument("--output", required=True, help="Output file path")
+
+    # download-papers
+    p_batch = subparsers.add_parser(
+        "download-papers",
+        help="Batch download papers from a JSON manifest",
     )
+    p_batch.add_argument("--manifest", required=True, help="JSON manifest file path")
+    p_batch.add_argument("--output-dir", required=True, help="Output directory for paper PDFs")
 
     args = parser.parse_args()
-    output_dir = Path(args.output_dir)
 
-    if args.output_type == "faculty":
-        if not args.school:
-            parser.error("--school 参数在 --output-type=faculty 时必须提供")
-
-        results = scrape_faculty_page(args.school, args.url, output_dir)
-
-        print("\n" + "=" * 60)
-        print("爬取完成！")
-        print(f"  学校: {results['school']} ({results['school_id']})")
-        print(f"  成功: {len(results['urls_scraped'])} 页")
-        print(f"  失败: {len(results['urls_failed'])} 页")
-        print(f"  输出: {results['output_dir']}")
-        print()
-        print("下一步：在 Claude Code 中运行命令：")
-        print(f"  '分析 {results['school']}'")
-        print("  Claude Code 会读取爬取的 markdown，提取 faculty 信息，判断 overlap，")
-        print("  生成 faculty_data.json 和 fit_report.md")
-
-        if results["urls_failed"]:
-            print("\n⚠ 以下 URL 爬取失败，请手动 copy-paste 内容：")
-            for url in results["urls_failed"]:
-                print(f"  - {url}")
-
-        # 如果提供了 faculty profile URL，也一并爬取
-        if args.faculty_profiles and results.get("school_id"):
-            log("\n开始爬取 faculty 主页...")
-            scrape_faculty_profiles(results["school_id"], args.faculty_profiles, output_dir)
-
-    elif args.output_type == "raw":
-        raw_dir = output_dir / "raw_pages"
-        success = scrape_raw(args.url, raw_dir)
-        if success:
-            print(f"\n✓ 内容已保存到: {raw_dir}")
-        else:
-            print(f"\n✗ 爬取失败: {args.url}")
-            print("请手动访问此 URL 并将内容粘贴给 Claude Code。")
-            sys.exit(1)
+    if args.command == "profiles":
+        cmd_profiles(args)
+    elif args.command == "download-paper":
+        cmd_download_paper(args)
+    elif args.command == "download-papers":
+        cmd_download_papers(args)
+    else:
+        parser.print_help()
+        sys.exit(1)
 
 
 if __name__ == "__main__":
