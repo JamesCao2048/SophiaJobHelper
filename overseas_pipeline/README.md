@@ -86,6 +86,7 @@ overseas_pipeline/
 │   ├── page_scraper.py             ← 爬取院系页面 & JD 原文
 │   ├── faculty_scraper.py          ← 教授个人信息抓取 & 论文下载
 │   ├── web_fetch_utils.py          ← 五层 fallback 通用抓取工具
+│   ├── paper_metadata.py           ← 论文元数据提取（DBLP / Semantic Scholar）
 │   ├── course_catalog_scraper.py
 │   └── hci_density_classifier.py
 ├── templates/                   ← LaTeX 格式模板（Caramel 配色，Step 3 使用）
@@ -100,7 +101,9 @@ overseas_pipeline/
 ├── strategies/
 │   ├── hci_density_strategy.md  ← HCI 密度策略（AI 读取）
 │   ├── dept_type_strategy.md    ← 院系类型四维策略（AI 读取）
-│   └── cv_strategy.md           ← CV 变体选择说明（AI 读取）
+│   ├── cv_strategy.md           ← CV 变体选择说明（AI 读取）
+│   ├── nz_te_tiriti_strategy.md ← 新西兰 Te Tiriti 融入策略（AI 读取）
+│   └── au_indigenous_strategy.md← 澳洲 Indigenous 融入策略（AI 读取）
 └── output/                      ← ★ 所有产出物在这里（见下方）
     ├── university_of_auckland/
     │   └── cs/                  ← cs = Computer Science 院系
