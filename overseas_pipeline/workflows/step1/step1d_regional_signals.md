@@ -20,12 +20,12 @@ JSON 格式定义见 `../references/regional_signal_schemas.md`。
    - Desirable / Nice-to-have → `boilerplate`
    - 仅 EEO 样板 / 页脚 → `no_mention`
 4. 对每个命中词记录：原文文本 + 所在板块/bullet 位置
-5. 写入 `faculty_data.json → te_tiriti.jd_signal`
+5. 写入 `dept_data.json → te_tiriti.jd_signal`
 
 ### B. 学校信号检测
 
 1. 检查学校卡 `region_knowledge/schools/{school_id}/{dept_id}.md` 是否已有 `Te Tiriti 学校信号` 字段，且 `assessed_date` 在 6 个月内
-   - 如有 → 读取复用，写入 `faculty_data.json → te_tiriti.school_signal`，跳到 C
+   - 如有 → 读取复用，写入 `dept_data.json → te_tiriti.school_signal`，跳到 C
    - 如无或已过期 → 继续
 2. 查策略文件 §六 学校种子表，按 school_id 匹配已知条约页面 URL
 3. 爬取种子 URL：`python src/web_fetch_utils.py "种子URL" --search-hint "学校名 Te Tiriti"`
@@ -39,7 +39,7 @@ JSON 格式定义见 `../references/regional_signal_schemas.md`。
 8. **双写入：**
    - 写入 `region_knowledge/schools/{school_id}/{dept_id}.md → ## Te Tiriti 学校信号`
    - 写入 `output/{school_id}/{dept_id}/knowledge/{dept_id}.md`（同步）
-9. 写入 `faculty_data.json → te_tiriti.school_signal`
+9. 写入 `dept_data.json → te_tiriti.school_signal`
 
 ### C. 预判策略标签
 
@@ -55,7 +55,7 @@ JSON 格式定义见 `../references/regional_signal_schemas.md`。
    ⚠ NZ Te Tiriti 高级别信号（[strategy]），需用户审查后手动触发 Step 2
    ```
    > ⚠ 不得假设用户了解 NZ 文化背景。中断报告的目标是让从未接触过 Te Tiriti 的申请者也能理解其重要性和对材料准备的影响。
-3. 写入 `faculty_data.json → te_tiriti.strategy`
+3. 写入 `dept_data.json → te_tiriti.strategy`
 4. 留空 `te_tiriti.strategy_rationale`（Step 2 填充）
 5. 在 `step1_summary.md` 中追加一行：`Te Tiriti: JD=[level], School=[level] → [strategy]（初步）`
 6. **全量模式中断判定**：如 strategy ∈ {strong, full_treaty} → 全量模式下 pipeline 在 Step 1 完成后**自动中断**，不进入 Step 2，等待用户审查 step1_summary 后手动触发继续
@@ -75,12 +75,12 @@ JSON 格式定义见 `../references/regional_signal_schemas.md`。
    - Desirable / Nice-to-have / About the University → `boilerplate`
    - 仅 EEO 样板 / 页脚 → `no_mention`
 4. 对每个命中词记录：原文文本 + 所在板块/bullet 位置
-5. 写入 `faculty_data.json → au_indigenous.jd_signal`
+5. 写入 `dept_data.json → au_indigenous.jd_signal`
 
 ### B. 学校信号检测
 
 1. 检查学校卡 `region_knowledge/schools/{school_id}/{dept_id}.md` 是否已有 `AU Indigenous 学校信号` 字段，且 `assessed_date` 在 6 个月内
-   - 如有 → 读取复用，写入 `faculty_data.json → au_indigenous.school_signal`，跳到 C
+   - 如有 → 读取复用，写入 `dept_data.json → au_indigenous.school_signal`，跳到 C
    - 如无或已过期 → 继续
 2. 查策略文件 §八 学校种子表，按 school_id 匹配已知 RAP/Indigenous Strategy URL
 3. 爬取种子 URL：`python src/web_fetch_utils.py "种子URL" --search-hint "学校名 Indigenous strategy"`
@@ -94,13 +94,13 @@ JSON 格式定义见 `../references/regional_signal_schemas.md`。
 8. **双写入：**
    - 写入 `region_knowledge/schools/{school_id}/{dept_id}.md → ## AU Indigenous 学校信号`（格式见策略文件 §七 7.2）
    - 写入 `output/{school_id}/{dept_id}/knowledge/{dept_id}.md`（同步）
-9. 写入 `faculty_data.json → au_indigenous.school_signal`
+9. 写入 `dept_data.json → au_indigenous.school_signal`
 
 ### C. 预判策略标签
 
 1. 查策略文件 §二 矩阵，根据 jd_signal × school_signal 得出初步 strategy label
 2. 如为 `strong` 或 `full_rap` → **在 `step1_summary.md` 顶部标注中断警告**
-3. 写入 `faculty_data.json → au_indigenous.strategy`
+3. 写入 `dept_data.json → au_indigenous.strategy`
 4. 留空 `au_indigenous.strategy_rationale`（Step 2 填充）
 
 ### D. Step 1 Summary 新增行

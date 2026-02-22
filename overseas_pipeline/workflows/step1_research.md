@@ -13,7 +13,7 @@
 | Phase | 文件 | 内容 | 触发条件 | 主要输出物 |
 |-------|------|------|---------|-----------|
 | A | `step1/step1a_setup.md` | 初始化与数据准备 | 始终执行 | output 目录、JD 原文 |
-| B | `step1/step1b_scrape_analyze.md` | 爬取与分析 | 始终执行 | faculty_data.json、sources.md、papers/ |
+| B | `step1/step1b_scrape_analyze.md` | 爬取与分析 | 始终执行 | dept_data.json、faculty/、sources.md、papers/ |
 | C | `step1/step1c_profiling.md` | 分类与画像 | 始终执行 | 规则卡、HCI 密度、dept_profile、课程、data_quality.json |
 | D | `step1/step1d_regional_signals.md` | 地区信号检测 | region=new_zealand 或 australia | te_tiriti / au_indigenous 信号 |
 
@@ -27,6 +27,11 @@
 
 ---
 
-## faculty_data.json 格式
+## 数据文件格式
+
+- `dept_data.json`：院系级数据（metadata、job_posting、dept_profile、hci_density、strategic_intelligence、te_tiriti、teaching_context、decision_makers、data_quality、faculty_summary[]）
+- `faculty/{slug}.json`：个人 faculty 文件（name、title、homepage、clusters、research_interests、overlap_with_sophia、overlap_reason、research_background、overlapping_papers 等）
+
+`faculty_summary[]` 中每条记录包含 `file` 字段指向对应的 `faculty/{slug}.json`。
 
 完整 JSON schema 见 `references/faculty_data_schema.md`。

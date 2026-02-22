@@ -6,7 +6,7 @@
 
 ## 并行执行策略
 
-Phase B 完成（B4 `faculty_data.json` 写入后），**立即并行启动以下任务**：
+Phase B 完成（B4 `dept_data.json` + `faculty/` 写入后），**立即并行启动以下任务**：
 
 ```
 B4 完成
@@ -45,18 +45,18 @@ C1/C2/C3/C4/C5 全部完成 → C6（数据审查与补全）
 
 ```bash
 python overseas_pipeline/src/hci_density_classifier.py \
-  --input output/{school_id}/{dept_id}/faculty_data.json \
+  --input output/{school_id}/{dept_id}/dept_data.json \
   [--target-dept "{目标系名称}"]
 ```
 
-自动推断双层密度（target_dept + faculty_wide）和策略标签，写入 `faculty_data.json` 的 `hci_density` 字段。**agent 随后补充 `strategy_rationale`**（自然语言解释，检查边界情况）。
+自动推断双层密度（target_dept + faculty_wide）和策略标签，写入 `dept_data.json` 的 `hci_density` 字段。**agent 随后补充 `strategy_rationale`**（自然语言解释，检查边界情况）。
 
 ### C3. 生成院系四维画像（dept_profile）
 
 读取策略文件：`overseas_pipeline/strategies/dept_type_strategy.md §一`
 
 1. **官方分类**：从院系名称关键词匹配 `official_category`（cs/ischool/ds/aix/other）
-2. **建院背景**：爬取院系 About / History 页面，提取 `founding_year` / `founding_method` / `founding_motivation`
+2. **建院背景**：爬取院系 About / History 页面，提取 `founding.year` / `founding.method` / `founding.motivation`
 3. **四维评估**：综合以下信号，对每个维度评定 high/medium/low：
    - JD 内容（关键词、研究要求）
    - 院系名称 + 建院背景
@@ -65,7 +65,7 @@ python overseas_pipeline/src/hci_density_classifier.py \
    - 课程设置（C5 完成后可更新）
 4. **用户审核触发**：若维度存在不确定性（信号矛盾或置信度低），在 `step1_summary.md` 生成 `⚠ 院系维度需确认` 区块
 
-写入 `faculty_data.json → dept_profile`（格式见 `../references/faculty_data_schema.md`）
+写入 `dept_data.json → dept_profile`（格式见 `../references/faculty_data_schema.md`）。注意：维度使用嵌套结构 `{level, confidence, evidence}`；建院背景使用 `dept_profile.founding.{year,method,motivation}`；背景分布写入 `dept_profile.faculty_background_distribution`；补充说明写入 `dept_profile.notes`
 
 **step1_summary.md 中的院系画像报告格式：**
 
@@ -88,7 +88,7 @@ python overseas_pipeline/src/hci_density_classifier.py \
 
 读取策略文件：`overseas_pipeline/strategies/dept_type_strategy.md §一`
 
-**可并行执行**：A/B/C 三个子任务各开 subagent，主 Agent 等待汇总后写入 `faculty_data.json → strategic_intelligence`。
+**可并行执行**：A/B/C 三个子任务各开 subagent，主 Agent 等待汇总后写入 `dept_data.json → strategic_intelligence`。
 
 #### A. 学院级战略方向（始终执行）
 
@@ -102,7 +102,7 @@ python overseas_pipeline/src/hci_density_classifier.py \
 - 对每个 cluster 爬取子页面（`python src/web_fetch_utils.py "cluster URL"`），提取：
   - 最新项目（近 2 年）及研究方向
   - 成员列表（与 Phase B faculty 数据交叉对应）
-- 识别与 Sophia 最相关的 2-3 个 cluster，标记 `alignment_with_sophia`（high/medium/low）及原因
+- 识别与 Sophia 最相关的 2-3 个 cluster，标记 `sophia_alignment`（high/medium/low）及 `alignment_notes`
 - 原始内容保存到 `raw/cluster_{cluster_name}.md`
 - **C3 更新**：cluster 方向信息写入后，可修正对应维度评分（如 cluster 含 ethics/social center → SI 可能上调）
 
@@ -114,20 +114,20 @@ python overseas_pipeline/src/hci_density_classifier.py \
 - 爬取各学院 faculty 页面，找与 Sophia 研究有交集的教授
 - 记录合作角度（如"临床对话分析"、"教育技术评估"）
 
-**汇总后写入** `faculty_data.json → strategic_intelligence`（格式见 `../references/faculty_data_schema.md`）
+**汇总后写入** `dept_data.json → strategic_intelligence`（格式见 `../references/faculty_data_schema.md`）
 
 ### C5. 抓取课程目录
 
 ```bash
 python overseas_pipeline/src/course_catalog_scraper.py \
   --url "{目标系课程页面URL}" \
-  --output output/{school_id}/{dept_id}/faculty_data.json \
+  --output output/{school_id}/{dept_id}/dept_data.json \
   --school "{学校名}"
 ```
 
 五层 fallback 抓取课程列表：
 - 原始内容**始终保存**到 `output/{school_id}/{dept_id}/raw/course_catalog_raw.md`
-- 正则提取结果写入 `faculty_data.json` 的 `department_courses` 字段
+- 正则提取结果写入 `dept_data.json` 的 `teaching_context.department_courses` 字段
 - 如课程页面 URL 未知，用 Tavily 搜索 `site:{domain} course catalog`
 
 **⚠ 如果五层 fallback 全部失败（如 JS 渲染 + SSO 登录），必须使用 WebSearch 兜底：**
@@ -139,9 +139,9 @@ WebSearch: "{学校名} DATASCI courses"
 **禁止**使用"近似"课程编号——必须通过至少一种方式验证课程编号的真实存在性。
 
 **agent 随后审查**（参照 `overseas_pipeline/strategies/hci_density_strategy.md` 中的课程优先级逻辑）：
-- 若 `department_courses` 为空（正则提取失败），读取 `raw/course_catalog_raw.md` 直接识别课程
+- 若 `teaching_context.department_courses` 为空（正则提取失败），读取 `raw/course_catalog_raw.md` 直接识别课程
 - 识别 Sophia 能教的课，按 `hci_density.strategy` 对应的密度策略排序（density_strategy_priority 字段）
-- 将识别结果写回 `faculty_data.json` 的 `department_courses` 字段
+- 将识别结果写回 `dept_data.json` 的 `teaching_context.department_courses` 字段
 
 ### C6. 数据审查与补全
 

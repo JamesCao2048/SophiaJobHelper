@@ -76,7 +76,7 @@ overseas_pipeline/           ← 本模块（所有资源自包含）
 │   ├── step2_analysis.md
 │   ├── step3_materials.md
 │   └── references/                    ← 参考文件（JSON schema、模板、检查清单）
-│       ├── faculty_data_schema.md     ← faculty_data.json 完整格式
+│       ├── faculty_data_schema.md     ← dept_data.json + faculty/{slug}.json 完整格式
 │       ├── data_quality_spec.md       ← 数据质量分级标准 + 消息模板
 │       ├── regional_signal_schemas.md ← Te Tiriti + AU Indigenous JSON 格式
 │       ├── fit_report_template.md     ← fit_report.md 完整模板
@@ -114,8 +114,10 @@ region_knowledge/                  ← 区域知识库（项目根目录）
 ```
 output/{school_id}/
 ├── {dept_id}/                         ← 院系级目录（必须存在，单系学校也需要此层）
-│   ├── faculty_data.json              ← Step 1
-│   ├── faculty_data.sources.md        ← Step 1
+│   ├── dept_data.json                 ← Step 1（院系级元数据 + faculty 摘要索引）
+│   ├── dept_data.sources.md           ← Step 1
+│   ├── faculty/                       ← Step 1（每位教授独立文件）
+│   │   └── {slug}.json                ← 教授详细信息（背景、论文、研究兴趣）
 │   ├── data_quality.json              ← Step 1
 │   ├── knowledge/
 │   │   └── {dept_id}.md               ← 院系规则卡运行期副本（与 region_knowledge 双写入）
@@ -163,7 +165,7 @@ output/{school_id}/
 
 → **执行前先读取 `workflows/step2_analysis.md`**
 
-核心步骤：读取 faculty_data + 地区规则卡 → 爬取 JD → 规则冲突检查（冲突时必须暂停）→ 生成 fit_report.md
+核心步骤：读取 dept_data + faculty/*.json + 地区规则卡 → 爬取 JD → 规则冲突检查（冲突时必须暂停）→ 生成 fit_report.md
 
 ### Step 3 — 材料生成
 
