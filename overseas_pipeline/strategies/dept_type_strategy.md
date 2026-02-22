@@ -106,8 +106,28 @@
 
 **Major/Minor 判定规则：**
 - **major**：占该 faculty 近期发表（5 年内）的 ≥60%
-- **minor**：占 20–40%（明显的次要方向，minor 可为 null）
+- **minor**：占 15–40%（明显的次要方向，minor 可为 null）
 - 若主页无发表列表，通过 Google Scholar 或 DBLP 补充
+
+**分类信息来源优先级：**
+
+1. **venue**（确定大类，如 NeurIPS → `ml_theory`，UIST → `hci_systems`）
+2. **标题关键词**（区分同 venue 内的子类型，尤其是 CHI qual vs systems，见下表）
+3. **abstract**（有则补充验证，优先用于 CHI 和跨学科论文）
+
+**CHI 论文的 qual/systems 区分规则（title 关键词）：**
+
+CHI 本身同时发表定性研究和系统论文，须用标题关键词区分：
+
+| 判定场景 | 信号 | 归属 |
+|---------|------|------|
+| 标题含 systems 关键词 | system, tool, platform, interface, framework, prototype, pipeline, architecture, deployment, implementation | `hci_systems` |
+| 标题含 qual 关键词 | user study, interview, survey, qualitative, thematic, field study, diary, probe, lived experience, perception, understanding, how people | `hci_qual` |
+| 两类关键词均出现 | 看主体：以 system 为主体的评估 → `hci_systems`；以发现/理解为主体 → `hci_qual` |
+| 关键词不明确 + 有 abstract | 读 abstract：系统贡献为主 → `hci_systems`；洞察/发现为主 → `hci_qual` |
+| 关键词不明确 + 无 abstract | 默认归 `hci_qual`（保守估计，CHI 整体偏定性） |
+
+同样适用于 CSCW：其系统论文数量少，标题明确包含系统关键词时才归 `hci_systems`，否则默认 `hci_qual`。
 
 **对维度评估的影响（统计院系 faculty 的背景分布）：**
 - 半数以上为 `ml_theory` / `stats_ds` → QR 倾向 **high**

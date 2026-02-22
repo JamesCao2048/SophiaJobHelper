@@ -38,7 +38,7 @@ python3 -c "from src.web_fetch_utils import TAVILY_API_KEY; print('✅ TAVILY_AP
 - 列出已有的 `{dept_id}/` 子目录
 - 识别与当前院系 faculty 重叠的教授（joint appointment 或同校 HCI 教授）
 - 将有价值的论文 PDF **复制**到当前院系的 `papers/` 目录（不是 symlink）
-- 将已有院系的 `related_applications` 信息写入当前院系的 `faculty_data.json`
+- 将已有院系的 `related_applications` 信息写入当前院系的 `dept_data.json`
 - 在 step1_summary.md 中列出：从哪个已有院系复用了哪些论文
 
 **跨系 faculty 数据复用约定：**
@@ -93,4 +93,4 @@ python overseas_pipeline/src/page_scraper.py --url "{job_url}" --output-type raw
 - 输出文件命名：`raw/jd_main.md`；若 JD 有多页（如独立的 Selection Criteria 页），追加命名 `jd_ksc.md`、`jd_about.md` 等
 - 若脚本失败，使用 `web-fetch-fallback` skill 补救
 - 若 URL 不可访问（需登录/已关闭）：提示用户手动粘贴 JD 文本到 `raw/jd_main.md`
-- 写入 `faculty_data.json → job_url`（如尚未写入）
+- 写入 `dept_data.json → job_posting.job_url`（如尚未写入）

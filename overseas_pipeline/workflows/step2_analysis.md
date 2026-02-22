@@ -2,7 +2,7 @@
 
 ## 前提
 
-Step 1 已完成（`output/{school_id}/{dept_id}/faculty_data.json` 存在）
+Step 1 已完成（`output/{school_id}/{dept_id}/dept_data.json` 存在）
 
 ---
 
@@ -10,7 +10,7 @@ Step 1 已完成（`output/{school_id}/{dept_id}/faculty_data.json` 存在）
 
 ### 1. 加载院系数据
 
-读取 `output/{school_id}/{dept_id}/faculty_data.json`（含 `hci_density`、`department_courses`、`dept_profile`、`strategic_intelligence` 字段）
+读取 `output/{school_id}/{dept_id}/dept_data.json`（含 `hci_density`、`teaching_context`、`dept_profile`、`strategic_intelligence`、`faculty_summary[]` 字段）
 
 ### 2. 加载地区与院系规则卡
 
@@ -39,7 +39,7 @@ Step 1 已完成（`output/{school_id}/{dept_id}/faculty_data.json` 存在）
 - ❌ 缺失（Step 1 未执行或爬取失败）：立即补救
   ```bash
   python overseas_pipeline/src/page_scraper.py \
-    --url "{faculty_data.json → job_url}" --output-type raw \
+    --url "{dept_data.json → job_posting.url}" --output-type raw \
     --output-dir output/{school_id}/{dept_id}/raw/
   ```
   脚本失败则用 `web-fetch-fallback` skill，最终失败则请用户粘贴 JD 文本
@@ -68,12 +68,14 @@ Step 1 已完成（`output/{school_id}/{dept_id}/faculty_data.json` 存在）
 
 ### 6. 加载论文数据与 Sophia 现有材料
 
-**论文读取优先级**（对每位 high/medium faculty 的 `overlapping_papers[]`）：
+**Faculty 数据加载**：从 `dept_data.json → faculty_summary[]` 获取 high/medium overlap 教授列表，然后读取对应的 `faculty/{slug}.json` 获取完整详情（`overlapping_papers`、`overlap_confidence`、`overlap_notes`、`research_background` 等）。
+
+**论文读取优先级**（对每位 high/medium faculty 的 `faculty/{slug}.json → overlapping_papers[]`）：
 - 有 `local_pdf` → 读取 PDF 全文进行精读分析
 - 无 `local_pdf` 但有 `abstract` → 使用摘要进行分析（在 fit_report 注明"摘要分析，未读全文"）
 - 两者都无 → 仅凭标题和 `relevance` 做推断，在 fit_report 标注置信度为 low
 
-**overlap_confidence 降权规则**（读取 `faculty_data.json → overlap_confidence` 字段）：
+**overlap_confidence 降权规则**（读取 `faculty/{slug}.json → overlap_confidence` 字段）：
 - `high`：正常权重；可在 Cover Letter 和 Research Statement 中明确点名
 - `medium`：正常权重，但 fit_report 中注明"间接交集"；Cover Letter 点名时措辞保守
 - `low`：该教授在 fit_report 中标注 ⚠（证据偏弱）；在合作段落中降权或不列入；
@@ -93,19 +95,19 @@ Step 1 已完成（`output/{school_id}/{dept_id}/faculty_data.json` 存在）
 
 ### 8. NZ Te Tiriti 矩阵分析（条件：region=new_zealand）
 
-a. 读取 `faculty_data.json → te_tiriti` 块（Step 1 已填充的 jd_signal、school_signal、strategy）
+a. 读取 `dept_data.json → te_tiriti` 块（Step 1 已填充的 jd_signal、school_signal、strategy）
 b. 读取 Sophia 材料识别可 Claim 的经历锚点（`materials/Research_Statement.md`, `materials/Teaching_Statement.md`）
 c. 确认/调整策略标签：
    - 如需调整，在 `strategy_rationale` 中记录理由
    - 典型上调：JD 是 `boilerplate` 但已知该校（Auckland/VUW）面试必考条约题 → 上调一级
    - 典型维持：school_signal=`strong` 但 JD 无任何条约词 → 维持矩阵结果（不下调）
-d. 填充 `faculty_data.json → te_tiriti.strategy_rationale`
+d. 填充 `dept_data.json → te_tiriti.strategy_rationale`
 e. 在 fit_report 中生成 **Te Tiriti 评估** 专节（格式见 `references/fit_report_template.md`）
 f. **Per-document 建议必须为每个文档提供具体修辞指令**（不能只写 Cover Letter 建议而留空 Research Statement / Teaching Statement）
 
 ### 9. AU 原住民矩阵分析（条件：region=australia）
 
-a. 读取 `faculty_data.json → au_indigenous` 块（Step 1 已填充的 jd_signal、school_signal、strategy）
+a. 读取 `dept_data.json → au_indigenous` 块（Step 1 已填充的 jd_signal、school_signal、strategy）
 b. 读取 Sophia 材料识别可 Claim 的经历锚点（`materials/Research_Statement.md`, `materials/Teaching_Statement.md`）
 c. 确认/调整策略标签：
    - Agent 可上调**至多一级**，仅限 skip→subtle 或 subtle→moderate
@@ -114,7 +116,7 @@ c. 确认/调整策略标签：
    - 上调必须在 `strategy_rationale` 中注明理由
 d. 如策略为 `strong`：在 fit_report 中显示升级门槛验证提示（见策略文件 §三）
 e. 如策略为 `full_rap`：**暂停并询问用户确认**后才写入最终策略标签（见策略文件 §三）
-f. 填充 `faculty_data.json → au_indigenous.strategy_rationale`
+f. 填充 `dept_data.json → au_indigenous.strategy_rationale`
 g. 在 fit_report 中生成 **AU Indigenous 评估** 专节（格式见 `references/fit_report_template.md`）
 h. **Per-document 建议必须为每个文档提供具体修辞指令，含 KSC Response 建议**
 

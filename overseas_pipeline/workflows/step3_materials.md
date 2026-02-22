@@ -57,10 +57,10 @@ Sophia 现有的真实申请材料文本，Step 3 从这里提取内容填入模
 
 两者都必须读取：
 - `strategies/dept_type_strategy.md`（**优先**）
-  - 从 `faculty_data.json` 获取 `dept_profile.dimensions`（QR / IO / SB / SI）
+  - 从 `dept_data.json` 获取 `dept_profile.dimensions`（QR / IO / SB / SI）
   - 从 `fit_report.md` 的"院系类型策略分析"节确认：技术伪装程度、主推论文、经费叙事、术语体系
 - `strategies/hci_density_strategy.md`
-  - 从 `faculty_data.json` 获取 `hci_density.strategy` 和 `department_courses`
+  - 从 `dept_data.json` 获取 `hci_density.strategy` 和 `teaching_context`
   - 确认点名优先级和课程匹配顺序
 
 ### 5. 加载 LaTeX 内容来源
@@ -105,7 +105,7 @@ Sophia 现有的真实申请材料文本，Step 3 从这里提取内容填入模
   - TOCHI 论文在所有类型院系均为首推（体现 HCI 的系统性贡献）
   - 根据 QR/SB 等级调整 P2、P3 顺序
 - **院系战略对齐段落（Future Work 节）**：
-  - 参照 `faculty_data.json → strategic_intelligence.clusters`，在 Future Work/Research Vision 节加入与目标院系最相关 cluster 的战略方向对齐（1-2 句）
+  - 参照 `dept_data.json → strategic_intelligence.clusters`，在 Future Work/Research Vision 节加入与目标院系最相关 cluster 的战略方向对齐（1-2 句）
   - SB=high → 强调系统基础设施和工具贡献方向
   - SI=high → 强调社会影响、政策影响、应用落地方向
 - 同时生成 `research_statement.notes.md`
@@ -119,7 +119,7 @@ Sophia 现有的真实申请材料文本，Step 3 从这里提取内容填入模
   - pioneer 系列（QR=high）→ CS 核心课（数据结构/软工/算法）在前，HCI 课作为"可开设新课"在后
   - builder 系列 → 互补课程在前（填补 HCI Track 缺口），列课程编号（来自 `department_courses`）
   - specialist → 高阶/研究生 HCI 课在前，工作室教学法/PBL 理念突出
-- **院系特色课程**（来自 `faculty_data.json → department_courses`）：将 `sophia_can_teach: true` 的课程按以上优先级顺序提及（列课程编号）
+- **院系特色课程**（来自 `dept_data.json → teaching_context.department_courses`）：将 `sophia_can_teach: true` 的课程按以上优先级顺序提及（列课程编号）
 - **博士指导理念**（specialist 时必须包含 / builder 时建议包含）：说明如何培育未来研究者
 - 澳洲：加 40/40/20 声明
 - NTT：Teaching Statement 是核心材料，扩充 advising 描述

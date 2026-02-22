@@ -7,7 +7,7 @@
 
 ## Te Tiriti（NZ）
 
-### faculty_data.json te_tiriti 块格式
+### dept_data.json te_tiriti 块格式
 
 ```json
 "te_tiriti": {
@@ -59,7 +59,7 @@
 
 ## AU Indigenous
 
-### faculty_data.json au_indigenous 块格式
+### dept_data.json au_indigenous 块格式
 
 ```json
 "au_indigenous": {
